@@ -63,6 +63,7 @@ func Open(name string) error {
 
 	if name == testPortName {
 		SerialCur.Port = newTestPort()
+		chOp <- true
 		return nil
 	}
 

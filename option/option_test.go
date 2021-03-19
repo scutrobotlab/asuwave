@@ -9,10 +9,10 @@ func TestCheckCanSave(t *testing.T) {
 		want bool
 	}{
 		{1, SaveVariableProj, true},
-		{2, SaveVariableModi, true},
-		{4, SaveVariableRead, true},
+		{2, SaveVariableRead, true},
+		{4, SaveVariableModi, true},
 		{1, SaveVariableModi, false},
-		{3, SaveVariableRead, false},
+		{5, SaveVariableRead, false},
 		{6, SaveVariableProj, false},
 		{6, SaveVariableModi, true},
 		{7, SaveVariableRead, true},
