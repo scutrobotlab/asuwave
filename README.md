@@ -38,6 +38,8 @@ npm run build # 生产环境构建
 go test -v ./... # 测试
 go build # 编译
 ./asuwave # 执行
+# 构建Release
+sh ./build.sh
 ```
 
 ### 项目结构
