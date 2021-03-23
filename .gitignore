@@ -1,5 +1,6 @@
 *.exe
 /asuwave
+/asuwave_*
 config.json
 vToRead.json
 vToModi.json
