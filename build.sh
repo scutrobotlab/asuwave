@@ -21,3 +21,5 @@ zip asuwave_windows.zip asuwave_windows.exe
 
 rm -f ./server/server.go
 mv ./server/server.go.org ./server/server.go
+rm -f ./server/bindata.go
+go mod tidy
