@@ -12,7 +12,7 @@
         </v-toolbar>
         <v-row>
           <v-col cols="4">
-            <v-file-input label="上传变量地址表文件" v-model="file"></v-file-input>
+            <v-file-input label="上传elf或者axf文件" v-model="file"></v-file-input>
           </v-col>
           <v-col cols="8">
             <v-text-field
