@@ -54,6 +54,8 @@ sh ./build.sh
 │   ├── const.go
 │   ├── datautil.go
 │   └── datautil_test.go
+├── fromelf - 后端·elf/axf文件处理
+│   └── fromelf.go
 ├── mcu  - 单片机端
 │   ├── README.md
 │   ├── RobotMonitor.c
@@ -144,11 +146,8 @@ const osThreadAttr_t robotMonitor_attributes = {
 robotMonitorHandle = osThreadNew(tskRobotMonitor, NULL, &robotMonitor_attributes);
 ```
 
-### Keil
-在Keil的Project-Options for Target-User -> After Build/Rebuild，User Command 里添加 `fromelf -a -o "$L@L.dtaddr" "#L"` 来生成.dtaddr文件（这个文件扩展名是我瞎起的，data address的简称）
-
 ### 上位机网页端
-选择并开启串口后，在 *读取变量列表* 中上传Keil生成的.dtaddr文件，在程序成功解析变量表之后就可以添加变量，其中：  
+选择并开启串口后，在 *读取变量列表* 中上传elf或者axf文件，在程序成功解析之后就可以添加变量，其中：  
 
 * 观察 只能用于绘制曲线  
 * 修改 只能用于调参  
