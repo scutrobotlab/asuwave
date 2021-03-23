@@ -13,6 +13,7 @@ FROM golang:latest
 WORKDIR /build
 COPY ./main.go ./go.sum ./go.mod /build/
 COPY ./datautil /build/datautil/
+COPY ./fromelf /build/fromelf/
 COPY ./option /build/option/
 COPY ./serial /build/serial/
 COPY ./server /build/server/
