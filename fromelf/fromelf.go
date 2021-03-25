@@ -77,6 +77,9 @@ func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
 					namePrefix = append(namePrefix, y.Name)
 					dfs(namePrefix, a, x, s.Field)
 				} else {
+					if _, ok := variable.TypeLen[t.String()]; !ok {
+						continue
+					}
 					y.Type = t.String()
 				}
 			}
@@ -101,6 +104,10 @@ func dfs(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, s []*
 		} else {
 			a := addrPrefix + uint32(v.ByteOffset)
 			if a < 0x20000000 || a >= 0x80000000 {
+				continue
+			}
+			t := v.Type.String()
+			if _, ok := variable.TypeLen[t]; !ok {
 				continue
 			}
 			x.Variables = append(x.Variables, variable.ToProjectT{
