@@ -27,15 +27,17 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build project
-        run: sh ./build.sh
+        run: |
+          chmod +x build.sh
+          ./build.sh
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            asuwave_linux.zip
-            asuwave_mac.zip
-            asuwave_windows.zip
+            ./build/asuwave_linux.zip
+            ./build/asuwave_mac.zip
+            ./build/asuwave_windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

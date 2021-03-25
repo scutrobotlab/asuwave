@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 npm ci
 npm run build
@@ -11,14 +11,27 @@ go get github.com/elazarl/go-bindata-assetfs/...
 go-bindata-assetfs -pkg server -o ./server/bindata.go ./dist/...
 go mod tidy
 
+build_dir="build"
+
+if [[ ! -d $build_dir ]]; then
+    mkdir $build_dir
+else
+    rm -rf $build_dir
+fi
+
+build_prefix="asuwave_"
+os_list=("linux" "darwin" "windows")
+build_suffix=("" "" ".exe")
+
 flags="-w -s -X 'main.githash=$(git describe --tags --long --dirty=-dev)' -X 'main.buildtime=$(date)' -X 'main.goversion=$(go version)'"
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="$flags" -o asuwave_linux
-CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="$flags" -o asuwave_mac
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="$flags" -o asuwave_windows.exe
-upx -q -9 asuwave_linux asuwave_mac asuwave_windows.exe
-zip asuwave_linux.zip asuwave_linux
-zip asuwave_mac.zip asuwave_mac
-zip asuwave_windows.zip asuwave_windows.exe
+
+for ((i = 0 ; i < 3 ; i++)); do
+    file=$build_dir/$build_prefix${os_list[$i]}
+    out=$file${build_suffix[$i]}
+    CGO_ENABLED=0 GOOS=${os_list[$i]} GOARCH=amd64 go build -ldflags="$flags" -o $out
+    upx -q -9 $out
+    zip -j -9 $file.zip $out
+done
 
 rm -f ./server/server.go
 mv ./server/server.go.org ./server/server.go
