@@ -25,9 +25,10 @@ var (
 func main() {
 	vFlag := false
 	bFlag := false
-	pFlag := flag.Int("p", -1, "port to bind")
-	flag.BoolVar(&bFlag, "b", false, "start browser")
+	pFlag := -1
 	flag.BoolVar(&vFlag, "v", false, "show version")
+	flag.BoolVar(&bFlag, "b", false, "start browser")
+	flag.IntVar(&pFlag, "p", -1, "port to bind")
 	flag.Parse()
 
 	if vFlag {
@@ -40,8 +41,8 @@ func main() {
 	option.Load()
 	variable.Load()
 
-	if pFlag != nil && *pFlag > 0 && *pFlag < 65535 {
-		option.Config.Port = *pFlag
+	if pFlag >= 0 && pFlag <= 65535 {
+		option.Config.Port = pFlag
 	}
 
 	option.Save()

@@ -13,6 +13,8 @@ import (
 // Init server
 func Init(c chan string) {
 	host := "0.0.0.0:" + strconv.Itoa(option.Config.Port)
+	log.Println("Listen on " + host)
+	log.Println("Don't close this before you have done")
 
 	variableToReadCtrl := makeVariableCtrl(&variable.ToRead, true)
 	variableToModiCtrl := makeVariableCtrl(&variable.ToModi, false)
