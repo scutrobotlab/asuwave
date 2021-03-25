@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -14,11 +16,26 @@ import (
 	"github.com/scutrobotlab/asuwave/variable"
 )
 
+var (
+	githash   string
+	buildtime string
+	goversion string
+)
+
 func main() {
+	vFlag := false
 	bFlag := false
 	pFlag := flag.Int("p", -1, "port to bind")
 	flag.BoolVar(&bFlag, "b", false, "start browser")
+	flag.BoolVar(&vFlag, "v", false, "show version")
 	flag.Parse()
+
+	if vFlag {
+		fmt.Printf("Git Commit Hash : %s\n", githash)
+		fmt.Printf("Build Time : %s\n", buildtime)
+		fmt.Printf("Golang Version : %s\n", goversion)
+		os.Exit(0)
+	}
 
 	option.Load()
 	variable.Load()

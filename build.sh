@@ -11,9 +11,10 @@ go get github.com/elazarl/go-bindata-assetfs/...
 go-bindata-assetfs -pkg server -o ./server/bindata.go ./dist/...
 go mod tidy
 
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o asuwave_linux
-CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-w -s" -o asuwave_mac
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-w -s" -o asuwave_windows.exe
+flags="-w -s -X 'main.githash=$(git describe --tags --long --dirty=-dev)' -X 'main.buildtime=$(date)' -X 'main.goversion=$(go version)'"
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="$flags" -o asuwave_linux
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="$flags" -o asuwave_mac
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="$flags" -o asuwave_windows.exe
 upx -q -9 asuwave_linux asuwave_mac asuwave_windows.exe
 zip asuwave_linux.zip asuwave_linux
 zip asuwave_mac.zip asuwave_mac
