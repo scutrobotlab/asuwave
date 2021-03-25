@@ -2,8 +2,6 @@
 package datautil
 
 import (
-	"regexp"
-
 	"github.com/scutrobotlab/asuwave/variable"
 )
 
@@ -107,15 +105,5 @@ func MakeChartPack(x *variable.ListChartT, y *variable.ListT, data []byte) {
 		if chartData.Name != "" {
 			x.Variables = append(x.Variables, chartData)
 		}
-	}
-}
-
-func GetProjectVariables(x *variable.ListProjectT, data []byte) {
-	reg := regexp.MustCompile(`(0x[0-9a-f]{8})\s{2}(0x[0-9a-f]+)\s+((\*\s)?[a-zA-Z0-9_\.]+)\s+([a-zA-Z0-9_\.\s]+?)[\n|\r]`)
-	match := reg.FindAllStringSubmatch(string(data), -1)
-
-	x.Variables = nil
-	for _, v := range match {
-		x.Variables = append(x.Variables, variable.ToProjectT{Addr: v[1], Size: v[2], Name: v[3], Type: v[5]})
 	}
 }

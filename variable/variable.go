@@ -37,7 +37,6 @@ var ToModi ListT
 
 type ToProjectT struct {
 	Addr string
-	Size string
 	Name string
 	Type string
 }
