@@ -120,6 +120,9 @@ func dfs(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, s []*
 }
 
 func checkStruct(t dwarf.Type) (*dwarf.StructType, bool) {
+	if s, ok := t.(*dwarf.StructType); ok {
+		return s, true
+	}
 	if td, ok := t.(*dwarf.TypedefType); ok {
 		if s, ok := td.Type.(*dwarf.StructType); ok {
 			return s, true
