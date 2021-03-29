@@ -2,6 +2,8 @@
 
 ![Go](https://github.com/scutrobotlab/asuwave/workflows/Go/badge.svg) ![Node.js](https://github.com/scutrobotlab/asuwave/workflows/Node.js/badge.svg) ![Release](https://github.com/scutrobotlab/asuwave/workflows/Release/badge.svg) ![Heroku](https://github.com/scutrobotlab/asuwave/workflows/Heroku/badge.svg)
 
+[Demo](https://asuwave.herokuapp.com/)  
+
 >~~你所用过坠好的上位机~~  
 >~~简洁、优雅且好用~~  
 >每日一问，今日进度如何
