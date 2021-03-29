@@ -3,8 +3,6 @@
 npm ci
 npm run build
 
-flags="-w -s -X 'main.githash=$(git describe --tags --long --dirty=-dev)' -X 'main.buildtime=$(date)' -X 'main.goversion=$(go version)'"
-
 cp ./server/server.go ./server/server.go.org
 sed -i 's/http.Dir(\".\/dist\/\")/assetFS()/g' ./server/server.go
 
@@ -24,6 +22,7 @@ fi
 build_prefix="asuwave_"
 os_list=("linux" "darwin" "windows")
 build_suffix=("" "" ".exe")
+flags="-w -s -X 'main.githash=$(git describe --tags --long)' -X 'main.buildtime=$(date)' -X 'main.goversion=$(go version)'"
 
 for ((i = 0 ; i < 3 ; i++)); do
     file=$build_dir/$build_prefix${os_list[$i]}
