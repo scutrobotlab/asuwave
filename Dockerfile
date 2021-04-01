@@ -11,14 +11,14 @@ RUN npm run build
 
 FROM golang:latest
 WORKDIR /build
-COPY ./main.go ./go.sum ./go.mod /build/
+COPY ./main.go ./main_release.go ./go.sum ./go.mod /build/
 COPY ./datautil /build/datautil/
 COPY ./fromelf /build/fromelf/
 COPY ./option /build/option/
 COPY ./serial /build/serial/
 COPY ./server /build/server/
 COPY ./variable /build/variable/
-RUN go build -ldflags="-w -s" -o asuwave
 COPY --from=build /app/dist/ /build/dist/
+RUN go build -tags release -ldflags="-w -s" -o asuwave
 
 CMD ./asuwave -p $PORT
