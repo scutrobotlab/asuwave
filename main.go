@@ -32,9 +32,9 @@ func main() {
 	flag.Parse()
 
 	if vFlag {
-		fmt.Printf("Git Commit Hash : %s\n", githash)
-		fmt.Printf("Build Time : %s\n", buildtime)
-		fmt.Printf("Golang Version : %s\n", goversion)
+		fmt.Printf("asuwave %s\n", githash)
+		fmt.Printf("build time %s\n", buildtime)
+		fmt.Println(goversion)
 		os.Exit(0)
 	}
 
