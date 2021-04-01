@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"io/fs"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 )
 
 // Init server
-func Init(c chan string) {
+func Init(c chan string, fsys *fs.FS) {
 	host := "0.0.0.0:" + strconv.Itoa(option.Config.Port)
 	log.Println("Listen on " + host)
 	log.Println("Don't close this before you have done")
@@ -20,7 +21,7 @@ func Init(c chan string) {
 	variableToModiCtrl := makeVariableCtrl(&variable.ToModi, false)
 	websocketCtrl := makeWebsocketCtrl(c)
 
-	http.Handle("/", http.FileServer(http.Dir("./dist/")))
+	http.Handle("/", http.FileServer(http.FS(*fsys)))
 
 	http.HandleFunc("/serial", serialCtrl)
 	http.HandleFunc("/serial_cur", serialCurCtrl)

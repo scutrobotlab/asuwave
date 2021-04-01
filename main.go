@@ -47,6 +47,8 @@ func main() {
 
 	option.Save()
 
+	fsys := getFS()
+
 	if bFlag {
 		startBrowser()
 	}
@@ -55,7 +57,7 @@ func main() {
 	go serial.GrReceive()
 	go serial.GrTransmit()
 	go serial.GrRxPrase(c)
-	server.Init(c)
+	server.Init(c, &fsys)
 }
 
 func startBrowser() {
