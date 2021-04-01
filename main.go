@@ -57,7 +57,7 @@ func main() {
 	go serial.GrReceive()
 	go serial.GrTransmit()
 	go serial.GrRxPrase(c)
-	server.Init(c, &fsys)
+	server.Start(c, &fsys)
 }
 
 func startBrowser() {

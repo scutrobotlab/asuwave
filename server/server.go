@@ -11,8 +11,8 @@ import (
 	"github.com/scutrobotlab/asuwave/variable"
 )
 
-// Init server
-func Init(c chan string, fsys *fs.FS) {
+// Start server
+func Start(c chan string, fsys *fs.FS) {
 	host := "0.0.0.0:" + strconv.Itoa(option.Config.Port)
 	log.Println("Listen on " + host)
 	log.Println("Don't close this before you have done")
