@@ -76,6 +76,7 @@ export default {
       return this.$store.state.variables["proj"];
     },
     searchData() {
+      if (this.$store.getters.searchVToProj(this.keyword) == null) return null;
       return this.$store.getters.searchVToProj(this.keyword).slice(0, 200);
     },
   },
