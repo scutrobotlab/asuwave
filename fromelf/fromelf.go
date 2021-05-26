@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/scutrobotlab/asuwave/variable"
@@ -103,8 +104,11 @@ func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
 
 					// 尝试着一层一层地拨开
 					namePrefix := []string{y.Name}
-					dfs(namePrefix, a, x, s.Field)
+					dfsStruct(namePrefix, a, x, s.Field)
 
+				} else if ar, ok := checkArray(t); ok {
+					namePrefix := []string{y.Name}
+					dfsArray(namePrefix, a, x, ar.Type, ar.Count)
 				} else {
 
 					// 别用谎言欺骗自己
@@ -129,7 +133,7 @@ func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
 }
 
 // 一层一层地拨开你的心
-func dfs(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, s []*dwarf.StructField) {
+func dfsStruct(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, s []*dwarf.StructField) {
 
 	// 不愿放过每一个问题
 	for _, v := range s {
@@ -142,12 +146,18 @@ func dfs(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, s []*
 			addrPrefix = addrPrefix + uint32(v.ByteOffset)
 
 			// 勇敢地接着走下去
-			dfs(namePrefix, addrPrefix, x, st.Field)
+			dfsStruct(namePrefix, addrPrefix, x, st.Field)
 
 			// 回到路口，准备下一次的旅程
 			namePrefix = namePrefix[:len(namePrefix)-1]
 			addrPrefix = addrPrefix - uint32(v.ByteOffset)
 
+		} else if a, ok := checkArray(v.Type); ok {
+			namePrefix = append(namePrefix, v.Name)
+			addrPrefix = addrPrefix + uint32(v.ByteOffset)
+			dfsArray(namePrefix, addrPrefix, x, a.Type, a.Count)
+			namePrefix = namePrefix[:len(namePrefix)-1]
+			addrPrefix = addrPrefix - uint32(v.ByteOffset)
 		} else {
 
 			// 终于，你缓缓开口
@@ -186,5 +196,45 @@ func checkStruct(t dwarf.Type) (*dwarf.StructType, bool) {
 	}
 
 	// 最终仍是沉默
+	return nil, false
+}
+
+func dfsArray(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, t dwarf.Type, c int64) {
+
+	for i := int64(0); i < c; i++ {
+		if st, ok := checkStruct(t); ok {
+			namePrefix = append(namePrefix, "["+strconv.FormatInt(i, 10)+"]")
+			dfsStruct(namePrefix, addrPrefix, x, st.Field)
+			namePrefix = namePrefix[:len(namePrefix)-1]
+		} else if a, ok := checkArray(t); ok {
+			namePrefix = append(namePrefix, "["+strconv.FormatInt(i, 10)+"]")
+			dfsArray(namePrefix, addrPrefix, x, a.Type, a.Count)
+			namePrefix = namePrefix[:len(namePrefix)-1]
+		} else {
+			a := addrPrefix
+			if a < 0x20000000 || a >= 0x80000000 {
+				continue
+			}
+			t := t.String()
+			if _, ok := variable.TypeLen[t]; !ok {
+				continue
+			}
+			x.Variables = append(x.Variables, variable.ToProjectT{
+				Name: strings.Join(namePrefix, ".") + ".[" + strconv.FormatInt(i, 10) + "]",
+				Addr: fmt.Sprintf("0x%08x", a),
+				Type: t,
+			})
+		}
+		addrPrefix = addrPrefix + uint32(t.Size())
+	}
+}
+
+func checkArray(t dwarf.Type) (*dwarf.ArrayType, bool) {
+	if a, ok := t.(*dwarf.ArrayType); ok {
+		if a.Count != -1 {
+			return a, true
+		}
+	}
+
 	return nil, false
 }
