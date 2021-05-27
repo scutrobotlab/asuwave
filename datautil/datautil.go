@@ -54,8 +54,13 @@ func FindValidPart(data []byte) (int, int) {
 		return 0, 0
 	}
 
+	a := (n - r) % 20
+	if a == 0 {
+		a = 20
+	}
+
 	// 也许收获满满
-	r = n - (n-r)%20
+	r = n - a
 	return l, r + 1
 }
 
