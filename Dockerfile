@@ -14,6 +14,7 @@ WORKDIR /build
 COPY ./main.go ./main_release.go ./go.sum ./go.mod /build/
 COPY ./datautil /build/datautil/
 COPY ./fromelf /build/fromelf/
+COPY ./logger /build/logger/
 COPY ./option /build/option/
 COPY ./serial /build/serial/
 COPY ./server /build/server/
