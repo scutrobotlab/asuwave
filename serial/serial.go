@@ -10,6 +10,7 @@ import (
 	"go.bug.st/serial"
 
 	"github.com/scutrobotlab/asuwave/datautil"
+	"github.com/scutrobotlab/asuwave/logger"
 	"github.com/scutrobotlab/asuwave/variable"
 )
 
@@ -169,18 +170,23 @@ func GrRxPrase(c chan string) {
 		rxBuff = append(rxBuff, rx...)
 
 		startIdx, endIdx := datautil.FindValidPart(rxBuff)
+
+		logger.Log.Printf("rxBuff: %#v\n", rxBuff)
+		logger.Log.Printf("startIdx: %d, endIdx: %d\n", startIdx, endIdx)
+
 		buff := rxBuff[startIdx:endIdx]
-		if endIdx >= len(rxBuff) {
-			rxBuff = nil
-		} else {
-			rxBuff = rxBuff[endIdx:]
-		}
 
 		x.Variables = nil
 		datautil.MakeChartPack(&x, &variable.ToRead, buff)
 		if len(x.Variables) != 0 {
 			b, _ := json.Marshal(x)
 			c <- string(b)
+		}
+
+		if endIdx >= len(rxBuff) {
+			rxBuff = nil
+		} else {
+			rxBuff = rxBuff[endIdx:]
 		}
 	}
 }
