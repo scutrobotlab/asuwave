@@ -22,7 +22,10 @@ const lineColors = {
     colors.purple.base,
     colors.indigo.base,
     colors.teal.base,
-    colors.pink.base,
+    colors.lightBlue.base,
+    colors.grey.base,
+    colors.lime.base,
+    colors.brown.base,
   ],
   dark: [
     colors.red.lighten2,
@@ -31,7 +34,10 @@ const lineColors = {
     colors.purple.lighten2,
     colors.indigo.lighten2,
     colors.teal.lighten2,
-    colors.pink.lighten2,
+    colors.lightBlue.lighten2,
+    colors.grey.lighten2,
+    colors.lime.lighten2,
+    colors.brown.lighten2,
   ],
 };
 
