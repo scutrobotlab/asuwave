@@ -16,10 +16,14 @@ import (
 // Start server
 func Start(c chan string, fsys *fs.FS) {
 	port := ":" + strconv.Itoa(option.Config.Port)
+	logger.Log.Println("Listen on " + port)
 
 	fmt.Println("asuwave running at:")
 	fmt.Println("- Local:   http://localhost" + port + "/")
-	fmt.Println("- Network: http://" + getLocalIP() + port + "/")
+	ips := getLocalIP()
+	for _, ip := range ips {
+		fmt.Println("- Network: http://" + ip + port + "/")
+	}
 	fmt.Println("Don't close this before you have done")
 
 	variableToReadCtrl := makeVariableCtrl(&variable.ToRead, true)
@@ -45,17 +49,18 @@ func errorJson(s string) string {
 	return string(b)
 }
 
-func getLocalIP() string {
+func getLocalIP() []string {
+	var ips []string
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		return "127.0.0.1"
+		return ips
 	}
 
 	for _, addr := range addrs {
 		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
-			return ipnet.IP.String()
+			ips = append(ips, ipnet.IP.String())
 		}
 	}
 
-	return "127.0.0.1"
+	return ips
 }
