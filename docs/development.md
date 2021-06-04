@@ -13,7 +13,7 @@ npm run serve # 启动并调试
 npm run build # 生产环境构建
 # 后端
 go test -v ./... # 测试
-go build # 编译
+go build # 编译开发版
 ./asuwave # 执行
 # 构建Release
 chmod +x build.sh
