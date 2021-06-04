@@ -36,8 +36,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ./build/asuwave_linux.zip
-            ./build/asuwave_darwin.zip
-            ./build/asuwave_windows.zip
+            ./build/asuwave_darwin_amd64.zip
+            ./build/asuwave_darwin_arm64.zip
+            ./build/asuwave_linux_amd64.zip
+            ./build/asuwave_linux_arm64.zip
+            ./build/asuwave_windows_amd64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
