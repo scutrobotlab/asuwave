@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -68,10 +67,11 @@ func startBrowser() {
 	}
 	run, ok := commands[runtime.GOOS]
 	if !ok {
-		log.Printf("don't know how to open things on %s platform", runtime.GOOS)
+		fmt.Printf("don't know how to open things on %s platform", runtime.GOOS)
 	} else {
 		go func() {
-			log.Println("Your browser will start in 3 seconds")
+			time.Sleep(1 * time.Second)
+			fmt.Println("Your browser will start in 3 seconds")
 			time.Sleep(3 * time.Second)
 			exec.Command(run, "http://localhost:"+strconv.Itoa(option.Config.Port)).Start()
 		}()

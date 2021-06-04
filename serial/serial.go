@@ -3,7 +3,6 @@ package serial
 import (
 	"encoding/json"
 	"errors"
-	"log"
 	"strings"
 	"time"
 
@@ -45,10 +44,10 @@ func Find() []string {
 
 	tmp, err := serial.GetPortsList()
 	if err != nil {
-		log.Println("Serial ports errors!")
+		logger.Log.Println("Serial ports errors!")
 	}
 	if len(tmp) == 0 {
-		log.Println("No serial ports found!")
+		logger.Log.Println("No serial ports found!")
 	}
 	for _, port := range tmp {
 		if strings.Contains(port, "USB") || strings.Contains(port, "ACM") || strings.Contains(port, "COM") || strings.Contains(port, "tty.usb") {
@@ -141,7 +140,7 @@ func GrReceive() {
 			default:
 				b, err := Receive(buff)
 				if err != nil {
-					log.Println("GrReceive error:", err)
+					logger.Log.Println("GrReceive error:", err)
 				}
 				chRx <- b
 				time.Sleep(5 * time.Millisecond)
@@ -156,7 +155,7 @@ func GrTransmit() {
 		b := <-chTx
 		err := Transmit(b)
 		if err != nil {
-			log.Println("GrTransmit error: ", err)
+			logger.Log.Println("GrTransmit error: ", err)
 		}
 		time.Sleep(3 * time.Millisecond)
 	}

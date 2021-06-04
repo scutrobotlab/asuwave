@@ -1,10 +1,11 @@
 package server
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
+
+	"github.com/scutrobotlab/asuwave/logger"
 )
 
 var upgrader = websocket.Upgrader{
@@ -16,7 +17,7 @@ func makeWebsocketCtrl(ch chan string) func(w http.ResponseWriter, r *http.Reque
 	return func(w http.ResponseWriter, r *http.Request) {
 		c, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			log.Print("upgrade:", err)
+			logger.Log.Print("upgrade:", err)
 			return
 		}
 		defer c.Close()
@@ -24,7 +25,7 @@ func makeWebsocketCtrl(ch chan string) func(w http.ResponseWriter, r *http.Reque
 			b := <-ch
 			err = c.WriteMessage(websocket.TextMessage, []byte(b))
 			if err != nil {
-				log.Println("write:", err)
+				logger.Log.Println("write:", err)
 				break
 			}
 		}
