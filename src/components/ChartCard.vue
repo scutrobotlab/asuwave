@@ -8,6 +8,7 @@
     </v-card-actions>
   </v-card>
 </template>
+
 <script>
 import timechart from "timechart";
 import colors from "vuetify/lib/util/colors";
@@ -38,6 +39,8 @@ export default {
   name: "ChartCard",
   mixins: [Themeable],
   data: () => ({
+    chart: null,
+    ws: null,
     indexColor: -1,
   }),
   created() {
