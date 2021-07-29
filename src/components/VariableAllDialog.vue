@@ -23,8 +23,8 @@
             ></v-text-field>
           </v-col>
           <v-col cols="1">
-            <v-btn class="ma-2" outlined color="#1E88E5FF" disabled @click="deleteVariable()">
-              一键删除（未可用）
+            <v-btn class="ma-2" outlined color="#1E88E5FF" @click="deleteVariable()">
+              一键删除
             </v-btn>
           </v-col>
         </v-row>

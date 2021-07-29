@@ -161,7 +161,20 @@ func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		io.WriteString(w, "")
 	case http.MethodDelete:
-		fmt.Println("good")
+		filePath := "./vToProj.json"
+		_, err := os.Stat(filePath)
+		if os.IsNotExist(err) {
+			fmt.Println("can not find the 'vToProj.json'")
+			return
+		}
+		file, err := os.OpenFile(filePath, os.O_RDWR|os.O_TRUNC, 0666)
+		if err != nil {
+			fmt.Println("open file err")
+			return
+		}
+		defer file.Close()
+		variable.ToProj.Variables = nil
+
 		w.WriteHeader(http.StatusNoContent)
 		io.WriteString(w, "")
 	default:
