@@ -15,6 +15,14 @@
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-row>
                 <v-col cols="12" sm="6" md="6">
+                  <v-color-picker
+                    dot-size="25"
+                    swatches-max-height="100"
+                    show-swatches
+                    v-model="Inputcolor"
+                  ></v-color-picker>
+                </v-col>
+                <v-col cols="12" sm="6" md="6">
                   <v-select
                     :items="[1, 2, 3]"
                     label="板子代号"
@@ -23,34 +31,54 @@
                     required
                     v-model="Board"
                   ></v-select>
-                </v-col>
-                <v-col cols="12" sm="6" md="6">
-                  <v-select
-                    :items="types"
-                    label="变量类型"
-                    :rules="[(v) => !!v || '变量类型是必要的']"
-                    required
-                    v-model="Type"
-                  ></v-select>
-                </v-col>
-                <v-col cols="12" sm="6" md="6">
-                  <v-text-field
-                    label="变量名"
-                    type="text"
-                    :rules="[(v) => !!v || '变量名是必要的']"
-                    required
-                    v-model="Name"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="6">
-                  <v-text-field
-                    label="变量地址"
-                    type="text"
-                    :rules="AddrRules"
-                    hint="形如2000ab78"
-                    required
-                    v-model="Addr"
-                  ></v-text-field>
+                  <v-row>
+                    <v-col cols="12" sm="12" md="12">
+                      <v-select
+                        :items="types"
+                        label="变量类型"
+                        :rules="[(v) => !!v || '变量类型是必要的']"
+                        required
+                        :disabled="disable"
+                        v-model="Type"
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+
+                  <v-row>
+                    <v-col cols="12" sm="12" md="12">
+                      <v-text-field
+                        label="变量名称"
+                        type="text"
+                        :rules="[(v) => !!v || '变量名是必要的']"
+                        required
+                        v-model="Name"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12" sm="12" md="12">
+                      <v-text-field
+                        label="变量地址"
+                        type="text"
+                        :rules="AddrRules"
+                        :disabled="disable"
+                        hint="形如2000ab78"
+                        required
+                        v-model="Addr"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12" sm="12" md="12">
+                      <v-text-field
+                        label="变量颜色"
+                        type="text"
+                        disabled
+                        required
+                        v-model="Inputcolor"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-form>
@@ -75,11 +103,15 @@ export default {
   props: ["opt"],
   data: () => ({
     dialog: false,
+    disable: false,
+    colorcard: false,
     valid: true,
     Board: 1,
     Name: "",
     Type: "",
     Addr: "",
+    Inputcolor: "#F3CB09FF",
+    showcolorcard: "",
     AddrRules: [
       (v) => !!v || "变量地址是必要的",
       (v) => /2[0-9a-f]{7}/.test(v) || "格式错误，应形如2000ab78",
@@ -93,14 +125,26 @@ export default {
   methods: {
     openDialog() {
       this.dialog = true;
+      console.log(this.opt);
+    },
+    openDialogFromList(name, type, board, addr) {
+      this.dialog = true;
+      this.disable = true;
+      this.Name = name;
+      this.Type = type;
+      this.Addr = addr;
+      console.log(this.opt);
     },
     addVariable() {
       if (this.$refs.form.validate()) {
         this.errorHandler(
-          postVariable(this.opt, 1, this.Name, this.Type, parseInt(this.Addr, 16))
+          postVariable("read", 1, this.Name, this.Type, parseInt(this.Addr, 16), this.Inputcolor)
         ).then(async () => {
           this.dialog = false;
-          await this.$store.dispatch("getV", this.opt);
+          await this.$store.dispatch("getV", "read");
+          this.$bus.$emit("sendcolor", this.Inputcolor);
+          console.log(this.Inputcolor);
+          alert("添加成功！");
         });
       }
     },

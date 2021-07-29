@@ -2,15 +2,15 @@ package server
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
-	"os"
-	"sort"
-
+	"fmt"
 	"github.com/scutrobotlab/asuwave/datautil"
 	"github.com/scutrobotlab/asuwave/fromelf"
 	"github.com/scutrobotlab/asuwave/serial"
 	"github.com/scutrobotlab/asuwave/variable"
+	"io"
+	"net/http"
+	"os"
+	"sort"
 )
 
 func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +19,6 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 		defer r.Body.Close()
 		w.Header().Set("Content-Type", "application/json")
 		var err error
-
 		switch r.Method {
 		case http.MethodGet:
 			b, _ := json.Marshal(vList)
@@ -119,7 +118,6 @@ func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
 	defer variable.Refresh()
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
-
 	switch r.Method {
 	case http.MethodGet:
 		b, _ := json.Marshal(variable.ToProj)
@@ -162,7 +160,10 @@ func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusNoContent)
 		io.WriteString(w, "")
-
+	case http.MethodDelete:
+		fmt.Println("good")
+		w.WriteHeader(http.StatusNoContent)
+		io.WriteString(w, "")
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		io.WriteString(w, errorJson(http.StatusText(http.StatusMethodNotAllowed)))

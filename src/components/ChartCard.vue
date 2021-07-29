@@ -4,42 +4,15 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn text @click="exportData">导出</v-btn>
-      <v-btn text color="primaryText" @click="follow">跟随</v-btn>
+      <v-btn text color="primaryText" @click="follow">{{ showFollow }}</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
 import timechart from "timechart";
-import colors from "vuetify/lib/util/colors";
 import Themeable from "vuetify/lib/mixins/themeable";
-
-const lineColors = {
-  light: [
-    colors.red.base,
-    colors.green.base,
-    colors.orange.base,
-    colors.purple.base,
-    colors.indigo.base,
-    colors.teal.base,
-    colors.lightBlue.base,
-    colors.grey.base,
-    colors.lime.base,
-    colors.brown.base,
-  ],
-  dark: [
-    colors.red.lighten2,
-    colors.green.lighten2,
-    colors.orange.lighten2,
-    colors.purple.lighten2,
-    colors.indigo.lighten2,
-    colors.teal.lighten2,
-    colors.lightBlue.lighten2,
-    colors.grey.lighten2,
-    colors.lime.lighten2,
-    colors.brown.lighten2,
-  ],
-};
+import { getVariable } from "@/api/variable.js";
 
 export default {
   name: "ChartCard",
@@ -47,7 +20,10 @@ export default {
   data: () => ({
     chart: null,
     ws: null,
-    indexColor: -1,
+    indexColor: -2,
+    inputColor: "",
+    showFollow: "跟随",
+    putColors: [],
   }),
   created() {
     this.initWS();
@@ -55,7 +31,7 @@ export default {
   destroyed() {
     this.ws.close();
   },
-  mounted() {
+  async mounted() {
     this.chart = new timechart(this.$refs.chart, {
       baseTime: Date.now(),
       series: [],
@@ -74,12 +50,19 @@ export default {
     this.$nextTick(() => {
       this.chart.onResize();
     });
+    this.$bus.$on("sendcolor", (data) => {
+      this.inputColor = data;
+    });
+    getVariable("read").then((variable) => {
+      this.putColors = variable;
+      this.indexColor = -1;
+    });
   },
   watch: {
-    isDark: function() {
-      for (const s of this.chart.options.series) {
-        this.updateColor(s);
-      }
+    isDark: function () {
+      // for (const s of this.chart.options.series) {
+      //   this.updateColor(s);
+      // }
       this.chart.update();
     },
   },
@@ -87,11 +70,8 @@ export default {
     initWS() {
       let url = "";
       if (process.env.NODE_ENV === "production") {
-        url =
-          (document.location.protocol == "https:" ? "wss" : "ws") +
-          "://" +
-          window.location.host +
-          "/ws";
+        url = (document.location.protocol == "https:" ? "wss" : "ws") + "://";
+        window.location.host + "/ws";
       } else {
         url = "ws://localhost:8000/ws";
       }
@@ -115,39 +95,53 @@ export default {
     },
     updateColor(series) {
       const index = series.colorIndex;
-      const colorArray = this.isDark ? lineColors.dark : lineColors.light;
-      series.color = colorArray[index % colorArray.length];
+      if (this.inputColor != "") {
+        series.color = this.inputColor;
+      } else {
+        series.color = this.putColors[index].Inputcolor;
+      }
     },
     praseWS(data) {
       if (!data) {
         return;
       }
-
       const jsonWS = JSON.parse(data);
       const seriesArray = this.chart.options.series;
-      for (const dp of jsonWS.Variables) {
-        let series = seriesArray.find((a) => a.name == dp.Name);
-        if (!series) {
-          this.indexColor++;
-          series = {
-            name: dp.Name,
-            colorIndex: this.indexColor,
-            data: [],
-          };
-          this.updateColor(series);
-          seriesArray.push(series);
+      if (this.indexColor != -2) {
+        for (const dp of jsonWS.Variables) {
+          let series = seriesArray.find((a) => a.name == dp.Name);
+          if (!series) {
+            this.indexColor++;
+            series = {
+              name: dp.Name,
+              colorIndex: this.indexColor,
+              data: [],
+            };
+            this.updateColor(series);
+            seriesArray.push(series);
+          }
+          series.data.push({
+            x: dp.Tick,
+            y: dp.Data,
+          });
         }
-        series.data.push({
-          x: dp.Tick,
-          y: dp.Data,
-        });
       }
       this.chart.update();
     },
     follow() {
-      this.chart.options.realTime = true;
+      switch (this.showFollow) {
+        case "跟随":
+          this.chart.options.realTime = true;
+          this.showFollow = "取消跟随";
+          break;
+        case "取消跟随":
+          this.chart.options.realTime = false;
+          this.showFollow = "跟随";
+          break;
+      }
     },
     exportData() {
+      console.log(this.chart.options.series);
       const json = JSON.stringify(this.chart.options);
       const blob = new Blob([json], { type: "application/json" });
       const anchor = document.createElement("a");

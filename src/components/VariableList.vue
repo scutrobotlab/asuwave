@@ -12,14 +12,18 @@
     <ErrorAlert v-model="error" />
     <v-list-group v-for="i in variables" :key="i.Name">
       <template v-slot:activator>
-        <v-list-item-icon>
-          <v-icon>mdi-variable</v-icon>
-        </v-list-item-icon>
+        <v-tooltip right color="#1A237E">
+          <template v-slot:activator="{ on, attrs }">
+            <v-list-item-icon v-bind="attrs" v-on="on">
+              <v-icon>mdi-variable</v-icon>
+            </v-list-item-icon>
+          </template>
+          <span>{{i.Name}}</span>
+        </v-tooltip>
         <v-list-item-content>
           <v-list-item-title>{{ i.Name }}</v-list-item-title>
         </v-list-item-content>
       </template>
-
       <v-list-item>
         <v-list-item-icon>
           <v-icon>mdi-tag-multiple</v-icon>
@@ -54,6 +58,7 @@ export default {
     variables() {
       return this.$store.state.variables[this.opt];
     },
+    
   },
   async mounted() {
     await this.getVariables();

@@ -18,12 +18,22 @@
       <v-card-text></v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn icon href="https://github.com/scutrobotlab/asuwave">
-          <v-icon>mdi-github</v-icon>
-        </v-btn>
-        <v-btn icon v-on:click="hc = 'pink'" v-bind:color="hc">
-          <v-icon>mdi-heart</v-icon>
-        </v-btn>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon href="https://github.com/scutrobotlab/asuwave" v-bind="attrs" v-on="on">
+              <v-icon>mdi-github</v-icon>
+            </v-btn>
+          </template>
+          <span>你的每一个反馈都会让我们变得更好!</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-on:click="hc = 'pink'" v-bind:color="hc" v-bind="attrs" v-on="on">
+              <v-icon>mdi-heart</v-icon>
+            </v-btn>
+          </template>
+          <span>你的鼓励是我们的动力!</span>
+        </v-tooltip>
       </v-card-actions>
     </v-card>
   </v-dialog>

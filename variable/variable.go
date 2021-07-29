@@ -21,12 +21,13 @@ var TypeLen = map[string]int{
 }
 
 type T struct {
-	Board uint8
-	Name  string
-	Type  string
-	Addr  uint32
-	Data  float64
-	Tick  uint32
+	Board      uint8
+	Name       string
+	Type       string
+	Addr       uint32
+	Data       float64
+	Tick       uint32
+	Inputcolor string
 }
 type ListT struct {
 	Variables []T
