@@ -10,6 +10,7 @@
           </v-toolbar-items>
           <v-toolbar-title>变量列表</v-toolbar-title>
         </v-toolbar>
+        <v-alert type="success" :value="alert">添加成功！ </v-alert>
         <v-row>
           <v-col cols="4">
             <v-file-input label="上传elf或者axf文件" v-model="file"></v-file-input>
@@ -23,14 +24,14 @@
             ></v-text-field>
           </v-col>
           <v-col cols="1">
-            <v-btn class="ma-2" outlined color="#1E88E5FF" @click="deleteVariable()">
+            <v-btn class="ma-2" outlined color="primary" @click="deleteVariable()">
               一键删除
             </v-btn>
           </v-col>
         </v-row>
 
         <ErrorAlert v-model="error" />
-        <v-simple-table dense fixed-header>
+        <v-simple-table dense fixed-header height="780px">
           <template v-slot:default>
             <thead>
               <tr>
@@ -47,13 +48,19 @@
                 <td>{{ list.Type }}</td>
                 <td>{{ list.Addr }}</td>
                 <td>
-                  <v-btn icon v-on:click="openVariableDialog(list.Name, list.Type, 1, list.Addr)">
+                  <v-btn
+                    icon
+                    v-on:click="openVariableDialog(list.Name, list.Type, 1, list.Addr, 'read')"
+                  >
                     <v-icon>mdi-plus</v-icon>
                     {{ reaction }}
                   </v-btn>
                 </td>
                 <td>
-                  <v-btn icon v-on:click="variableAdd('modi', list)">
+                  <v-btn
+                    icon
+                    v-on:click="openVariableDialog(list.Name, list.Type, 1, list.Addr, 'modi')"
+                  >
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
                 </td>
@@ -69,7 +76,7 @@
 
 <script>
 import errorMixin from "@/mixins/errorMixin.js";
-import { postVariable, postVariableToProj, deleteVariableAll } from "@/api/variable.js";
+import { postVariableToProj, deleteVariableAll } from "@/api/variable.js"; //postVariable,
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 
 export default {
@@ -79,6 +86,8 @@ export default {
     file: null,
     keyword: "",
     reaction: "",
+    alert: false,
+    opt: "",
   }),
   components: {
     VariableNewDialog,
@@ -100,12 +109,17 @@ export default {
   },
   async mounted() {
     await this.getVariableList();
+    this.$bus.$on("sendalert", (data) => {
+      this.alert = data;
+      setTimeout(this.realert, 1000);
+    });
   },
   methods: {
     openDialog() {
       this.dialog = true;
     },
-    openVariableDialog(name, type, board, addr) {
+    openVariableDialog(name, type, board, addr, opt) {
+      this.opt = opt;
       this.$refs.VariableNewDialog.openDialogFromList(name, type, board, addr);
     },
     async closeDialog() {
@@ -116,13 +130,17 @@ export default {
     async getVariableList() {
       await this.$store.dispatch("getV", "proj");
     },
-    async variableAdd(mode, i) {
-      await this.errorHandler(postVariable(mode, 1, i.Name, i.Type, parseInt(i.Addr, 16)));
-      alert("添加成功！");
-    },
+    // async variableAdd(mode, i) {
+    //   await this.errorHandler(postVariable(mode, 1, i.Name, i.Type, parseInt(i.Addr, 16)));
+    //   this.alert = true;
+    //   setTimeout(this.realert, 1000);
+    // },
     async deleteVariable() {
       await this.errorHandler(deleteVariableAll());
       this.getVariableList();
+    },
+    realert() {
+      this.alert = false;
     },
   },
 };

@@ -125,7 +125,6 @@ export default {
   methods: {
     openDialog() {
       this.dialog = true;
-      console.log(this.opt);
     },
     openDialogFromList(name, type, board, addr) {
       this.dialog = true;
@@ -133,18 +132,17 @@ export default {
       this.Name = name;
       this.Type = type;
       this.Addr = addr;
-      console.log(this.opt);
     },
     addVariable() {
       if (this.$refs.form.validate()) {
         this.errorHandler(
-          postVariable("read", 1, this.Name, this.Type, parseInt(this.Addr, 16), this.Inputcolor)
+          postVariable(this.opt, 1, this.Name, this.Type, parseInt(this.Addr, 16), this.Inputcolor)
         ).then(async () => {
           this.dialog = false;
-          await this.$store.dispatch("getV", "read");
+          await this.$store.dispatch("getV", this.opt);
           this.$bus.$emit("sendcolor", this.Inputcolor);
-          console.log(this.Inputcolor);
-          alert("添加成功！");
+          this.$bus.$emit("sendalert", true);
+          console.log(this.opt);
         });
       }
     },
