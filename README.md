@@ -111,11 +111,11 @@ void tskAsuwave(void *arg)
 
 打开后的界面：
 
-![](.\public\IMG_0095.PNG)
+![](pic\IMG_0095.PNG)
 
 变量选择界面
 
-![](.\public\IMG_0096.PNG)
+![](pic\IMG_0096.PNG)
 
 目前上位机可以修改的变量数量上限是所有全局变量的数量，观察的变量数量上限是10.
 
