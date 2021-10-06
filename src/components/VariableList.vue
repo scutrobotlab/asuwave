@@ -18,7 +18,7 @@
               <v-icon>mdi-variable</v-icon>
             </v-list-item-icon>
           </template>
-          <span>{{i.Name}}</span>
+          <span>{{ i.Name }}</span>
         </v-tooltip>
         <v-list-item-content>
           <v-list-item-title>{{ i.Name }}</v-list-item-title>
@@ -58,7 +58,6 @@ export default {
     variables() {
       return this.$store.state.variables[this.opt];
     },
-    
   },
   async mounted() {
     await this.getVariables();

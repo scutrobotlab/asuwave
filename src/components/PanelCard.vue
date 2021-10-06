@@ -19,7 +19,7 @@
           v-on="on"
           v-bind="attrs"
         >
-          <v-icon>mdi-iframe-variable</v-icon>
+          <v-icon>mdi-application-variable</v-icon>
         </v-btn>
       </template>
       <v-card>

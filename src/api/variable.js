@@ -11,7 +11,7 @@ export async function getVariableType() {
 }
 
 export async function postVariable(mode, Board, Name, Type, Addr, Inputcolor) {
-  return await fetchApi("/variable_" + mode, "POST", { Board, Name, Type, Addr , Inputcolor});
+  return await fetchApi("/variable_" + mode, "POST", { Board, Name, Type, Addr, Inputcolor });
 }
 
 export async function postVariableToProj(file) {
@@ -19,12 +19,12 @@ export async function postVariableToProj(file) {
 }
 
 export async function putVariable(mode, Board, Name, Type, Addr, Data, Inputcolor) {
-  return await fetchApi("/variable_" + mode, "PUT", { Board, Name, Type, Addr, Data ,Inputcolor});
+  return await fetchApi("/variable_" + mode, "PUT", { Board, Name, Type, Addr, Data, Inputcolor });
 }
 
 export async function deleteVariable(mode, Board, Name, Type, Addr, Inputcolor) {
-  return await fetchApi("/variable_" + mode, "DELETE", { Board, Name, Type, Addr ,Inputcolor});
+  return await fetchApi("/variable_" + mode, "DELETE", { Board, Name, Type, Addr, Inputcolor });
 }
 export async function deleteVariableAll() {
-  return await fetchApi("/variable_proj", "DELETE","vToProj.json");
+  return await fetchApi("/variable_proj", "DELETE", "vToProj.json");
 }

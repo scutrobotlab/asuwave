@@ -102,7 +102,7 @@ export default {
     },
   },
   watch: {
-    file: async function () {
+    file: async function() {
       await this.errorHandler(postVariableToProj(this.file));
       await this.getVariableList();
     },

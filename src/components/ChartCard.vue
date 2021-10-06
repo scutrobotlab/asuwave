@@ -59,7 +59,7 @@ export default {
     });
   },
   watch: {
-    isDark: function () {
+    isDark: function() {
       // for (const s of this.chart.options.series) {
       //   this.updateColor(s);
       // }
