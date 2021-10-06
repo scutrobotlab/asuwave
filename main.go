@@ -111,12 +111,12 @@ func checkUpdate() {
 		return
 	}
 	if gittag == gr.TagName {
-		fmt.Println("already the latest version: " + githash)
+		fmt.Println("already the latest version: " + gittag)
 		return
 	}
 	for _, asset := range gr.Assets {
 		if strings.Contains(asset.Name, runtime.GOOS+"_"+runtime.GOARCH) {
-			fmt.Println("current version is " + githash)
+			fmt.Println("current version is " + gittag)
 			fmt.Println("new version available: " + gr.TagName)
 			fmt.Print("download now? (y/n) ")
 			var a string
