@@ -70,8 +70,11 @@ export default {
     initWS() {
       let url = "";
       if (process.env.NODE_ENV === "production") {
-        url = (document.location.protocol == "https:" ? "wss" : "ws") + "://";
-        window.location.host + "/ws";
+        url =
+          (document.location.protocol == "https:" ? "wss" : "ws") +
+          "://" +
+          window.location.host +
+          "/ws";
       } else {
         url = "ws://localhost:8000/ws";
       }
