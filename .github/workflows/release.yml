@@ -25,6 +25,8 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
+        id: checkout
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
 
       - name: Build project
         run: |
@@ -36,10 +38,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ./build/asuwave_darwin_amd64.zip
-            ./build/asuwave_darwin_arm64.zip
-            ./build/asuwave_linux_amd64.zip
-            ./build/asuwave_linux_arm64.zip
-            ./build/asuwave_windows_amd64.zip
+            ./build/asuwave_${{ steps.checkout.outputs.tag }}_darwin_amd64.zip
+            ./build/asuwave_${{ steps.checkout.outputs.tag }}_darwin_arm64.zip
+            ./build/asuwave_${{ steps.checkout.outputs.tag }}_linux_amd64.zip
+            ./build/asuwave_${{ steps.checkout.outputs.tag }}_linux_arm64.zip
+            ./build/asuwave_${{ steps.checkout.outputs.tag }}_windows_amd64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
