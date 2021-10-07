@@ -23,7 +23,7 @@ COPY ./variable /build/variable/
 COPY --from=build /app/dist/ /build/dist/
 RUN CGO_ENABLED=0 go build -tags release -ldflags="-w -s" -o asuwave
 
-FROM alpine:latest
-COPY --from=binary /build/asuwave /app/
+FROM scratch
+COPY --from=binary /build/asuwave /
 
-CMD /app/asuwave -p $PORT
+CMD ["/asuwave"]

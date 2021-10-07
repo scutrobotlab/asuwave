@@ -37,7 +37,9 @@ func main() {
 	option.Load()
 	variable.Load()
 
-	if pFlag >= 0 && pFlag <= 65535 {
+	if val, ok := os.LookupEnv("PORT"); ok {
+		option.Config.Port, _ = strconv.Atoi(val)
+	} else if pFlag >= 0 && pFlag <= 65535 {
 		option.Config.Port = pFlag
 	}
 
