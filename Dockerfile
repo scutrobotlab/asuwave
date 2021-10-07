@@ -21,7 +21,7 @@ COPY ./serial /build/serial/
 COPY ./server /build/server/
 COPY ./variable /build/variable/
 COPY --from=build /app/dist/ /build/dist/
-RUN CGO_ENABLED=0 go build -tags release -ldflags="-w -s" -o asuwave
+RUN go build -tags release -o asuwave
 
 FROM scratch
 COPY --from=binary /build/asuwave /
