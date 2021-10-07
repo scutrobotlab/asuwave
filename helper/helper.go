@@ -30,7 +30,7 @@ type githubRelease struct {
 
 func init() {
 	if _, err := os.Stat(AppConfigDir()); os.IsNotExist(err) {
-		err := os.Mkdir(AppConfigDir(), 0755)
+		err := os.MkdirAll(AppConfigDir(), 0755)
 		if err != nil {
 			panic(err)
 		}
