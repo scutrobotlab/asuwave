@@ -1,6 +1,16 @@
 # 上位机 · 网页版 · 重制版
 
-![Go](https://github.com/scutrobotlab/asuwave/workflows/Go/badge.svg) ![Node.js](https://github.com/scutrobotlab/asuwave/workflows/Node.js/badge.svg) ![Release](https://github.com/scutrobotlab/asuwave/workflows/Release/badge.svg) ![Heroku](https://github.com/scutrobotlab/asuwave/workflows/Heroku/badge.svg) ![CodeQL](https://github.com/scutrobotlab/asuwave/workflows/CodeQL/badge.svg)
+![Go](https://github.com/scutrobotlab/asuwave/workflows/Go/badge.svg)
+![Node.js](https://github.com/scutrobotlab/asuwave/workflows/Node.js/badge.svg)
+![Release](https://github.com/scutrobotlab/asuwave/workflows/Release/badge.svg)
+![Heroku](https://github.com/scutrobotlab/asuwave/workflows/Heroku/badge.svg)
+![CodeQL](https://github.com/scutrobotlab/asuwave/workflows/CodeQL/badge.svg)  
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/scutrobotlab/asuwave)
+![GitHub all releases](https://img.shields.io/github/downloads/scutrobotlab/asuwave/total)
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/scutrobotlab/asuwave/latest/total)  
+![GitHub repo size](https://img.shields.io/github/repo-size/scutrobotlab/asuwave)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/scutrobotlab/asuwave)
+[![Go Report Card](https://goreportcard.com/badge/github.com/scutrobotlab/asuwave)](https://goreportcard.com/report/github.com/scutrobotlab/asuwave)  
 
 [Demo](https://asuwave.herokuapp.com/)  
 
