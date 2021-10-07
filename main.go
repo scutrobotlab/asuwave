@@ -25,9 +25,7 @@ func main() {
 	flag.Parse()
 
 	if vFlag {
-		fmt.Printf("asuwave %s\n", helper.GitHash)
-		fmt.Printf("build time %s\n", helper.BuildTime)
-		fmt.Println(helper.GoVersion)
+		fmt.Println(helper.GetVersion())
 		os.Exit(0)
 	}
 

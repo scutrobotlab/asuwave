@@ -2,6 +2,9 @@ package option
 
 import (
 	"os"
+	"path"
+
+	"github.com/scutrobotlab/asuwave/helper"
 )
 
 const (
@@ -17,7 +20,7 @@ type ConfigT struct {
 
 var Config ConfigT
 
-const configFileName = "config.json"
+var configFileName = path.Join(helper.AppConfigDir(), "config.json")
 
 func CheckCanSave(s int) bool {
 	return s&Config.Save == s

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"strings"
 	"time"
@@ -25,6 +26,28 @@ type githubRelease struct {
 		Name               string `json:"name"`
 		BrowserDownloadURL string `json:"browser_download_url"`
 	} `json:"assets"`
+}
+
+func init() {
+	if _, err := os.Stat(AppConfigDir()); os.IsNotExist(err) {
+		err := os.Mkdir(AppConfigDir(), 0755)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func AppConfigDir() string {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		dir = "./"
+	}
+
+	return path.Join(dir, "asuwave")
+}
+
+func GetVersion() string {
+	return fmt.Sprintf("asuwave %s\nbuild time %s\n%s", GitHash, BuildTime, GoVersion)
 }
 
 func CheckUpdate() {

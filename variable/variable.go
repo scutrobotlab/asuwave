@@ -2,7 +2,9 @@ package variable
 
 import (
 	"os"
+	"path"
 
+	"github.com/scutrobotlab/asuwave/helper"
 	"github.com/scutrobotlab/asuwave/option"
 )
 
@@ -58,9 +60,11 @@ type ListChartT struct {
 	Variables []ToChartT
 }
 
-const vToReadFileName = "vToRead.json"
-const vToModiFileName = "vToModi.json"
-const vToProjFileName = "vToProj.json"
+var (
+	vToReadFileName = path.Join(helper.AppConfigDir(), "vToRead.json")
+	vToModiFileName = path.Join(helper.AppConfigDir(), "vToModi.json")
+	vToProjFileName = path.Join(helper.AppConfigDir(), "vToProj.json")
+)
 
 func Load() {
 	option.JsonLoad(vToReadFileName, &ToRead)
