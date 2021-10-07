@@ -132,6 +132,8 @@ func (tp *testPort) SetDTR(dtr bool) error { return errors.New("not supported") 
 
 func (tp *testPort) SetRTS(rts bool) error { return errors.New("not supported") }
 
+func (tp *testPort) SetReadTimeout(timeout time.Duration) error { return nil }
+
 func (tp *testPort) GetModemStatusBits() (*serial.ModemStatusBits, error) {
 	return nil, errors.New("not supported")
 }
