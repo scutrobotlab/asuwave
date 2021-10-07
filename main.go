@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/scutrobotlab/asuwave/helper"
 	"github.com/scutrobotlab/asuwave/option"
@@ -47,7 +48,7 @@ func main() {
 	fsys := getFS()
 
 	if bFlag {
-		helper.StartBrowser()
+		helper.StartBrowser("http://localhost:" + strconv.Itoa(option.Config.Port))
 	}
 
 	c := make(chan string, 10)

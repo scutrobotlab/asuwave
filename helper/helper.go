@@ -8,11 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
-
-	"github.com/scutrobotlab/asuwave/option"
 )
 
 var (
@@ -90,7 +87,7 @@ func DownloadFile(url, filename string) error {
 	return nil
 }
 
-func StartBrowser() {
+func StartBrowser(url string) {
 	var commands = map[string]string{
 		"windows": "explorer.exe",
 		"darwin":  "open",
@@ -104,7 +101,7 @@ func StartBrowser() {
 			time.Sleep(1 * time.Second)
 			fmt.Println("Your browser will start in 3 seconds")
 			time.Sleep(3 * time.Second)
-			exec.Command(run, "http://localhost:"+strconv.Itoa(option.Config.Port)).Start()
+			exec.Command(run, url).Start()
 		}()
 	}
 }
