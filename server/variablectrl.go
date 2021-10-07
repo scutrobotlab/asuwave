@@ -2,14 +2,15 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/scutrobotlab/asuwave/datautil"
-	"github.com/scutrobotlab/asuwave/fromelf"
-	"github.com/scutrobotlab/asuwave/serial"
-	"github.com/scutrobotlab/asuwave/variable"
 	"io"
 	"net/http"
 	"os"
 	"sort"
+
+	"github.com/scutrobotlab/asuwave/datautil"
+	"github.com/scutrobotlab/asuwave/fromelf"
+	"github.com/scutrobotlab/asuwave/serial"
+	"github.com/scutrobotlab/asuwave/variable"
 )
 
 func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
