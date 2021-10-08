@@ -1,13 +1,14 @@
-on:
-  push:
-    tags:
-    - 'v*'
-
 name: Release
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  ubuntu-build:
-    name: Ubuntu build
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
 
@@ -37,41 +38,12 @@ jobs:
           name: my-artifact
           path: |
             ./build/*.zip
-            !./build/*_windows_amd64.zip
-
-  windows-build:
-    name: Windows build
-    runs-on: windows-latest
-    steps:
-
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.16
-        id: go
-
-      - name: Set up node 14.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14.x
-        id: node
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build project
-        run: .\build.ps1
-
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: my-artifact
-          path: .\build\*_windows_amd64.zip
 
   release:
     name: Release
-    needs: [ubuntu-build, windows-build]
+    needs: build
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
 
       - name: Checkout code
