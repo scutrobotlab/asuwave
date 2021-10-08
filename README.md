@@ -39,11 +39,11 @@
 
 ### 单片机端代码准备
 
-复制`asuwave.c`和`asuwave.h`到你的工程
+复制[asuwave.c](mcu/asuwave.c)和[asuwave.h](mcu/asuwave.h)到你的工程
 
 #### 串口配置
 
-就是cubeMx的默认配置
+使用STM32CubeMX的默认配置，并启用串口空闲中断和DMA
 
 #### 上位机初始化函数
 
@@ -115,7 +115,7 @@ void tskAsuwave(void *arg)
 
 ### 电脑端使用指南
 
-打开`asuwave_windows_amd64.exe`软件
+从[Releases](https://github.com/scutrobotlab/asuwave/releases)下载符合计算机操作系统和架构的最新版软件并运行
 
 然后在浏览器输入地址`http://localhost:8000/`
 
@@ -144,4 +144,4 @@ typedef struct
 static list_addr_t list_addr[MAX_ADDR_NUM];
 ```
 
-其他的一些情况可以刷新以下网页看看。
+其他的一些情况可以刷新一下网页看看。
