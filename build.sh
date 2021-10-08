@@ -16,7 +16,7 @@ gittag=`git describe --tags --abbrev=0`
 build_prefix="asuwave_"
 os_list=("linux" "darwin" "windows")
 arch_list=("amd64" "arm64")
-flags="-w -s -X '${importpath}.GitTag=${gittag}' -X '${importpath}.GitHash=$(git describe --tags --long)' -X '${importpath}.BuildTime=$(date)' -X '${importpath}.GoVersion=$(go version)'"
+flags="-w -s -X '${importpath}.GitTag=${gittag}' -X '${importpath}.GitHash=$(git describe --tags --long)' -X '${importpath}.BuildTime=$(date +'%Y-%m-%d %H:%M')' -X '${importpath}.GoVersion=$(go version)'"
 
 for os in ${os_list[@]}; do
     for arch in ${arch_list[@]}; do
