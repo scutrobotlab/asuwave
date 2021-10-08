@@ -44,9 +44,6 @@ jobs:
     runs-on: windows-latest
     steps:
 
-      - name: Set up upx
-        run: choco install upx
-
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:

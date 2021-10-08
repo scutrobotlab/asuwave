@@ -30,7 +30,6 @@ foreach ($os in $os_list) {
         $Env:GOOS=${os}
         $Env:GOARCH=${arch}
         go build -tags release -ldflags="$flags" -o $out
-        upx -q -9 $out
         Compress-Archive -CompressionLevel "Optimal" -Path $out -DestinationPath "${file}.zip"
     }
 }
