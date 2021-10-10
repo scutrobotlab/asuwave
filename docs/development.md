@@ -3,7 +3,7 @@
 ## 电脑端
 
 * node --version >= v14 （建议）  
-* go version >= 1.16 （必要）  
+* go version >= 1.17 （必要）  
 
 ### 常用命令
 ```bash

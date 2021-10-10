@@ -3,6 +3,7 @@
 ```
 ├── .github - github actions相关
 │   └── workflows
+│       ├── codeql-analysis.yml
 │       ├── go.yml
 │       ├── heroku.yml
 │       ├── node.yml
@@ -13,12 +14,13 @@
 │   └── datautil_test.go
 ├── fromelf - 后端·elf/axf文件处理
 │   └── fromelf.go
+├── helper - 后端·杂七杂八函数
+│   └── helper.go
 ├── logger - 后端·日志
 │   └── logger.go
 ├── mcu  - 单片机端
-│   ├── README.md
-│   ├── RobotMonitor.c
-│   └── RobotMonitor.h
+│   ├── asuwave.c
+│   └── asuwave.h
 ├── option -  后端·用户配置控制
 │   ├── jsonfile.go
 │   ├── option.go
@@ -75,7 +77,8 @@
 ├── .gitignore
 ├── .prettierrc - 自定义前端文件格式化规则
 ├── babel.config.js
-├── build.sh - 用于构建Release的脚本
+├── build.ps1 - 用于构建Release的脚本(Windows)
+├── build.sh - 用于构建Release的脚本(Ubuntu)
 ├── Dockerfile - 用于部署演示网页到Heroku的docker
 ├── go.mod
 ├── go.sum
