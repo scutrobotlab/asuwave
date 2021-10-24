@@ -13,6 +13,11 @@
 import timechart from "timechart";
 import Themeable from "vuetify/lib/mixins/themeable";
 import { getVariable } from "@/api/variable.js";
+import { lineChart } from "timechart/dist/lib/plugins/lineChart";
+import { d3Axis } from "timechart/dist/lib/plugins/d3Axis";
+import { legend } from "timechart/dist/lib/plugins/legend";
+import { crosshair } from "timechart/dist/lib/plugins/crosshair";
+import { nearestPoint } from "timechart/dist/lib/plugins/nearestPoint";
 
 export default {
   name: "ChartCard",
@@ -37,6 +42,7 @@ export default {
       series: [],
       xRange: { min: 0, max: 20 * 1000 },
       realTime: true,
+      tooltip: true,
       zoom: {
         x: {
           autoRange: true,
@@ -45,6 +51,13 @@ export default {
         y: {
           autoRange: true,
         },
+      },
+      plugins: {
+        lineChart,
+        d3Axis,
+        legend,
+        crosshair,
+        nearestPoint,
       },
     });
     this.$nextTick(() => {
@@ -59,7 +72,7 @@ export default {
     });
   },
   watch: {
-    isDark: function() {
+    isDark: function () {
       // for (const s of this.chart.options.series) {
       //   this.updateColor(s);
       // }
