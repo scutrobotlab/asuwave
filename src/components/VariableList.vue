@@ -1,5 +1,5 @@
 <template>
-  <v-list>
+  <v-list class="mb-8">
     <v-list-item>
       <v-list-item-title>变量·{{ showtext }}</v-list-item-title>
       <v-spacer></v-spacer>
@@ -10,36 +10,23 @@
       </v-list-item-icon>
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-group v-for="i in variables" :key="i.Name">
-      <template v-slot:activator>
-        <v-tooltip right color="#1A237E">
-          <template v-slot:activator="{ on, attrs }">
-            <v-list-item-icon v-bind="attrs" v-on="on">
-              <v-icon>mdi-variable</v-icon>
-            </v-list-item-icon>
-          </template>
-          <span>{{ i.Name }}</span>
-        </v-tooltip>
-        <v-list-item-content>
-          <v-list-item-title>{{ i.Name }}</v-list-item-title>
-        </v-list-item-content>
-      </template>
-      <v-list-item>
-        <v-list-item-icon>
-          <v-icon>mdi-tag-multiple</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>{{ i.Type }}</v-list-item-content>
-        <v-btn icon absolute small right v-on:click="delVariable(i)">
+    <v-list-item dense v-for="i in variables" :key="i.Name">
+        <v-list-item-avatar size="20" :color="i.Inputcolor"/>
+      <v-list-item-content>
+        <v-list-item-title>
+          <span class="green--text">{{ i.Type }}</span>
+          &nbsp;
+          {{ i.Name }}
+        </v-list-item-title>
+        <v-list-item-subtitle>{{ hexdsp(i.Addr) }}</v-list-item-subtitle>
+      </v-list-item-content>
+
+      <v-list-item-action>
+        <v-btn x-small icon v-on:click="delVariable(i)">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-icon>
-          <v-icon>mdi-view-list</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>{{ hexdsp(i.Addr) }}</v-list-item-content>
-      </v-list-item>
-    </v-list-group>
+      </v-list-item-action>
+    </v-list-item>
     <VariableNewDialog ref="VariableNewDialog" v-bind:opt="opt" />
   </v-list>
 </template>

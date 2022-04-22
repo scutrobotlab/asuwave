@@ -4,8 +4,8 @@
       <v-list-item-title>保存选项</v-list-item-title>
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-item v-for="i in config" :key="i.t">
-      <v-switch v-model="i.v" :label="i.t" v-on:change="updateConfig(i)" inset></v-switch>
+    <v-list-item dense v-for="i in config" :key="i.t">
+      <v-switch dense v-model="i.v" :label="i.t" v-on:change="updateConfig(i)" inset></v-switch>
     </v-list-item>
   </v-list>
 </template>
