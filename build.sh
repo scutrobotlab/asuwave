@@ -1,5 +1,13 @@
 #!/bin/bash
 
+importpath="github.com/scutrobotlab/asuwave/helper"
+build_prefix="asuwave_"
+os_list=("linux" "darwin" "windows")
+arch_list=("amd64" "arm64")
+gittag=`git describe --tags --abbrev=0`
+
+sed -i "s/^VUE_APP_GITTAG=.*/VUE_APP_GITTAG=${gittag}/g" .env
+
 npm ci
 npm run build
 
@@ -11,11 +19,6 @@ else
     rm -rf $build_dir
 fi
 
-importpath="github.com/scutrobotlab/asuwave/helper"
-gittag=`git describe --tags --abbrev=0`
-build_prefix="asuwave_"
-os_list=("linux" "darwin" "windows")
-arch_list=("amd64" "arm64")
 flags="-w -s -X '${importpath}.GitTag=${gittag}' -X '${importpath}.GitHash=$(git describe --tags --long)' -X '${importpath}.BuildTime=$(date +'%Y-%m-%d %H:%M')' -X '${importpath}.GoVersion=$(go version)'"
 
 for os in ${os_list[@]}; do
