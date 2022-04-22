@@ -7,7 +7,7 @@
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>坠好用的上位机</v-list-item-title>
-          <v-list-item-subtitle>{{ current.version.tag_name }}</v-list-item-subtitle>
+          <v-list-item-subtitle>{{ current_tag }}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-icon>
           <v-btn icon v-on:click="dialog = false">
@@ -20,24 +20,36 @@
           <v-progress-circular indeterminate :size="20" class="mr-2" color="primary" />
           正在检查更新...
         </v-card-text>
-        <v-card-text v-else-if="current.version.tag_name === update.version.tag_name">
-          <v-icon color="success" class="mr-2">mdi-check-circle</v-icon>已是最新版本。
+        <v-card-text v-else-if="current_tag === update.response.tag_name">
+          <v-icon color="success" left>mdi-check-circle</v-icon>已是最新版本。
+          <a @click="checkUpdate" class="text--secondary ">重新检查</a>
         </v-card-text>
         <div v-else>
           <v-card-title>
-            {{ update.version.tag_name
-            }}<v-chip color="warning" outlined small class="mx-2">New</v-chip>
+            {{ update.response.tag_name }}
+            <v-chip color="warning" outlined small class="mx-2">New</v-chip>
           </v-card-title>
           <v-card-text class="text--secondary">
             更新日志：
-            <div>{{ update.version.body }}</div>
+            <div>{{ update.response.body }}</div>
+            <div class="text-center text--disabled my-3">
+              <v-btn
+                v-if="download_link"
+                rounded
+                color="success"
+                :href="download_link.browser_download_url"
+                ><v-icon left>mdi-download</v-icon>下载</v-btn
+              >
+              <div v-if="download_link" class="my-1">
+                {{ download_link.name }} ({{ ByteUnitConvert(download_link.size) }})
+              </div>
+              <div class="my-1">
+                <a target="_blank" href="https://github.com/scutrobotlab/asuwave/releases">
+                  查看所有版本
+                </a>
+              </div>
+            </div>
           </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn small text color="success" @click="doUpdate"
-              ><v-icon left>mdi-arrow-up-circle</v-icon>立即更新</v-btn
-            >
-          </v-card-actions>
         </div>
       </div>
       <v-divider></v-divider>
@@ -46,7 +58,13 @@
         <v-spacer></v-spacer>
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
-            <v-btn icon href="https://github.com/scutrobotlab/asuwave" v-bind="attrs" v-on="on">
+            <v-btn
+              icon
+              href="https://github.com/scutrobotlab/asuwave"
+              target="_blank"
+              v-bind="attrs"
+              v-on="on"
+            >
               <v-icon>mdi-github</v-icon>
             </v-btn>
           </template>
@@ -59,44 +77,62 @@
 
 <script>
 import errorMixin from "@/mixins/errorMixin.js";
-import { getVersion, postUpdate } from "@/api/version.js";
+import { getVersion } from "@/api/version.js";
 export default {
   mixins: [errorMixin],
   data: () => ({
     dialog: false,
-    hc: "",
-    current: {
-      version: {
-        tag_name: "v 1.6.9"
-      }
-    },
+    os: "",
+    arch: "",
+    current_tag: "",
     update: {
       error: false,
       checking: true,
-      version: {
+      response: {
         tag_name: "",
         body: "",
+        assets: [],
       },
     },
   }),
+  computed: {
+    download_link() {
+      return this.update.response.assets.find((asset) => {
+        return (
+          asset.browser_download_url.includes(this.os) &&
+          asset.browser_download_url.includes(this.arch)
+        );
+      });
+    },
+  },
   methods: {
     openDialog() {
       this.dialog = true;
     },
+    ByteUnitConvert(val) {
+      return (
+        Math.floor(Math.log2(val) / 10) +
+        ["B", "KB", "MB", "GB", "TB"][Math.floor(Math.log2(val) / 10)]
+      );
+    },
     async checkUpdate() {
       this.update.checking = true;
-      this.update.version = await this.errorHandler(getVersion());
+      this.update.response = await this.errorHandler(getVersion());
       this.update.checking = false;
-    },
-    doUpdate() {
-      this.errorHandler(postUpdate());
     },
   },
   mounted() {
-    console.log("version", process.env.VUE_APP_GITTAG)
-    this.current.version = {
-      tag_name: process.env.VUE_APP_GITTAG,
-    }
+    this.current_tag = process.env.VUE_APP_GITTAG;
+
+    if (/Win|win/i.test(navigator.userAgent)) this.os = "windows";
+    else if (/Mac|mac|darwin/i.test(navigator.userAgent)) this.os = "darwin";
+    else if (/linux|gnu/i.test(navigator.userAgent)) this.os = "linux";
+
+    if (/(?:(amd|x(?:(?:86|64)[-_])?|wow|win)64)[;)]/i.test(navigator.userAgent))
+      this.arch = "amd64";
+    else if (/\b(aarch64|arm(v?8e?l?|_?64))\b/i.test(navigator.userAgent)) this.arch = "arm64";
+
+    window.console.log(navigator.userAgent);
     this.checkUpdate();
   },
 };
