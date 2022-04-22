@@ -30,7 +30,7 @@ func main() {
 	}
 
 	if uFlag {
-		helper.CheckUpdate()
+		helper.CheckUpdate(false)
 		os.Exit(0)
 	}
 
