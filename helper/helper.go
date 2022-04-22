@@ -50,7 +50,7 @@ func GetVersion() string {
 	return fmt.Sprintf("asuwave %s\nbuild time %s\n%s", GitHash, BuildTime, GoVersion)
 }
 
-func CheckUpdate() {
+func CheckUpdate(auto bool) {
 	resp, err := http.Get("https://api.github.com/repos/scutrobotlab/asuwave/releases/latest")
 	if err != nil {
 		fmt.Println("network error: " + err.Error())
@@ -72,8 +72,10 @@ func CheckUpdate() {
 			fmt.Println("new version available: " + gr.TagName)
 			fmt.Print("download now? (y/n) ")
 			var a string
-			fmt.Scanln(&a)
-			if a == "y" || a == "Y" || a == "yes" {
+			if !auto {
+				fmt.Scanln(&a)
+			}
+			if auto || a == "y" || a == "Y" || a == "yes" {
 				if err := DownloadFile(asset.BrowserDownloadURL, asset.Name); err != nil {
 					fmt.Println("download error: " + err.Error())
 					fmt.Println("trying hub.fastgit.org...")
@@ -85,29 +87,6 @@ func CheckUpdate() {
 		}
 	}
 	fmt.Printf("don't know your platform: %s, %s", runtime.GOOS, runtime.GOARCH)
-}
-
-func DownloadFile(url, filename string) error {
-	fmt.Println("downloading...")
-	resp, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("network error: %s", err.Error())
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status: %s", resp.Status)
-	}
-	file, err := os.Create(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("download complete: " + filename)
-	return nil
 }
 
 func StartBrowser(url string) {

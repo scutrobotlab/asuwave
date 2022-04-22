@@ -16,8 +16,8 @@ export default new Vuex.Store({
   getters: {
     searchVToProj: (state) => (keyword) => {
       if (keyword) {
-        return state.variables["proj"].filter(function(product) {
-          return Object.keys(product).some(function(key) {
+        return state.variables["proj"].filter(function (product) {
+          return Object.keys(product).some(function (key) {
             return (
               String(product[key])
                 .toLowerCase()
