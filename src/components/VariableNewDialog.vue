@@ -62,7 +62,7 @@
                         type="text"
                         :rules="AddrRules"
                         :disabled="disable"
-                        hint="形如2000ab78"
+                        hint="[2000 0000, 2fff ffff]区间的16进制数。"
                         required
                         v-model="Addr"
                       ></v-text-field>
@@ -114,7 +114,7 @@ export default {
     showcolorcard: "",
     AddrRules: [
       (v) => !!v || "变量地址是必要的",
-      (v) => /2[0-9a-f]{7}/.test(v) || "格式错误，应形如2000ab78",
+      (v) => /^(0x)?2[0-9a-fA-F]{7}$/.test(v) || "请输入[2000 0000, 2fff ffff]区间的16进制数。",
     ],
   }),
   computed: {
