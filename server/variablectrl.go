@@ -91,9 +91,14 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, errorJson("Invaild json"))
 				return
 			}
+			if serial.SerialCur.Name == "" {
+				w.WriteHeader(http.StatusInternalServerError)
+				io.WriteString(w, "Not allow when serial port closed.")
+				return
+			}
 			for i, v := range vList.Variables {
 				if v.Addr == oldVariable.Addr {
-					if isVToRead && serial.SerialCur.Name != "" {
+					if isVToRead {
 						err = serial.SendCmd(datautil.ActModeUnSubscribe, oldVariable)
 						if err != nil {
 							w.WriteHeader(http.StatusInternalServerError)
