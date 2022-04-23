@@ -1,7 +1,7 @@
 <template>
-  <v-list class="mb-8">
+  <v-list class="mb-8" :disabled="!serial_status">
     <v-list-item>
-      <v-list-item-title>变量·{{ showtext }}</v-list-item-title>
+      <v-list-item-title>只读变量</v-list-item-title>
       <v-spacer></v-spacer>
       <v-list-item-icon>
         <v-btn icon v-on:click="openDialog()">
@@ -10,50 +10,40 @@
       </v-list-item-icon>
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-item dense v-for="i in variables" :key="i.Name">
-      <v-list-item-avatar size="20" :color="i.Inputcolor" v-if="showtext == '观察'" />
-      <v-list-item-content v-if="showtext == '观察'">
+    <v-list-item dense v-for="i in variables" :key="i.Name" style="font-family: monospace">
+      <v-list-item-avatar size="20" :color="i.Inputcolor" />
+      <v-list-item-content>
         <v-list-item-title>
           <span class="green--text">{{ i.Type }}</span>
-          &nbsp;
-          {{ i.Name }}
+          {{ i.Name }};
         </v-list-item-title>
         <v-list-item-subtitle>{{ hexdsp(i.Addr) }}</v-list-item-subtitle>
       </v-list-item-content>
-      <v-text-field
-        v-else
-        dense
-        :label="i.Type + ' ' + i.Name + ' ='"
-        :hint="hexdsp(i.Addr)"
-        append-outer-icon="mdi-send"
-        v-model="i.Data"
-        @click:append-outer="modiVariable(i)"
-      >
-      </v-text-field>
-
       <v-list-item-action>
         <v-btn small icon v-on:click="delVariable(i)">
           <v-icon small>mdi-close</v-icon>
         </v-btn>
       </v-list-item-action>
     </v-list-item>
-    <VariableNewDialog ref="VariableNewDialog" v-bind:opt="opt" />
+    <VariableNewDialog ref="VariableNewDialog" opt="read" />
   </v-list>
 </template>
 
 <script>
 import errorMixin from "@/mixins/errorMixin.js";
-import { putVariable, deleteVariable } from "@/api/variable.js";
+import { deleteVariable } from "@/api/variable.js";
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 export default {
   mixins: [errorMixin],
-  props: ["showtext", "opt"],
   components: {
     VariableNewDialog,
   },
   computed: {
     variables() {
-      return this.$store.state.variables.variables[this.opt];
+      return this.$store.state.variables.variables.read;
+    },
+    serial_status() {
+      return this.$store.state.serialPort.status;
     },
   },
   async mounted() {
@@ -70,15 +60,11 @@ export default {
       return "0x" + z + h;
     },
     async getVariables() {
-      await this.$store.dispatch("variables/getV", this.opt);
+      await this.$store.dispatch("variables/getV", "read");
     },
     async delVariable(i) {
-      await this.errorHandler(deleteVariable(this.opt, 1, i.Name, i.Type, i.Addr));
+      await this.errorHandler(deleteVariable("read", 1, i.Name, i.Type, i.Addr));
       await this.getVariables();
-    },
-
-    async modiVariable(i) {
-      await this.errorHandler(putVariable("modi", 1, i.Name, i.Type, i.Addr, parseFloat(i.Data)));
     },
   },
 };

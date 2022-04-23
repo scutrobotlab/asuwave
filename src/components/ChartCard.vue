@@ -1,6 +1,6 @@
 <template>
   <v-card style="overflow-y: hidden">
-    <div :class="themeClasses" ref="chart" style="width: 100%; height: 77vh"></div>
+    <div :class="themeClasses" ref="chart" style="width: 100%; height: 85vh"></div>
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn text @click="exportData">导出</v-btn>

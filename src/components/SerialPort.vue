@@ -25,12 +25,21 @@ import { getSerial, getSerialCur, postSerialCur, deleteSerialCur } from "@/api/s
 export default {
   mixins: [errorMixin],
   data: () => ({
-    status: false,
     serial: null,
     serialList: [],
   }),
   mounted() {
     Promise.all([this.getSerialList(), this.getSerial()]);
+  },
+  computed: {
+    status: {
+      get() {
+        return this.$store.state.serialPort.status;
+      },
+      set(val) {
+        this.$store.commit("serialPort/setStatus", val);
+      },
+    },
   },
   methods: {
     async getSerialList() {
@@ -39,17 +48,17 @@ export default {
     async getSerial() {
       this.serial = await this.errorHandler(getSerialCur());
       if (this.serial) {
-        this.status = true;
+        this.$store.commit("serialPort/setStatus", true);
       }
     },
     optSerial() {
       if (this.status) {
         this.errorHandler(postSerialCur(this.serial)).catch(() => {
-          this.status = false;
+          this.$store.commit("serialPort/setStatus", false);
         });
       } else {
         this.errorHandler(deleteSerialCur()).catch(() => {
-          this.status = true;
+          this.$store.commit("serialPort/setStatus", true);
         });
       }
     },

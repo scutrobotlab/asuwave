@@ -119,7 +119,7 @@ export default {
   }),
   computed: {
     types() {
-      return this.$store.state.vTypes;
+      return this.$store.state.variables.vTypes;
     },
   },
   methods: {
@@ -139,7 +139,7 @@ export default {
           postVariable(this.opt, 1, this.Name, this.Type, parseInt(this.Addr, 16), this.Inputcolor)
         ).then(async () => {
           this.dialog = false;
-          await this.$store.dispatch("getV", this.opt);
+          await this.$store.dispatch("variables/getV", this.opt);
           this.$bus.$emit("sendcolor", this.Inputcolor);
           this.$bus.$emit("sendalert", true);
           console.log(this.opt);

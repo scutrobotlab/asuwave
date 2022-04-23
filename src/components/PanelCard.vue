@@ -59,7 +59,7 @@ export default {
   }),
   computed: {
     variables() {
-      return this.$store.state.variables["modi"];
+      return this.$store.state.variables.variables["modi"];
     },
   },
   methods: {

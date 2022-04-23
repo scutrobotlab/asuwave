@@ -94,15 +94,15 @@ export default {
   },
   computed: {
     lists() {
-      return this.$store.state.variables["proj"];
+      return this.$store.state.variables.variables["proj"];
     },
     searchData() {
-      if (this.$store.getters.searchVToProj(this.keyword) == null) return null;
-      return this.$store.getters.searchVToProj(this.keyword).slice(0, 200);
+      if (this.$store.getters.variables.searchVToProj(this.keyword) == null) return null;
+      return this.$store.getters.variables.searchVToProj(this.keyword).slice(0, 200);
     },
   },
   watch: {
-    file: async function() {
+    file: async function () {
       await this.errorHandler(postVariableToProj(this.file));
       await this.getVariableList();
     },
@@ -123,12 +123,12 @@ export default {
       this.$refs.VariableNewDialog.openDialogFromList(name, type, board, addr);
     },
     async closeDialog() {
-      await this.$store.dispatch("getV", "read");
-      await this.$store.dispatch("getV", "modi");
+      await this.$store.dispatch("variables/getV", "read");
+      await this.$store.dispatch("variables/getV", "modi");
       this.dialog = false;
     },
     async getVariableList() {
-      await this.$store.dispatch("getV", "proj");
+      await this.$store.dispatch("variables/getV", "proj");
     },
     // async variableAdd(mode, i) {
     //   await this.errorHandler(postVariable(mode, 1, i.Name, i.Type, parseInt(i.Addr, 16)));

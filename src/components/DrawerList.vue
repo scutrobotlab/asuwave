@@ -16,9 +16,9 @@
     </v-list>
     <v-divider />
 
-    <VariableList showtext="观察" opt="read" />
+    <VariableReadList />
     <v-divider />
-    <VariableList showtext="修改" opt="modi" />
+    <VariableModiList />
     <v-divider />
     <SaveConfig />
     <VariableAllDialog ref="VariableAllDialog" />
@@ -28,13 +28,15 @@
 <script>
 import SerialPort from "@/components/SerialPort.vue";
 import SaveConfig from "@/components/SaveConfig.vue";
-import VariableList from "@/components/VariableList.vue";
+import VariableModiList from "@/components/VariableModiList.vue";
+import VariableReadList from "@/components/VariableReadList.vue";
 import VariableAllDialog from "@/components/VariableAllDialog.vue";
 export default {
   components: {
     SerialPort,
     SaveConfig,
-    VariableList,
+    VariableModiList,
+    VariableReadList,
     VariableAllDialog,
   },
   data: () => ({

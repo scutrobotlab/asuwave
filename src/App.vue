@@ -19,10 +19,7 @@
     </v-app-bar>
 
     <v-main>
-      <v-container>
-        <ChartCard />
-        <PanelCard />
-      </v-container>
+      <ChartCard />
     </v-main>
 
     <v-footer app color="primary">
@@ -37,21 +34,19 @@
 import DrawerList from "@/components/DrawerList.vue";
 import AboutDialog from "@/components/AboutDialog.vue";
 import ChartCard from "@/components/ChartCard.vue";
-import PanelCard from "@/components/PanelCard.vue";
 
 export default {
   components: {
     DrawerList,
     AboutDialog,
     ChartCard,
-    PanelCard,
   },
   props: {
     source: String,
   },
   async mounted() {
     this.$vuetify.theme.dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    await this.$store.dispatch("getVType");
+    await this.$store.dispatch("variables/getVType");
   },
   methods: {
     switchDrawer() {
