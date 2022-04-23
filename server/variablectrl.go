@@ -33,7 +33,7 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, errorJson("Invaild json"))
 				return
 			}
-			if newVariable.Addr < 0x20000000 || newVariable.Addr > 0x2fffffff {
+			if newVariable.Addr < 0x20000000 || newVariable.Addr >= 0x80000000 {
 				w.WriteHeader(http.StatusBadRequest)
 				io.WriteString(w, errorJson("Address out of range"))
 				return
