@@ -86,7 +86,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="error" @click="$refs.form.reset()">清空</v-btn>
+          <v-btn color="error" @click="reset()">清空</v-btn>
           <v-btn color="primary" :disabled="!valid" @click="addVariable()">添加</v-btn>
         </v-card-actions>
       </v-card>
@@ -123,8 +123,17 @@ export default {
     },
   },
   methods: {
+    reset() {
+      this.Board = 1;
+      this.Name = "";
+      this.Type = "";
+      this.Addr = "";
+      window.console.log(this.randomColor());
+      this.Inputcolor = this.randomColor();
+    },
     openDialog() {
       this.dialog = true;
+      this.Inputcolor = this.randomColor();
     },
     openDialogFromList(name, type, board, addr) {
       this.dialog = true;
@@ -145,6 +154,18 @@ export default {
           console.log(this.opt);
         });
       }
+    },
+    randomColor() {
+      let color = "#";
+      for (let i = 0; i < 6; i++) {
+        let seed = "0123456789abcdef";
+        if (Math.random() < 0.5) {
+          seed = this.$vuetify.theme.dark ? "89abcdef" : "01234567";
+        }
+        color += seed[Math.floor(Math.random() * seed.length)];
+      }
+      color += "FF";
+      return color;
     },
   },
 };
