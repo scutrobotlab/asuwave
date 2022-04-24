@@ -23,7 +23,7 @@ func TestMakeCmd(t *testing.T) {
 				Data:  -8.25,
 				Tick:  0,
 			},
-			[]byte{0x01, 0x07, 0x04, 0x56, 0x34, 0x12, 0x80, 0x00, 0x00, 0x04, 0xc1, 0x00, 0x00, 0x00, 0x00, 0x0a},
+			[]byte{0x1, 0x7, 0x4, 0x56, 0x34, 0x12, 0x20, 0x0, 0x0, 0x4, 0xc1, 0x0, 0x0, 0x0, 0x0, 0xa},
 		},
 	}
 
@@ -178,6 +178,7 @@ func TestFindValidPart(t *testing.T) {
 	}
 }
 
+
 func TestMakeChartPack(t *testing.T) {
 	cases := []struct {
 		in    []byte
@@ -198,7 +199,7 @@ func TestMakeChartPack(t *testing.T) {
 						Board: 1,
 						Name:  "a",
 						Type:  "float",
-						Addr:  0x20123456,
+						Addr:  0x80123456,
 					},
 				},
 			},
@@ -233,7 +234,7 @@ func TestMakeChartPack(t *testing.T) {
 						Board: 1,
 						Name:  "a",
 						Type:  "float",
-						Addr:  0x20123456,
+						Addr:  0x80123456,
 					},
 					{
 						Board: 1,

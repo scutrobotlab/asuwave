@@ -8,6 +8,7 @@ import (
 )
 
 func TestVariableToReadCtrl(t *testing.T) {
+	// serial.Open("Test port")
 	cases := casesT{
 		{
 			http.MethodGet,
@@ -57,7 +58,7 @@ func TestVariableToReadCtrl(t *testing.T) {
 				Type:  "int",
 				Addr:  0x20123456,
 			},
-			http.StatusNoContent,
+			http.StatusInternalServerError,
 		},
 	}
 
@@ -128,7 +129,7 @@ func TestVariableToModiCtrl(t *testing.T) {
 				Type:  "int",
 				Addr:  0x20123456,
 			},
-			http.StatusNoContent,
+			http.StatusInternalServerError,
 		},
 	}
 
