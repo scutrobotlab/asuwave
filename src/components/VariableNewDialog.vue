@@ -128,7 +128,6 @@ export default {
       this.Name = "";
       this.Type = "";
       this.Addr = "";
-      window.console.log(this.randomColor());
       this.Inputcolor = this.randomColor();
     },
     openDialog() {
