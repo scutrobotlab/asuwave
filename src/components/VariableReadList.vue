@@ -1,5 +1,5 @@
 <template>
-  <v-list class="mb-8" :disabled="!serial_status">
+  <v-list class="mb-8">
     <v-list-item>
       <v-list-item-title>只读变量</v-list-item-title>
       <v-spacer></v-spacer>

@@ -30,10 +30,10 @@ var SerialCur = T{
 	Port: nil,
 }
 
-var chOp = make(chan bool)
-var chEd = make(chan bool)
-var chRx = make(chan []byte, 10)
-var chTx = make(chan []byte, 10)
+var chOp = make(chan bool)       // 敞开心扉
+var chEd = make(chan bool)       // 沉默不语
+var chRx = make(chan []byte, 10) // 来信收讫
+var chTx = make(chan []byte, 10) // 去信已至
 
 const testPortName = "Test port"
 
@@ -165,21 +165,43 @@ func GrRxPrase(c chan string) {
 	var rxBuff []byte
 	var x variable.ListChartT
 	for {
-		rx := <-chRx
-		rxBuff = append(rxBuff, rx...)
+		rx := <-chRx                   // 收到你的来信
+		rxBuff = append(rxBuff, rx...) // 深藏我的心底
 
-		startIdx, endIdx := datautil.FindValidPart(rxBuff)
+		startIdx, endIdx := datautil.FindValidPart(rxBuff) // 找寻甜蜜的话语
 
+		// 所有的酸甜苦辣都值得铭记
 		logger.Log.Printf("rxBuff: %#v\n", rxBuff)
 		logger.Log.Printf("startIdx: %d, endIdx: %d\n", startIdx, endIdx)
 
-		buff := rxBuff[startIdx:endIdx]
+		buff := rxBuff[startIdx:endIdx] // 撷取甜蜜的片段
 
+		// 拼凑出完整的清单
 		x.Variables = nil
-		datautil.MakeChartPack(&x, &variable.ToRead, buff)
+		var add variable.ListT // 有些变量，我难以忘记
+		var del variable.ListT // 有些变量，我不愿提起
+		datautil.MakeChartPack(&x, &add, &del, &variable.ToRead, buff)
 		if len(x.Variables) != 0 {
 			b, _ := json.Marshal(x)
 			c <- string(b)
+		}
+
+		// 挂念的变量，还望顺问近祺
+		for _, v := range add.Variables {
+			err := SendCmd(datautil.ActModeSubscribe, v)
+			if err != nil {
+				logger.Log.Println("SendCmd error:", err)
+				return
+			}
+		}
+
+		// 无缘的变量，就请随风逝去
+		for _, v := range del.Variables {
+			err := SendCmd(datautil.ActModeUnSubscribe, v)
+			if err != nil {
+				logger.Log.Println("SendCmd error:", err)
+				return
+			}
 		}
 
 		if endIdx >= len(rxBuff) {

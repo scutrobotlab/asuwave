@@ -8,6 +8,13 @@ import (
 	"github.com/scutrobotlab/asuwave/option"
 )
 
+var LenType = map[int]string{
+	1: "uint8_t",
+	2: "uint16_t",
+	4: "uint32_t",
+	8: "uint64_t",
+}
+
 var TypeLen = map[string]int{
 	"uint8_t":  1,
 	"uint16_t": 2,

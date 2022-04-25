@@ -1,5 +1,5 @@
 <template>
-  <v-list class="mb-8" :disabled="!serial_status">
+  <v-list class="mb-8">
     <v-list-item>
       <v-list-item-title>可写变量</v-list-item-title>
       <v-spacer></v-spacer>
@@ -19,6 +19,7 @@
         append-icon="mdi-send"
         v-model="i.Data"
         type="number"
+        :disabled="!serial_status"
         @click:append="modiVariable(i)"
       >
       </v-text-field>

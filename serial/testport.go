@@ -56,7 +56,7 @@ func testValue(x float64, addr uint32) float64 {
 		scale = math.Sin(currentPhase * 2 * math.Pi)
 	}
 	y := scale * amplitude
-	log.Printf("Test port: Address: 0x%08X %.5f => %.5f\n", addr, x, y)
+	//log.Printf("Test port: Address: 0x%08X %.5f => %.5f\n", addr, x, y)
 	return y
 }
 
@@ -69,17 +69,17 @@ func (tp *testPort) Read(p []byte) (n int, err error) {
 
 	for i, addr := range addresses {
 		s := p[20*i : 20*(i+1)]
-		s[0] = 1 // board
-		s[1] = 2 // act
-		s[2] = 8 // typeLen
-		copy(s[3:7], variable.AnyToBytes(addr))
+		s[0] = 1                                // 单片机代号 board
+		s[1] = 2                                // 响应或错误代号 act (0x02 = 订阅的正常返回)
+		s[2] = 8                                // 数据长度 typeLen
+		copy(s[3:7], variable.AnyToBytes(addr)) // 单片机地址
 		t := time.Since(tp.createdTime)
 		x := t.Seconds()
 		u := t.Milliseconds()
 		y := testValue(x, addr)
-		copy(s[7:15], variable.AnyToBytes(y))
-		copy(s[15:19], variable.AnyToBytes(uint32(u)))
-		s[19] = '\n'
+		copy(s[7:15], variable.AnyToBytes(y))          // 数据
+		copy(s[15:19], variable.AnyToBytes(uint32(u))) // 时间戳
+		s[19] = '\n'                                   // 尾部固定为0x0a
 	}
 	return len(addresses) * 20, nil
 }
@@ -116,6 +116,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 			}
 		}
 		tp.readingAddresses = newAddresses
+		log.Printf("Deleting address: %08X\n", address)
 
 	default:
 		return 0, errors.New("invalid act")

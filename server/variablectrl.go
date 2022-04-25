@@ -13,6 +13,8 @@ import (
 	"github.com/scutrobotlab/asuwave/variable"
 )
 
+// vList 要控制的参数列表；
+// isVToRead 为true代表只读变量，为false代表可写变量
 func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer variable.Refresh()
@@ -20,10 +22,11 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 		w.Header().Set("Content-Type", "application/json")
 		var err error
 		switch r.Method {
+		// 获取变量列表
 		case http.MethodGet:
 			b, _ := json.Marshal(vList)
 			io.WriteString(w, string(b))
-
+		// 新增变量
 		case http.MethodPost:
 			var newVariable variable.T
 			postData, _ := io.ReadAll(r.Body)
@@ -45,18 +48,10 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 					return
 				}
 			}
-			if isVToRead && serial.SerialCur.Name != "" {
-				err = serial.SendCmd(datautil.ActModeSubscribe, newVariable)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					io.WriteString(w, errorJson(err.Error()))
-					return
-				}
-			}
 			vList.Variables = append(vList.Variables, newVariable)
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, "")
-
+		// 为变量赋值
 		case http.MethodPut:
 			if isVToRead {
 				w.WriteHeader(http.StatusMethodNotAllowed)
@@ -71,17 +66,20 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, errorJson("Invaild json"))
 				return
 			}
-			if serial.SerialCur.Name != "" {
-				err = serial.SendCmd(datautil.ActModeWrite, modVariable)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					io.WriteString(w, errorJson(err.Error()))
-					return
-				}
+			if serial.SerialCur.Name == "" {
+				w.WriteHeader(http.StatusInternalServerError)
+				io.WriteString(w, "Not allow when serial port closed.")
+				return
+			}
+			err = serial.SendCmd(datautil.ActModeWrite, modVariable)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				io.WriteString(w, errorJson(err.Error()))
+				return
 			}
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, "")
-
+		// 删除变量
 		case http.MethodDelete:
 			var oldVariable variable.T
 			postData, _ := io.ReadAll(r.Body)
@@ -91,22 +89,10 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, errorJson("Invaild json"))
 				return
 			}
-			if serial.SerialCur.Name == "" {
-				w.WriteHeader(http.StatusInternalServerError)
-				io.WriteString(w, "Not allow when serial port closed.")
-				return
-			}
+
+			// 从 vList.Variables 中删除地址为 oldVariable.Addr 的变量
 			for i, v := range vList.Variables {
 				if v.Addr == oldVariable.Addr {
-					if isVToRead {
-						err = serial.SendCmd(datautil.ActModeUnSubscribe, oldVariable)
-						if err != nil {
-							w.WriteHeader(http.StatusInternalServerError)
-							io.WriteString(w, errorJson(err.Error()))
-							return
-						}
-					}
-
 					vList.Variables = append(vList.Variables[:i], vList.Variables[i+1:]...)
 					w.WriteHeader(http.StatusNoContent)
 					io.WriteString(w, "")
@@ -123,6 +109,7 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 	}
 }
 
+// 工程变量
 func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
 	defer variable.Refresh()
 	defer r.Body.Close()
