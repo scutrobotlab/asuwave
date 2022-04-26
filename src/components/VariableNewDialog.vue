@@ -148,7 +148,6 @@ export default {
         ).then(async () => {
           this.dialog = false;
           await this.$store.dispatch("variables/getV", this.opt);
-          this.$bus.$emit("sendcolor", this.Inputcolor);
           this.$bus.$emit("sendalert", true);
           console.log(this.opt);
         });

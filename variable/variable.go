@@ -38,23 +38,20 @@ type T struct {
 	Tick       uint32
 	Inputcolor string
 }
-type ListT struct {
-	Variables map[uint32]T
-}
 
-var ToRead ListT
-var ToModi ListT
+type ListT map[uint32]T
+
+var ToRead ListT = ListT{}
+var ToModi ListT = ListT{}
 
 type ToProjectT struct {
 	Addr string
 	Name string
 	Type string
 }
-type ListProjectT struct {
-	Variables map[uint32]ToProjectT
-}
+type ListProjectT map[string]ToProjectT
 
-var ToProj ListProjectT
+var ToProj ListProjectT = ListProjectT{}
 
 type ToChartT struct {
 	Board uint8
@@ -63,9 +60,7 @@ type ToChartT struct {
 	Tick  uint32
 }
 
-type ListChartT struct {
-	Variables map[uint32]ToChartT
-}
+type ListChartT []ToChartT
 
 var (
 	vToReadFileName = path.Join(helper.AppConfigDir(), "vToRead.json")

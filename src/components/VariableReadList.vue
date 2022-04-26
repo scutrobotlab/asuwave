@@ -10,14 +10,14 @@
       </v-list-item-icon>
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-item dense v-for="(i, Addr) in variables" :key="i.Addr" style="font-family: monospace">
+    <v-list-item dense v-for="(i, Addr) in variables" :key="Addr" style="font-family: monospace">
       <v-list-item-avatar size="20" :color="i.Inputcolor" />
       <v-list-item-content>
         <v-list-item-title>
           <span class="green--text">{{ i.Type }}</span>
           {{ i.Name }};
         </v-list-item-title>
-        <v-list-item-subtitle>{{ hexdsp(Addr) }}</v-list-item-subtitle>
+        <v-list-item-subtitle>{{ hexdsp(i.Addr) }}</v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
         <v-btn small icon v-on:click="delVariable(i)">
@@ -47,7 +47,7 @@ export default {
     },
   },
   async mounted() {
-    await this.getVariables();
+    this.getVariables();
   },
   methods: {
     openDialog() {

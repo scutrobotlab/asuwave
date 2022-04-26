@@ -195,14 +195,14 @@ func TestMakeChartPack(t *testing.T) {
 				0x0a,
 			},
 			listV: variable.ListT{
-				Variables: []variable.T{
-					{
+				Variables: map[uint32]variable.T{
+					0x80123456: {
 						Board: 1,
 						Name:  "a",
 						Type:  "float",
 						Addr:  0x80123456,
 					},
-					{
+					0x80654321: {
 						Board: 1,
 						Name:  "b",
 						Type:  "int",
@@ -221,8 +221,8 @@ func TestMakeChartPack(t *testing.T) {
 				},
 			},
 			wantAdd: variable.ListT{
-				Variables: []variable.T{
-					{
+				Variables: map[uint32]variable.T{
+					0x80654321: {
 						Board: 1,
 						Name:  "b",
 						Type:  "int",
@@ -247,8 +247,8 @@ func TestMakeChartPack(t *testing.T) {
 				0x0a,
 			},
 			listV: variable.ListT{
-				Variables: []variable.T{
-					{
+				Variables: map[uint32]variable.T{
+					0x80123456: {
 						Board: 1,
 						Name:  "a",
 						Type:  "float",
@@ -268,8 +268,8 @@ func TestMakeChartPack(t *testing.T) {
 			},
 			wantAdd: variable.ListT{},
 			wantDel: variable.ListT{
-				Variables: []variable.T{
-					{
+				Variables: map[uint32]variable.T{
+					0x80654321: {
 						Board: 1,
 						Type:  "uint32_t",
 						Addr:  0x80654321,

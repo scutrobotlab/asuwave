@@ -67,9 +67,7 @@ func FindValidPart(data []byte) (int, int) {
 // 从茫茫 data 中，寻找我所挂念的列表 y ，记录在列表 x 中。
 // 所有的 add 我都难以忘记，所有的 del 我都不愿提起
 func MakeChartPack(x *variable.ListChartT, add *variable.ListT, del *variable.ListT, y *variable.ListT, data []byte) {
-	var dataList variable.ListT
-
-OUTER1:
+	dataList := variable.ListT{}
 	for i := 0; i < len(data)/20; i++ {
 		// 变量的板子、心跳和地址
 		dataVar := variable.T{
@@ -79,58 +77,52 @@ OUTER1:
 			Tick:  variable.BytesToUint32(data[i*20+15 : i*20+19])}
 
 		// 它是我要找的那个变量吗？
-		for _, v := range y.Variables {
-			if v.Addr == dataVar.Addr { // 是的，我还挂念着它
-				dataVar.Name = v.Name
-				dataVar.Type = v.Type
-				switch v.Type {
-				case "uint8_t":
-					dataVar.Data = float64(variable.BytesToUint8(data[i*20+7 : i*20+15]))
-				case "uint16_t":
-					dataVar.Data = float64(variable.BytesToUint16(data[i*20+7 : i*20+15]))
-				case "uint32_t":
-					dataVar.Data = float64(variable.BytesToUint32(data[i*20+7 : i*20+15]))
-				case "uint64_t":
-					dataVar.Data = float64(variable.BytesToUint64(data[i*20+7 : i*20+15]))
-				case "int8_t":
-					dataVar.Data = float64(variable.BytesToInt8(data[i*20+7 : i*20+15]))
-				case "int16_t":
-					dataVar.Data = float64(variable.BytesToInt16(data[i*20+7 : i*20+15]))
-				case "int32_t", "int":
-					dataVar.Data = float64(variable.BytesToInt32(data[i*20+7 : i*20+15]))
-				case "int64_t":
-					dataVar.Data = float64(variable.BytesToInt64(data[i*20+7 : i*20+15]))
-				case "float":
-					dataVar.Data = float64(variable.BytesToFloat32(data[i*20+7 : i*20+15]))
-				case "double":
-					dataVar.Data = float64(variable.BytesToFloat64(data[i*20+7 : i*20+15]))
-				default:
-					dataVar.Data = 0
-				}
-				dataList.Variables = append(dataList.Variables, dataVar)
-
-				chartVar := variable.ToChartT{
-					Board: dataVar.Board,
-					Name:  dataVar.Name,
-					Data:  dataVar.Data,
-					Tick:  dataVar.Tick}
-				x.Variables = append(x.Variables, chartVar)
-				continue OUTER1
+		if v, ok := (*y)[dataVar.Addr]; ok { // 是的，我还挂念着它
+			dataVar.Name = v.Name
+			dataVar.Type = v.Type
+			switch v.Type {
+			case "uint8_t":
+				dataVar.Data = float64(variable.BytesToUint8(data[i*20+7 : i*20+15]))
+			case "uint16_t":
+				dataVar.Data = float64(variable.BytesToUint16(data[i*20+7 : i*20+15]))
+			case "uint32_t":
+				dataVar.Data = float64(variable.BytesToUint32(data[i*20+7 : i*20+15]))
+			case "uint64_t":
+				dataVar.Data = float64(variable.BytesToUint64(data[i*20+7 : i*20+15]))
+			case "int8_t":
+				dataVar.Data = float64(variable.BytesToInt8(data[i*20+7 : i*20+15]))
+			case "int16_t":
+				dataVar.Data = float64(variable.BytesToInt16(data[i*20+7 : i*20+15]))
+			case "int32_t", "int":
+				dataVar.Data = float64(variable.BytesToInt32(data[i*20+7 : i*20+15]))
+			case "int64_t":
+				dataVar.Data = float64(variable.BytesToInt64(data[i*20+7 : i*20+15]))
+			case "float":
+				dataVar.Data = float64(variable.BytesToFloat32(data[i*20+7 : i*20+15]))
+			case "double":
+				dataVar.Data = float64(variable.BytesToFloat64(data[i*20+7 : i*20+15]))
+			default:
+				dataVar.Data = 0
 			}
+			dataList[dataVar.Addr] = dataVar
+
+			chartVar := variable.ToChartT{
+				Board: dataVar.Board,
+				Name:  dataVar.Name,
+				Data:  dataVar.Data,
+				Tick:  dataVar.Tick}
+			*x = append(*x, chartVar)
+		} else {
+			// 有些变量，我已不愿提起
+			(*del)[dataVar.Addr] = dataVar
 		}
-		// 有些变量，我已不愿提起
-		del.Variables = append(del.Variables, dataVar)
 	}
 
 	// 我所挂念的，它们都还在吗
-OUTER2:
-	for _, v := range y.Variables {
-		for _, dv := range dataList.Variables {
-			if dv.Addr == v.Addr {
-				continue OUTER2
-			}
+	for _, v := range *y {
+		if _, ok := dataList[v.Addr]; !ok {
+			// 我很想它，下次请别忘记
+			(*add)[v.Addr] = v
 		}
-		// 我很想它，下次请别忘记
-		add.Variables = append(add.Variables, v)
 	}
 }

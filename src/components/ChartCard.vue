@@ -16,7 +16,6 @@
 <script>
 import timechart from "timechart";
 import Themeable from "vuetify/lib/mixins/themeable";
-import { getVariable } from "@/api/variable.js";
 import { lineChart } from "timechart/dist/lib/plugins/lineChart";
 import { d3Axis } from "timechart/dist/lib/plugins/d3Axis";
 import { legend } from "timechart/dist/lib/plugins/legend";
@@ -29,8 +28,6 @@ export default {
   data: () => ({
     chart: null,
     ws: null,
-    indexColor: -2,
-    inputColor: "",
     showFollow: "跟随",
     putColors: [],
   }),
@@ -39,6 +36,11 @@ export default {
   },
   destroyed() {
     this.ws.close();
+  },
+  computed: {
+    variables() {
+      return this.$store.state.variables.variables.read;
+    },
   },
   async mounted() {
     this.chart = new timechart(this.$refs.chart, {
@@ -67,19 +69,10 @@ export default {
     this.$nextTick(() => {
       this.chart.onResize();
     });
-    this.$bus.$on("sendcolor", (data) => {
-      this.inputColor = data;
-    });
-    getVariable("read").then((variable) => {
-      this.putColors = variable;
-      this.indexColor = -1;
-    });
+    this.$store.dispatch("variables/getV", "read");
   },
   watch: {
     isDark: function () {
-      // for (const s of this.chart.options.series) {
-      //   this.updateColor(s);
-      // }
       this.chart.update();
     },
   },
@@ -108,41 +101,38 @@ export default {
       console.log("连接断开");
     },
     WSonmessage(evt) {
-      this.praseWS(evt.data);
+      this.parseWS(evt.data);
     },
     WSonerror(evt) {
       console.log("ERROR: " + evt.data);
     },
-    updateColor(series) {
-      const index = series.colorIndex;
-      if (this.inputColor != "") {
-        series.color = this.inputColor;
-      } else {
-        series.color = this.putColors[index].Inputcolor;
-      }
-    },
-    praseWS(data) {
+    parseWS(data) {
       if (!data) {
         return;
       }
       const jsonWS = JSON.parse(data);
-      const seriesArray = this.chart.options.series;
-      if (this.indexColor != -2) {
-        for (const dp of jsonWS.Variables) {
-          let series = seriesArray.find((a) => a.name == dp.Name);
-          if (!series) {
-            this.indexColor++;
-            series = {
-              name: dp.Name,
-              colorIndex: this.indexColor,
-              data: [],
-            };
-            this.updateColor(series);
-            seriesArray.push(series);
-          }
+      let seriesArray = this.chart.options.series;
+      seriesArray.filter(s => {
+        if (Object.entries(this.variables).find(([, v]) => s.name == v.Name) === undefined) {
+          s.visible = false
+        }
+      });
+
+      for (const [, variable] of Object.entries(this.variables)) {
+        let chart_var = jsonWS.find((c) => c.Name == variable.Name);
+        let series = seriesArray.find((s) => s.name == variable.Name);
+        if (!series) {
+          series = {
+            name: variable.Name,
+            color: variable.Inputcolor,
+            data: [],
+          };
+          seriesArray.push(series);
+        }
+        if (chart_var) {
           series.data.push({
-            x: dp.Tick,
-            y: dp.Data,
+            x: chart_var.Tick,
+            y: chart_var.Data,
           });
         }
       }

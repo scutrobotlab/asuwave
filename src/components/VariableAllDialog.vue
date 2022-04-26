@@ -43,7 +43,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="list in searchData" :key="list.Name + list.Addr">
+              <tr v-for="list in searchData" :key="list.Name">
                 <td>{{ list.Name }}</td>
                 <td>{{ list.Type }}</td>
                 <td>{{ list.Addr }}</td>
