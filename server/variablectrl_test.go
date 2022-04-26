@@ -58,7 +58,7 @@ func TestVariableToReadCtrl(t *testing.T) {
 				Type:  "int",
 				Addr:  0x20123456,
 			},
-			http.StatusInternalServerError,
+			http.StatusNoContent,
 		},
 	}
 
@@ -113,7 +113,7 @@ func TestVariableToModiCtrl(t *testing.T) {
 				Addr:  0x20123456,
 				Data:  100,
 			},
-			http.StatusNoContent,
+			http.StatusInternalServerError,
 		},
 		{
 			http.MethodDelete,
@@ -129,7 +129,7 @@ func TestVariableToModiCtrl(t *testing.T) {
 				Type:  "int",
 				Addr:  0x20123456,
 			},
-			http.StatusInternalServerError,
+			http.StatusNoContent,
 		},
 	}
 

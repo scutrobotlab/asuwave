@@ -31,7 +31,7 @@ func ctrlerTest(ctrler func(http.ResponseWriter, *http.Request), name string, ca
 		resp := w.Result()
 		body, _ := io.ReadAll(resp.Body)
 		if resp.StatusCode != c.wantCode {
-			t.Errorf("Ctrler %v error: %v", name, resp.Status)
+			t.Errorf("Ctrler %v error: want '%d', got '%d'", name, c.wantCode, resp.StatusCode)
 		}
 
 		fmt.Printf("Ctrler %v response: %v\n", name, string(body))

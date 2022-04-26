@@ -178,12 +178,13 @@ func TestFindValidPart(t *testing.T) {
 	}
 }
 
-
 func TestMakeChartPack(t *testing.T) {
 	cases := []struct {
-		in    []byte
-		listV variable.ListT
-		want  variable.ListChartT
+		in        []byte
+		listV     variable.ListT
+		wantChart variable.ListChartT
+		wantAdd   variable.ListT
+		wantDel   variable.ListT
 	}{
 		{
 			in: []byte{
@@ -201,9 +202,15 @@ func TestMakeChartPack(t *testing.T) {
 						Type:  "float",
 						Addr:  0x80123456,
 					},
+					{
+						Board: 1,
+						Name:  "b",
+						Type:  "int",
+						Addr:  0x80654321,
+					},
 				},
 			},
-			want: variable.ListChartT{
+			wantChart: variable.ListChartT{
 				Variables: []variable.ToChartT{
 					{
 						Board: 1,
@@ -213,6 +220,17 @@ func TestMakeChartPack(t *testing.T) {
 					},
 				},
 			},
+			wantAdd: variable.ListT{
+				Variables: []variable.T{
+					{
+						Board: 1,
+						Name:  "b",
+						Type:  "int",
+						Addr:  0x80654321,
+					},
+				},
+			},
+			wantDel: variable.ListT{},
 		},
 
 		{
@@ -236,15 +254,9 @@ func TestMakeChartPack(t *testing.T) {
 						Type:  "float",
 						Addr:  0x80123456,
 					},
-					{
-						Board: 1,
-						Name:  "b",
-						Type:  "int",
-						Addr:  0x80654321,
-					},
 				},
 			},
-			want: variable.ListChartT{
+			wantChart: variable.ListChartT{
 				Variables: []variable.ToChartT{
 					{
 						Board: 1,
@@ -252,23 +264,62 @@ func TestMakeChartPack(t *testing.T) {
 						Data:  -8.25,
 						Tick:  1,
 					},
+				},
+			},
+			wantAdd: variable.ListT{},
+			wantDel: variable.ListT{
+				Variables: []variable.T{
 					{
 						Board: 1,
-						Name:  "b",
-						Data:  1,
-						Tick:  1,
+						Type:  "uint32_t",
+						Addr:  0x80654321,
 					},
 				},
 			},
 		},
 	}
+	isSameChart := func(a variable.ListChartT, b variable.ListChartT) (bool, string) {
+		ja, _ := json.Marshal(a)
+		jb, _ := json.Marshal(b)
+		sa := string(ja)
+		sb := string(jb)
+		return sa == sb, "Chart Not Same: " + sa + ", " + sb
+	}
+	isSame := func(a variable.ListT, b variable.ListT) (bool, string) {
+		if len(a.Variables) != len(b.Variables) {
+			return false, ""
+		}
+		for i := range a.Variables {
+			if a.Variables[i].Board != b.Variables[i].Board {
+				return false, ""
+			}
+			if a.Variables[i].Addr != b.Variables[i].Addr {
+				return false, ""
+			}
+			if variable.TypeLen[a.Variables[i].Type] != variable.TypeLen[b.Variables[i].Type] {
+				return false, ""
+			}
+		}
+
+		ja, _ := json.Marshal(a)
+		jb, _ := json.Marshal(b)
+		sa := string(ja)
+		sb := string(jb)
+		return true, "List Not Same: " + sa + ", " + sb
+	}
 	for _, c := range cases {
-		var got variable.ListChartT
-		MakeChartPack(&got, &c.listV, c.in)
-		b1, _ := json.Marshal(got)
-		b2, _ := json.Marshal(c.want)
-		if string(b1) != string(b2) {
-			t.Errorf("MakeChartPack(%#v,%#v) want %#v", got, c.in, c.want)
+		var gotChart variable.ListChartT
+		var gotAdd variable.ListT
+		var gotDel variable.ListT
+		MakeChartPack(&gotChart, &gotAdd, &gotDel, &c.listV, c.in)
+		if ok, msg := isSameChart(gotChart, c.wantChart); !ok {
+			t.Errorf("MakeChartPack, chart: " + msg)
+		}
+		if ok, msg := isSame(gotAdd, c.wantAdd); !ok {
+			t.Errorf("MakeChartPack, chart: " + msg)
+		}
+		if ok, msg := isSame(gotDel, c.wantDel); !ok {
+			t.Errorf("MakeChartPack, chart: " + msg)
 		}
 	}
 }
