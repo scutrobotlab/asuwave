@@ -10,12 +10,12 @@
       </v-list-item-icon>
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-item v-for="i in variables" :key="i.Addr" class="mb-2">
+    <v-list-item v-for="(i, Addr) in variables" :key="i.Addr" class="mb-2">
       <v-text-field
         style="font-family: monospace"
         dense
         :label="i.Type + ' ' + i.Name + ' ='"
-        :hint="hexdsp(i.Addr)"
+        :hint="hexdsp(Addr)"
         append-icon="mdi-send"
         v-model="i.Data"
         type="number"

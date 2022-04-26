@@ -39,7 +39,7 @@ type T struct {
 	Inputcolor string
 }
 type ListT struct {
-	Variables []T
+	Variables map[uint32]T
 }
 
 var ToRead ListT
@@ -51,7 +51,7 @@ type ToProjectT struct {
 	Type string
 }
 type ListProjectT struct {
-	Variables []ToProjectT
+	Variables map[uint32]ToProjectT
 }
 
 var ToProj ListProjectT
@@ -64,7 +64,7 @@ type ToChartT struct {
 }
 
 type ListChartT struct {
-	Variables []ToChartT
+	Variables map[uint32]ToChartT
 }
 
 var (

@@ -4,9 +4,9 @@ export default {
     namespaced: true,
     state: {
         variables: {
-            proj: [],
-            read: [],
-            modi: [],
+            proj: {},
+            read: {},
+            modi: {},
         },
         vTypes: [],
     },
@@ -29,7 +29,7 @@ export default {
     },
     mutations: {
         setV(state, i) {
-            state.variables[i.t] = i.v;
+            state.variables[i.t][i.Addr] = i.v;
         },
         setVType(state, i) {
             state.vTypes = i;
