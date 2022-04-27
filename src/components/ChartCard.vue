@@ -112,12 +112,11 @@ export default {
       }
       const jsonWS = JSON.parse(data);
       let seriesArray = this.chart.options.series;
-      seriesArray.filter(s => {
+      seriesArray.forEach(s => {
         if (Object.entries(this.variables).find(([, v]) => s.name == v.Name) === undefined) {
           s.visible = false
         }
       });
-
       for (const [, variable] of Object.entries(this.variables)) {
         let chart_var = jsonWS.find((c) => c.Name == variable.Name);
         let series = seriesArray.find((s) => s.name == variable.Name);
