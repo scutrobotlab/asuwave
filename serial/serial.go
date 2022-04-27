@@ -128,7 +128,7 @@ func GrReceive() {
 	buff := make([]byte, 200)
 	for {
 		<-chOp
-		for _, v := range variable.ToRead.Variables {
+		for _, v := range variable.ToRead {
 			SendCmd(datautil.ActModeSubscribe, v)
 			time.Sleep(10 * time.Millisecond)
 		}
@@ -163,7 +163,6 @@ func GrTransmit() {
 
 func GrRxPrase(c chan string) {
 	var rxBuff []byte
-	var x variable.ListChartT
 	for {
 		rx := <-chRx                   // 收到你的来信
 		rxBuff = append(rxBuff, rx...) // 深藏我的心底
@@ -177,17 +176,14 @@ func GrRxPrase(c chan string) {
 		buff := rxBuff[startIdx:endIdx] // 撷取甜蜜的片段
 
 		// 拼凑出完整的清单
-		x.Variables = nil
-		var add variable.ListT // 有些变量，我难以忘记
-		var del variable.ListT // 有些变量，我不愿提起
-		datautil.MakeChartPack(&x, &add, &del, &variable.ToRead, buff)
-		if len(x.Variables) != 0 {
+		x, add, del := datautil.MakeChartPack(&variable.ToRead, buff)
+		if len(x) != 0 {
 			b, _ := json.Marshal(x)
 			c <- string(b)
 		}
 
 		// 挂念的变量，还望顺问近祺
-		for _, v := range add.Variables {
+		for _, v := range add {
 			err := SendCmd(datautil.ActModeSubscribe, v)
 			if err != nil {
 				logger.Log.Println("SendCmd error:", err)
@@ -196,7 +192,7 @@ func GrRxPrase(c chan string) {
 		}
 
 		// 无缘的变量，就请随风逝去
-		for _, v := range del.Variables {
+		for _, v := range del {
 			err := SendCmd(datautil.ActModeUnSubscribe, v)
 			if err != nil {
 				logger.Log.Println("SendCmd error:", err)

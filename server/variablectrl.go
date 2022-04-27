@@ -41,14 +41,12 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, errorJson("Address out of range"))
 				return
 			}
-			for _, v := range vList.Variables {
-				if v.Addr == newVariable.Addr {
-					w.WriteHeader(http.StatusBadRequest)
-					io.WriteString(w, errorJson("Address already used"))
-					return
-				}
+			if _, ok := (*vList)[newVariable.Addr]; ok {
+				w.WriteHeader(http.StatusBadRequest)
+				io.WriteString(w, errorJson("Address already used"))
+				return
 			}
-			vList.Variables = append(vList.Variables, newVariable)
+			(*vList)[newVariable.Addr] = newVariable
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, "")
 		// 为变量赋值
@@ -90,17 +88,17 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				return
 			}
 
+			// 我认为不必再检查是否存在这个变量
+			// if _, ok := vList.Variables[oldVariable.Addr]; !ok {
+			// 	w.WriteHeader(http.StatusBadRequest)
+			// 	io.WriteString(w, errorJson("No such address"))
+			// }
+
 			// 从 vList.Variables 中删除地址为 oldVariable.Addr 的变量
-			for i, v := range vList.Variables {
-				if v.Addr == oldVariable.Addr {
-					vList.Variables = append(vList.Variables[:i], vList.Variables[i+1:]...)
-					w.WriteHeader(http.StatusNoContent)
-					io.WriteString(w, "")
-					return
-				}
-			}
-			w.WriteHeader(http.StatusBadRequest)
-			io.WriteString(w, errorJson("No such address"))
+			delete(*vList, oldVariable.Addr)
+			w.WriteHeader(http.StatusNoContent)
+			io.WriteString(w, "")
+			return
 
 		default:
 			w.WriteHeader(http.StatusMethodNotAllowed)
@@ -157,7 +155,7 @@ func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		io.WriteString(w, "")
 	case http.MethodDelete:
-		variable.ToProj.Variables = nil
+		variable.ToProj = variable.ListProjectT{}
 
 		w.WriteHeader(http.StatusNoContent)
 		io.WriteString(w, "")

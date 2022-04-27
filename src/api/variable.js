@@ -2,7 +2,7 @@ import { fetchApi, uploadFile } from "./internal";
 
 export async function getVariable(mode) {
   const res = await fetchApi("/variable_" + mode);
-  return res.Variables;
+  return res;
 }
 
 export async function getVariableType() {

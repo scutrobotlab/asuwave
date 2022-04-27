@@ -17,10 +17,13 @@ type testPort struct {
 	createdTime      time.Time
 }
 
+var BoardSysTime time.Time = time.Now() // 虚拟电路板的系统时间
+
 func newTestPort() serial.Port {
+	log.Println(BoardSysTime)
 	return &testPort{
 		readingAddresses: []uint32{},
-		createdTime:      time.Now(),
+		createdTime:      BoardSysTime,
 	}
 }
 

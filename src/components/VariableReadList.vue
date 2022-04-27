@@ -10,7 +10,7 @@
       </v-list-item-icon>
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-item dense v-for="i in variables" :key="i.Addr" style="font-family: monospace">
+    <v-list-item dense v-for="(i, Addr) in variables" :key="Addr" style="font-family: monospace">
       <v-list-item-avatar size="20" :color="i.Inputcolor" />
       <v-list-item-content>
         <v-list-item-title>
@@ -47,7 +47,7 @@ export default {
     },
   },
   async mounted() {
-    await this.getVariables();
+    this.getVariables();
   },
   methods: {
     openDialog() {

@@ -4,9 +4,9 @@ export default {
     namespaced: true,
     state: {
         variables: {
-            proj: [],
-            read: [],
-            modi: [],
+            proj: {},
+            read: {},
+            modi: {},
         },
         vTypes: [],
     },
