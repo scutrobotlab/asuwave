@@ -195,39 +195,33 @@ func TestMakeChartPack(t *testing.T) {
 				0x0a,
 			},
 			listV: variable.ListT{
-				Variables: map[uint32]variable.T{
-					0x80123456: {
-						Board: 1,
-						Name:  "a",
-						Type:  "float",
-						Addr:  0x80123456,
-					},
-					0x80654321: {
-						Board: 1,
-						Name:  "b",
-						Type:  "int",
-						Addr:  0x80654321,
-					},
+				0x80123456: {
+					Board: 1,
+					Name:  "a",
+					Type:  "float",
+					Addr:  0x80123456,
+				},
+				0x80654321: {
+					Board: 1,
+					Name:  "b",
+					Type:  "int",
+					Addr:  0x80654321,
 				},
 			},
 			wantChart: variable.ListChartT{
-				Variables: []variable.ToChartT{
-					{
-						Board: 1,
-						Name:  "a",
-						Data:  -8.25,
-						Tick:  1,
-					},
+				{
+					Board: 1,
+					Name:  "a",
+					Data:  -8.25,
+					Tick:  1,
 				},
 			},
 			wantAdd: variable.ListT{
-				Variables: map[uint32]variable.T{
-					0x80654321: {
-						Board: 1,
-						Name:  "b",
-						Type:  "int",
-						Addr:  0x80654321,
-					},
+				0x80654321: {
+					Board: 1,
+					Name:  "b",
+					Type:  "int",
+					Addr:  0x80654321,
 				},
 			},
 			wantDel: variable.ListT{},
@@ -247,33 +241,27 @@ func TestMakeChartPack(t *testing.T) {
 				0x0a,
 			},
 			listV: variable.ListT{
-				Variables: map[uint32]variable.T{
-					0x80123456: {
-						Board: 1,
-						Name:  "a",
-						Type:  "float",
-						Addr:  0x80123456,
-					},
+				0x80123456: {
+					Board: 1,
+					Name:  "a",
+					Type:  "float",
+					Addr:  0x80123456,
 				},
 			},
 			wantChart: variable.ListChartT{
-				Variables: []variable.ToChartT{
-					{
-						Board: 1,
-						Name:  "a",
-						Data:  -8.25,
-						Tick:  1,
-					},
+				{
+					Board: 1,
+					Name:  "a",
+					Data:  -8.25,
+					Tick:  1,
 				},
 			},
 			wantAdd: variable.ListT{},
 			wantDel: variable.ListT{
-				Variables: map[uint32]variable.T{
-					0x80654321: {
-						Board: 1,
-						Type:  "uint32_t",
-						Addr:  0x80654321,
-					},
+				0x80654321: {
+					Board: 1,
+					Type:  "uint32_t",
+					Addr:  0x80654321,
 				},
 			},
 		},
@@ -286,17 +274,17 @@ func TestMakeChartPack(t *testing.T) {
 		return sa == sb, "Chart Not Same: " + sa + ", " + sb
 	}
 	isSame := func(a variable.ListT, b variable.ListT) (bool, string) {
-		if len(a.Variables) != len(b.Variables) {
+		if len(a) != len(b) {
 			return false, ""
 		}
-		for i := range a.Variables {
-			if a.Variables[i].Board != b.Variables[i].Board {
+		for i := range a {
+			if a[i].Board != b[i].Board {
 				return false, ""
 			}
-			if a.Variables[i].Addr != b.Variables[i].Addr {
+			if a[i].Addr != b[i].Addr {
 				return false, ""
 			}
-			if variable.TypeLen[a.Variables[i].Type] != variable.TypeLen[b.Variables[i].Type] {
+			if variable.TypeLen[a[i].Type] != variable.TypeLen[b[i].Type] {
 				return false, ""
 			}
 		}
@@ -308,10 +296,7 @@ func TestMakeChartPack(t *testing.T) {
 		return true, "List Not Same: " + sa + ", " + sb
 	}
 	for _, c := range cases {
-		var gotChart variable.ListChartT
-		var gotAdd variable.ListT
-		var gotDel variable.ListT
-		MakeChartPack(&gotChart, &gotAdd, &gotDel, &c.listV, c.in)
+		gotChart, gotAdd, gotDel := MakeChartPack(&c.listV, c.in)
 		if ok, msg := isSameChart(gotChart, c.wantChart); !ok {
 			t.Errorf("MakeChartPack, chart: " + msg)
 		}

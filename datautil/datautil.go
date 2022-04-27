@@ -66,7 +66,10 @@ func FindValidPart(data []byte) (int, int) {
 
 // 从茫茫 data 中，寻找我所挂念的列表 y ，记录在列表 x 中。
 // 所有的 add 我都难以忘记，所有的 del 我都不愿提起
-func MakeChartPack(x *variable.ListChartT, add *variable.ListT, del *variable.ListT, y *variable.ListT, data []byte) {
+func MakeChartPack(y *variable.ListT, data []byte) (x variable.ListChartT, add variable.ListT, del variable.ListT) {
+	x = variable.ListChartT{}
+	add = variable.ListT{} // 有些变量，我难以忘记
+	del = variable.ListT{} // 有些变量，我不愿提起
 	dataList := variable.ListT{}
 	for i := 0; i < len(data)/20; i++ {
 		// 变量的板子、心跳和地址
@@ -111,10 +114,10 @@ func MakeChartPack(x *variable.ListChartT, add *variable.ListT, del *variable.Li
 				Name:  dataVar.Name,
 				Data:  dataVar.Data,
 				Tick:  dataVar.Tick}
-			*x = append(*x, chartVar)
+			x = append(x, chartVar)
 		} else {
 			// 有些变量，我已不愿提起
-			(*del)[dataVar.Addr] = dataVar
+			del[dataVar.Addr] = dataVar
 		}
 	}
 
@@ -122,7 +125,8 @@ func MakeChartPack(x *variable.ListChartT, add *variable.ListT, del *variable.Li
 	for _, v := range *y {
 		if _, ok := dataList[v.Addr]; !ok {
 			// 我很想它，下次请别忘记
-			(*add)[v.Addr] = v
+			add[v.Addr] = v
 		}
 	}
+	return
 }

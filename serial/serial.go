@@ -176,10 +176,7 @@ func GrRxPrase(c chan string) {
 		buff := rxBuff[startIdx:endIdx] // 撷取甜蜜的片段
 
 		// 拼凑出完整的清单
-		x := variable.ListChartT{}
-		var add variable.ListT = variable.ListT{} // 有些变量，我难以忘记
-		var del variable.ListT = variable.ListT{} // 有些变量，我不愿提起
-		datautil.MakeChartPack(&x, &add, &del, &variable.ToRead, buff)
+		x, add, del := datautil.MakeChartPack(&variable.ToRead, buff)
 		if len(x) != 0 {
 			b, _ := json.Marshal(x)
 			c <- string(b)
