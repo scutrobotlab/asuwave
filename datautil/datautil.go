@@ -124,17 +124,6 @@ func MakeChartPack(y *variable.ListT, data []byte) (x variable.ListChartT, add v
 				Addr:  addr,
 				Tick:  tick,
 			}
-			dataList[dataVar.Addr] = dataVar
-
-			chartVar := variable.ToChartT{
-				Board: dataVar.Board,
-				Name:  dataVar.Name,
-				Data:  dataVar.Data,
-				Tick:  dataVar.Tick}
-			x = append(x, chartVar)
-		} else {
-			// 有些变量，我已不愿提起
-			del[dataVar.Addr] = dataVar
 		}
 	}
 
