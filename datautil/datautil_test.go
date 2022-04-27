@@ -196,16 +196,18 @@ func TestMakeChartPack(t *testing.T) {
 			},
 			listV: variable.ListT{
 				0x80123456: {
-					Board: 1,
-					Name:  "a",
-					Type:  "float",
-					Addr:  0x80123456,
+					Board:      1,
+					Name:       "a",
+					Type:       "float",
+					Addr:       0x80123456,
+					SignalGain: 1,
 				},
 				0x80654321: {
-					Board: 1,
-					Name:  "b",
-					Type:  "int",
-					Addr:  0x80654321,
+					Board:      1,
+					Name:       "b",
+					Type:       "int",
+					Addr:       0x80654321,
+					SignalGain: 1,
 				},
 			},
 			wantChart: variable.ListChartT{
@@ -242,10 +244,11 @@ func TestMakeChartPack(t *testing.T) {
 			},
 			listV: variable.ListT{
 				0x80123456: {
-					Board: 1,
-					Name:  "a",
-					Type:  "float",
-					Addr:  0x80123456,
+					Board:      1,
+					Name:       "a",
+					Type:       "float",
+					Addr:       0x80123456,
+					SignalGain: 1,
 				},
 			},
 			wantChart: variable.ListChartT{
