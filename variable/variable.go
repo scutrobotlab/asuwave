@@ -37,6 +37,8 @@ type T struct {
 	Data       float64
 	Tick       uint32
 	Inputcolor string
+	SignalGain float64
+	SignalBias float64
 }
 
 type ListT map[uint32]T

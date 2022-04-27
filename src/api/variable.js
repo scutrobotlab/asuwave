@@ -10,8 +10,8 @@ export async function getVariableType() {
   return res.Types;
 }
 
-export async function postVariable(mode, Board, Name, Type, Addr, Inputcolor) {
-  return await fetchApi("/variable_" + mode, "POST", { Board, Name, Type, Addr, Inputcolor });
+export async function postVariable(mode, Board, Name, Type, Addr, Inputcolor, SignalGain, SignalBias) {
+  return await fetchApi("/variable_" + mode, "POST", { Board, Name, Type, Addr, Inputcolor, SignalGain, SignalBias });
 }
 
 export async function postVariableToProj(file) {

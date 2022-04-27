@@ -64,6 +64,15 @@ func FindValidPart(data []byte) (int, int) {
 	return l, r + 1
 }
 
+func Convert_T_ToChartT(x variable.T) variable.ToChartT {
+	return variable.ToChartT{
+		Board: x.Board,
+		Name:  x.Name,
+		Data:  x.SignalGain*x.Data + x.SignalBias,
+		Tick:  x.Tick,
+	}
+}
+
 // 从茫茫 data 中，寻找我所挂念的列表 y ，记录在列表 x 中。
 // 所有的 add 我都难以忘记，所有的 del 我都不愿提起
 func MakeChartPack(y *variable.ListT, data []byte) (x variable.ListChartT, add variable.ListT, del variable.ListT) {
@@ -72,52 +81,49 @@ func MakeChartPack(y *variable.ListT, data []byte) (x variable.ListChartT, add v
 	del = variable.ListT{} // 有些变量，我不愿提起
 	dataList := variable.ListT{}
 	for i := 0; i < len(data)/20; i++ {
-		// 变量的板子、心跳和地址
-		dataVar := variable.T{
-			Board: data[i*20],
-			Type:  variable.LenType[int(data[i*20+2])], // 垃圾代码：由于variable.T需要Type字段（删除变量需要TypeLen），但是mcu只会反馈TypeLen，所以强行安排了一个Type。
-			Addr:  variable.BytesToUint32(data[i*20+3 : i*20+7]),
-			Tick:  variable.BytesToUint32(data[i*20+15 : i*20+19])}
+		// 解开关于它的一切
+		board := data[i*20]
+		typelen := int(data[i*20+2])
+		addr := variable.BytesToUint32(data[i*20+3 : i*20+7])
+		tick := variable.BytesToUint32(data[i*20+15 : i*20+19])
 
 		// 它是我要找的那个变量吗？
-		if v, ok := (*y)[dataVar.Addr]; ok { // 是的，我还挂念着它
-			dataVar.Name = v.Name
-			dataVar.Type = v.Type
+		if v, ok := (*y)[addr]; ok { // 是的，我还挂念着它
 			switch v.Type {
 			case "uint8_t":
-				dataVar.Data = float64(variable.BytesToUint8(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToUint8(data[i*20+7 : i*20+15]))
 			case "uint16_t":
-				dataVar.Data = float64(variable.BytesToUint16(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToUint16(data[i*20+7 : i*20+15]))
 			case "uint32_t":
-				dataVar.Data = float64(variable.BytesToUint32(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToUint32(data[i*20+7 : i*20+15]))
 			case "uint64_t":
-				dataVar.Data = float64(variable.BytesToUint64(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToUint64(data[i*20+7 : i*20+15]))
 			case "int8_t":
-				dataVar.Data = float64(variable.BytesToInt8(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToInt8(data[i*20+7 : i*20+15]))
 			case "int16_t":
-				dataVar.Data = float64(variable.BytesToInt16(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToInt16(data[i*20+7 : i*20+15]))
 			case "int32_t", "int":
-				dataVar.Data = float64(variable.BytesToInt32(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToInt32(data[i*20+7 : i*20+15]))
 			case "int64_t":
-				dataVar.Data = float64(variable.BytesToInt64(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToInt64(data[i*20+7 : i*20+15]))
 			case "float":
-				dataVar.Data = float64(variable.BytesToFloat32(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToFloat32(data[i*20+7 : i*20+15]))
 			case "double":
-				dataVar.Data = float64(variable.BytesToFloat64(data[i*20+7 : i*20+15]))
+				v.Data = float64(variable.BytesToFloat64(data[i*20+7 : i*20+15]))
 			default:
-				dataVar.Data = 0
+				v.Data = 0
 			}
-			dataList[dataVar.Addr] = dataVar
+			v.Tick = tick // 同步它的心跳
+			dataList[addr] = v
 
-			chartVar := variable.ToChartT{
-				Board: dataVar.Board,
-				Name:  dataVar.Name,
-				Data:  dataVar.Data,
-				Tick:  dataVar.Tick}
-			x = append(x, chartVar)
-		} else {
-			// 有些变量，我已不愿提起
-			del[dataVar.Addr] = dataVar
+			x = append(x, Convert_T_ToChartT(v))
+		} else { // 不是的，请忘了它
+			del[addr] = variable.T{
+				Board: board,
+				Type:  variable.LenType[typelen], // 垃圾代码：由于variable.T需要Type字段（删除变量需要TypeLen），但是mcu只会反馈TypeLen，所以强行安排了一个Type。
+				Addr:  addr,
+				Tick:  tick,
+			}
 		}
 	}
 

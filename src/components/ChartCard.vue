@@ -112,9 +112,9 @@ export default {
       }
       const jsonWS = JSON.parse(data);
       let seriesArray = this.chart.options.series;
-      seriesArray.forEach(s => {
+      seriesArray.forEach((s) => {
         if (Object.entries(this.variables).find(([, v]) => s.name == v.Name) === undefined) {
-          s.visible = false
+          s.visible = false;
         }
       });
       for (const [, variable] of Object.entries(this.variables)) {
@@ -127,6 +127,9 @@ export default {
             data: [],
           };
           seriesArray.push(series);
+        }
+        if (!series.visible) {
+          series.visible = true;
         }
         if (chart_var) {
           series.data.push({
