@@ -20,7 +20,7 @@ func main() {
 	pFlag := -1
 	flag.BoolVar(&vFlag, "v", false, "show version")
 	flag.BoolVar(&uFlag, "u", false, "check update")
-	flag.BoolVar(&bFlag, "b", false, "start browser")
+	flag.BoolVar(&bFlag, "b", true, "start browser")
 	flag.IntVar(&pFlag, "p", 8000, "port to bind")
 	flag.Parse()
 

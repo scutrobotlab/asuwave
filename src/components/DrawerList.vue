@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer width="300" v-model="drawer" app>
+  <v-navigation-drawer width="310" v-model="drawer" app>
     <SerialPort />
     <v-divider />
 

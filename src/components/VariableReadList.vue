@@ -14,10 +14,16 @@
       <v-list-item-avatar size="20" :color="i.Inputcolor" />
       <v-list-item-content>
         <v-list-item-title>
-          <span class="green--text">{{ i.Type }}</span>
-          {{ i.Name }};
+          <span class="green--text">{{ i.Type }}</span> {{ i.Name }}
+          <span class="text--disabled"> -> {{ hexdsp(i.Addr) }}</span
+          >;
         </v-list-item-title>
-        <v-list-item-subtitle>{{ hexdsp(i.Addr) }}</v-list-item-subtitle>
+        <v-list-item-subtitle>
+          <span style="color: #ff08;">return </span>
+          <span v-if="i.SignalGain != 1" class="text--disabled"> {{ i.SignalGain }} * </span>
+          <span>{{ i.Name }}</span>
+          <span v-if="i.SignalBias != 0" class="text--disabled"> + {{ i.SignalBias }} </span>;
+        </v-list-item-subtitle>
       </v-list-item-content>
       <v-list-item-action>
         <v-btn small icon v-on:click="delVariable(i)">

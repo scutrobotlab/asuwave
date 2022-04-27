@@ -31,54 +31,55 @@
                     required
                     v-model="Board"
                   ></v-select>
-                  <v-row>
-                    <v-col cols="12" sm="12" md="12">
-                      <v-select
-                        :items="types"
-                        label="变量类型"
-                        :rules="[(v) => !!v || '变量类型是必要的']"
-                        required
-                        :disabled="disable"
-                        v-model="Type"
-                      ></v-select>
-                    </v-col>
-                  </v-row>
-
-                  <v-row>
-                    <v-col cols="12" sm="12" md="12">
+                  <v-select
+                    :items="types"
+                    label="变量类型"
+                    :rules="[(v) => !!v || '变量类型是必要的']"
+                    required
+                    :disabled="disable"
+                    v-model="Type"
+                  ></v-select>
+                  <v-text-field
+                    label="变量名称"
+                    type="text"
+                    required
+                    :rules="NameRules"
+                    v-model="Name"
+                  ></v-text-field>
+                  <v-text-field
+                    label="变量地址"
+                    type="text"
+                    :rules="AddrRules"
+                    :disabled="disable"
+                    hint="[20000000, 7fffffff]区间的16进制数。"
+                    required
+                    v-model="Addr"
+                  ></v-text-field>
+                  <v-row dense>
+                    <v-col cols="12" sm="6" dense>
                       <v-text-field
-                        label="变量名称"
-                        type="text"
-                        :rules="[(v) => !!v || '变量名是必要的']"
-                        required
-                        v-model="Name"
+                        label="信号增益（Gain）"
+                        type="number"
+                        v-model="SignalGain"
+                        :hint="signalHint"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" dense>
+                      <v-text-field
+                        label="信号偏置（Bias）"
+                        type="number"
+                        v-model="SignalBias"
+                        :hint="signalHint"
                       ></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-row>
-                    <v-col cols="12" sm="12" md="12">
-                      <v-text-field
-                        label="变量地址"
-                        type="text"
-                        :rules="AddrRules"
-                        :disabled="disable"
-                        hint="[20000000, 7fffffff]区间的16进制数。"
-                        required
-                        v-model="Addr"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12" sm="12" md="12">
-                      <v-text-field
-                        label="变量颜色"
-                        type="text"
-                        disabled
-                        required
-                        v-model="Inputcolor"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
+                  <v-text-field
+                    label="变量颜色"
+                    type="text"
+                    disabled
+                    required
+                    v-model="Inputcolor"
+                  ></v-text-field>
                 </v-col>
               </v-row>
             </v-form>
@@ -110,16 +111,37 @@ export default {
     Name: "",
     Type: "",
     Addr: "",
+    SignalGain: 1,
+    SignalBias: 0,
     Inputcolor: "#F3CB09FF",
     showcolorcard: "",
     AddrRules: [
       (v) => !!v || "变量地址是必要的",
       (v) => /^(0x)?[2-7][0-9a-fA-F]{7}$/.test(v) || "请输入[2000 0000, 7fff ffff]区间的16进制数。",
     ],
+    NameRules: [
+      (v) => !!v || "变量名称是必要的",
+      (v) => /^[_a-zA-z]/.test(v) || "变量名应以字母或下划线开始。",
+    ],
   }),
   computed: {
     types() {
       return this.$store.state.variables.vTypes;
+    },
+    signalHint() {
+      let hint = "";
+      if (this.SignalGain != 1) {
+        hint += this.SignalGain + " * ";
+      }
+      if (this.Name != "") {
+        hint += this.Name;
+      } else {
+        hint += "var";
+      }
+      if (this.SignalBias != 0) {
+        hint += " + " + this.SignalBias;
+      }
+      return hint;
     },
   },
   methods: {
@@ -128,6 +150,8 @@ export default {
       this.Name = "";
       this.Type = "";
       this.Addr = "";
+      this.SignalGain = 1;
+      this.SignalBias = 0;
       this.Inputcolor = this.randomColor();
     },
     openDialog() {
@@ -144,7 +168,16 @@ export default {
     addVariable() {
       if (this.$refs.form.validate()) {
         this.errorHandler(
-          postVariable(this.opt, 1, this.Name, this.Type, parseInt(this.Addr, 16), this.Inputcolor)
+          postVariable(
+            this.opt,
+            this.Board,
+            this.Name,
+            this.Type,
+            parseInt(this.Addr, 16),
+            this.Inputcolor,
+            parseFloat(this.SignalGain),
+            parseFloat(this.SignalBias)
+          )
         ).then(async () => {
           this.dialog = false;
           await this.$store.dispatch("variables/getV", this.opt);

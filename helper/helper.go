@@ -10,7 +10,6 @@ import (
 	"path"
 	"runtime"
 	"strings"
-	"time"
 )
 
 var (
@@ -100,9 +99,7 @@ func StartBrowser(url string) {
 		fmt.Printf("don't know how to open things on %s platform", runtime.GOOS)
 	} else {
 		go func() {
-			time.Sleep(1 * time.Second)
-			fmt.Println("Your browser will start in 3 seconds")
-			time.Sleep(3 * time.Second)
+			fmt.Println("Your browser will start")
 			exec.Command(run, url).Start()
 		}()
 	}
