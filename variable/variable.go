@@ -51,7 +51,7 @@ type ToProjectT struct {
 	Name string
 	Type string
 }
-type ListProjectT map[string]ToProjectT
+type ListProjectT []ToProjectT
 
 var ToProj ListProjectT = ListProjectT{}
 

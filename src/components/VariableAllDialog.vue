@@ -31,43 +31,9 @@
         </v-row>
 
         <ErrorAlert v-model="error" />
-        <v-simple-table dense fixed-header height="780px">
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th>名称</th>
-                <th>类型</th>
-                <th>地址</th>
-                <th>观察</th>
-                <th>修改</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="list in searchData" :key="list.Name">
-                <td>{{ list.Name }}</td>
-                <td>{{ list.Type }}</td>
-                <td>{{ list.Addr }}</td>
-                <td>
-                  <v-btn
-                    icon
-                    v-on:click="openVariableDialog(list.Name, list.Type, 1, list.Addr, 'read')"
-                  >
-                    <v-icon>mdi-plus</v-icon>
-                    {{ reaction }}
-                  </v-btn>
-                </td>
-                <td>
-                  <v-btn
-                    icon
-                    v-on:click="openVariableDialog(list.Name, list.Type, 1, list.Addr, 'modi')"
-                  >
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
+        <v-data-table :items="lists" :headers="headers">
+         
+        </v-data-table>
         <VariableNewDialog ref="VariableNewDialog" v-bind:opt="opt" />
       </v-card>
     </v-dialog>
@@ -88,17 +54,30 @@ export default {
     reaction: "",
     alert: false,
     opt: "",
+    headers:[
+      {
+        text:"变量名称",
+        value: "Name"
+      },
+      {
+        text:"变量地址",
+        value: "Addr"
+      },
+      {
+        text:"变量类型",
+        value: "Type"
+      },
+    ]
   }),
   components: {
     VariableNewDialog,
   },
   computed: {
     lists() {
-      return this.$store.state.variables.variables["proj"];
+      return this.$store.state.variables.variables.proj;
     },
     searchData() {
-      if (this.$store.getters.variables.searchVToProj(this.keyword) == null) return null;
-      return this.$store.getters.variables.searchVToProj(this.keyword).slice(0, 200);
+       return this.$store.getters['variables/searchVToProj'](this.keyword)
     },
   },
   watch: {
