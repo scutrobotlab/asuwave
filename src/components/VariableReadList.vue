@@ -19,7 +19,7 @@
           >;
         </v-list-item-title>
         <v-list-item-subtitle>
-          <span style="color: #ff08;">return </span>
+          <span style="color: #1b1a;">return </span>
           <span v-if="i.SignalGain != 1" class="text--disabled"> {{ i.SignalGain }} * </span>
           <span>{{ i.Name }}</span>
           <span v-if="i.SignalBias != 0" class="text--disabled"> + {{ i.SignalBias }} </span>;

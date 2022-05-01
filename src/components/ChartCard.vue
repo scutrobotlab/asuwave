@@ -15,16 +15,14 @@
 
 <script>
 import timechart from "timechart";
-import Themeable from "vuetify/lib/mixins/themeable";
-import { lineChart } from "timechart/dist/lib/plugins/lineChart";
-import { d3Axis } from "timechart/dist/lib/plugins/d3Axis";
-import { legend } from "timechart/dist/lib/plugins/legend";
-import { crosshair } from "timechart/dist/lib/plugins/crosshair";
-import { nearestPoint } from "timechart/dist/lib/plugins/nearestPoint";
+import { lineChart } from 'timechart/plugins/lineChart';
+import { d3Axis } from 'timechart/plugins/d3Axis';
+import { legend } from 'timechart/plugins/legend';
+import { crosshair } from 'timechart/plugins/crosshair';
+import { nearestPoint } from 'timechart/plugins/nearestPoint';
 
 export default {
   name: "ChartCard",
-  mixins: [Themeable],
   data: () => ({
     chart: null,
     ws: null,
