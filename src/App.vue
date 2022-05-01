@@ -3,19 +3,19 @@
     <DrawerList ref="DrawerList" />
 
     <v-app-bar app dark color="primary">
-      <v-app-bar-nav-icon @click.stop="switchDrawer()"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click.stop="switchDrawer()" />
       <v-toolbar-title>坠好用的上位机</v-toolbar-title>
-      <v-btn icon v-on:click="openDialog()">
+      <v-btn icon @click="openDialog()">
         <v-icon>mdi-information-outline</v-icon>
       </v-btn>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-switch
         v-model="$vuetify.theme.dark"
         hide-details
         inset
         color="black"
-        v-bind:label="$vuetify.theme.dark ? '深色模式' : '浅色模式'"
-      ></v-switch>
+        :label="$vuetify.theme.dark ? '深色模式' : '浅色模式'"
+      />
     </v-app-bar>
 
     <v-main>
@@ -40,9 +40,6 @@ export default {
     DrawerList,
     AboutDialog,
     ChartCard,
-  },
-  props: {
-    source: String,
   },
   async mounted() {
     this.$vuetify.theme.dark = window.matchMedia("(prefers-color-scheme: dark)").matches;

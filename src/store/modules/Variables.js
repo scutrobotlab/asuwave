@@ -1,51 +1,52 @@
 import { getVariable, getVariableType } from "@/api/variable.js";
 
 export default {
-    namespaced: true,
-    state: {
-        variables: {
-            proj: {},
-            read: {},
-            modi: {},
-        },
-        vTypes: [],
+  namespaced: true,
+  state: {
+    variables: {
+      proj: {},
+      read: {},
+      modi: {},
     },
-    getters: {
-        searchVToProj: (state) => (keyword) => {
-            if (keyword) {
-                return state.variables["proj"].filter(function (product) {
-                    return Object.keys(product).some(function (key) {
-                        return (
-                            String(product[key])
-                                .toLowerCase()
-                                .indexOf(keyword) > -1
-                        );
-                    });
-                });
-            } else {
-                return state.variables["proj"];
-            }
-        },
+    vTypes: [],
+  },
+  getters: {
+    searchVToProj: (state) => (keyword) => {
+      if (keyword) {
+        let kw = keyword.toLowerCase()
+        return state.variables["proj"].filter(function (product) {
+          return Object.keys(product).some(function (key) {
+            return (
+              String(product[key])
+                .toLowerCase()
+                .indexOf(kw) > -1
+            );
+          });
+        });
+      } else {
+        return state.variables["proj"];
+      }
     },
-    mutations: {
-        setV(state, i) {
-            state.variables[i.t] = i.v;
-        },
-        setVType(state, i) {
-            state.vTypes = i;
-        },
+  },
+  mutations: {
+    setV(state, i) {
+      state.variables[i.t] = i.v;
     },
-    actions: {
-        getV({ commit }, t) {
-            getVariable(t).then((v) => {
-                commit("setV", { t, v });
-            });
-        },
-        getVType({ commit }) {
-            getVariableType().then((v) => {
-                commit("setVType", v);
-            });
-        },
+    setVType(state, i) {
+      state.vTypes = i;
     },
-    modules: {},
+  },
+  actions: {
+    getV({ commit }, t) {
+      getVariable(t).then((v) => {
+        commit("setV", { t, v });
+      });
+    },
+    getVType({ commit }) {
+      getVariableType().then((v) => {
+        commit("setVType", v);
+      });
+    },
+  },
+  modules: {},
 };

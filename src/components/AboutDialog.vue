@@ -3,31 +3,41 @@
     <v-card>
       <v-list-item>
         <v-list-item-avatar tile>
-          <img src="@/assets/logo.png" alt="Logo" />
+          <img src="@/assets/logo.png" alt="Logo">
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>坠好用的上位机</v-list-item-title>
           <v-list-item-subtitle>{{ current_tag }}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-icon>
-          <v-btn icon v-on:click="dialog = false">
+          <v-btn icon @click="dialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-list-item-icon>
       </v-list-item>
       <div>
         <v-card-text v-if="update.checking">
-          <v-progress-circular indeterminate :size="20" class="mr-2" color="primary" />
+          <v-progress-circular
+            indeterminate :size="20" class="mr-2"
+            color="primary"
+          />
           正在检查更新...
         </v-card-text>
         <v-card-text v-else-if="current_tag === update.response.tag_name">
-          <v-icon color="success" left>mdi-check-circle</v-icon>已是最新版本。
-          <a @click="checkUpdate" class="text--secondary ">重新检查</a>
+          <v-icon color="success" left>
+            mdi-check-circle
+          </v-icon>已是最新版本。
+          <a class="text--secondary " @click="checkUpdate">重新检查</a>
         </v-card-text>
         <div v-else>
           <v-card-title>
             {{ update.response.tag_name }}
-            <v-chip color="warning" outlined small class="mx-2">New</v-chip>
+            <v-chip
+              color="warning" outlined small
+              class="mx-2"
+            >
+              New
+            </v-chip>
           </v-card-title>
           <v-card-text class="text--secondary">
             更新日志：
@@ -38,8 +48,11 @@
                 rounded
                 color="success"
                 :href="download_link.browser_download_url"
-                ><v-icon left>mdi-download</v-icon>下载</v-btn
               >
+                <v-icon left>
+                  mdi-download
+                </v-icon>下载
+              </v-btn>
               <div v-if="download_link" class="my-1">
                 {{ download_link.name }} ({{ ByteUnitConvert(download_link.size) }})
               </div>
@@ -52,12 +65,12 @@
           </v-card-text>
         </div>
       </div>
-      <v-divider></v-divider>
+      <v-divider />
       <v-card-actions class="caption text--secondary">
         <span>&copy; {{ new Date().getFullYear() }} 华工机器人实验室</span>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn
               icon
               href="https://github.com/scutrobotlab/asuwave"
@@ -105,6 +118,21 @@ export default {
       });
     },
   },
+  mounted() {
+    this.current_tag = process.env.VUE_APP_GITTAG;
+    window.console.log(this.current_tag)
+
+    if (/Win|win/i.test(navigator.userAgent)) this.os = "windows";
+    else if (/Mac|mac|darwin/i.test(navigator.userAgent)) this.os = "darwin";
+    else if (/linux|gnu/i.test(navigator.userAgent)) this.os = "linux";
+
+    if (/(?:(amd|x(?:(?:86|64)[-_])?|wow|win)64)[;)]/i.test(navigator.userAgent))
+      this.arch = "amd64";
+    else if (/\b(aarch64|arm(v?8e?l?|_?64))\b/i.test(navigator.userAgent)) this.arch = "arm64";
+
+    window.console.log(navigator.userAgent);
+    this.checkUpdate();
+  },
   methods: {
     openDialog() {
       this.dialog = true;
@@ -120,20 +148,6 @@ export default {
       this.update.response = await this.errorHandler(getVersion());
       this.update.checking = false;
     },
-  },
-  mounted() {
-    this.current_tag = process.env.VUE_APP_GITTAG;
-
-    if (/Win|win/i.test(navigator.userAgent)) this.os = "windows";
-    else if (/Mac|mac|darwin/i.test(navigator.userAgent)) this.os = "darwin";
-    else if (/linux|gnu/i.test(navigator.userAgent)) this.os = "linux";
-
-    if (/(?:(amd|x(?:(?:86|64)[-_])?|wow|win)64)[;)]/i.test(navigator.userAgent))
-      this.arch = "amd64";
-    else if (/\b(aarch64|arm(v?8e?l?|_?64))\b/i.test(navigator.userAgent)) this.arch = "arm64";
-
-    window.console.log(navigator.userAgent);
-    this.checkUpdate();
   },
 };
 </script>

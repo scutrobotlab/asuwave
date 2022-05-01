@@ -2,9 +2,9 @@
   <v-list class="mb-8">
     <v-list-item>
       <v-list-item-title>可写变量</v-list-item-title>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-list-item-icon>
-        <v-btn icon v-on:click="openDialog()">
+        <v-btn icon @click="openDialog()">
           <v-icon>mdi-plus-circle</v-icon>
         </v-btn>
       </v-list-item-icon>
@@ -12,20 +12,21 @@
     <ErrorAlert v-model="error" />
     <v-list-item v-for="(i, Addr) in variables" :key="Addr" class="mb-2">
       <v-text-field
+        v-model="i.Data"
         style="font-family: monospace"
         dense
         :label="i.Type + ' ' + i.Name + ' ='"
         :hint="hexdsp(i.Addr)"
         append-icon="mdi-send"
-        v-model="i.Data"
         type="number"
         :disabled="!serial_status"
         @click:append="modiVariable(i)"
-      >
-      </v-text-field>
+      />
       <v-list-item-action>
-        <v-btn small icon v-on:click="delVariable(i)">
-          <v-icon small>mdi-close</v-icon>
+        <v-btn small icon @click="delVariable(i)">
+          <v-icon small>
+            mdi-close
+          </v-icon>
         </v-btn>
       </v-list-item-action>
     </v-list-item>
@@ -38,10 +39,10 @@ import errorMixin from "@/mixins/errorMixin.js";
 import { putVariable, deleteVariable } from "@/api/variable.js";
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 export default {
-  mixins: [errorMixin],
   components: {
     VariableNewDialog,
   },
+  mixins: [errorMixin],
   computed: {
     variables() {
       return this.$store.state.variables.variables.modi;

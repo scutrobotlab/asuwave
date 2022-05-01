@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer width="310" v-model="drawer" app>
+  <v-navigation-drawer v-model="drawer" width="310" app>
     <SerialPort />
     <v-divider />
 
@@ -9,9 +9,9 @@
           <v-list-item-title>读取变量列表</v-list-item-title>
           <v-list-item-subtitle>TODO文件路径</v-list-item-subtitle>
         </v-list-item-content>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-list-item-icon>
-          <v-btn icon v-on:click="openDialog()">
+          <v-btn icon @click="openDialog()">
             <v-icon>mdi-file-upload</v-icon>
           </v-btn>
         </v-list-item-icon>

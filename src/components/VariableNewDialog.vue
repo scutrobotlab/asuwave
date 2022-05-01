@@ -4,7 +4,7 @@
       <v-card>
         <v-toolbar dense color="primary">
           <v-toolbar-title>添加变量</v-toolbar-title>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn icon dark @click="dialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -16,79 +16,83 @@
               <v-row>
                 <v-col cols="12" sm="6" md="6">
                   <v-color-picker
+                    v-model="Inputcolor"
                     dot-size="25"
                     swatches-max-height="100"
                     show-swatches
-                    v-model="Inputcolor"
-                  ></v-color-picker>
+                  />
                 </v-col>
                 <v-col cols="12" sm="6" md="6">
                   <v-select
+                    v-model="Board"
                     :items="[1, 2, 3]"
                     label="板子代号"
                     hint="保持默认为1即可"
                     :rules="[(v) => !!v || '板子代号是必要的']"
                     required
-                    v-model="Board"
-                  ></v-select>
+                  />
                   <v-select
+                    v-model="Type"
                     :items="types"
                     label="变量类型"
                     :rules="[(v) => !!v || '变量类型是必要的']"
                     required
                     :disabled="disable"
-                    v-model="Type"
-                  ></v-select>
+                  />
                   <v-text-field
+                    v-model="Name"
                     label="变量名称"
                     type="text"
                     required
                     :rules="NameRules"
-                    v-model="Name"
-                  ></v-text-field>
+                  />
                   <v-text-field
+                    v-model="Addr"
                     label="变量地址"
                     type="text"
                     :rules="AddrRules"
                     :disabled="disable"
                     hint="[20000000, 7fffffff]区间的16进制数。"
                     required
-                    v-model="Addr"
-                  ></v-text-field>
+                  />
                   <v-row dense>
                     <v-col cols="12" sm="6" dense>
                       <v-text-field
+                        v-model="SignalGain"
                         label="信号增益（Gain）"
                         type="number"
-                        v-model="SignalGain"
                         :hint="signalHint"
-                      ></v-text-field>
+                      />
                     </v-col>
                     <v-col cols="12" sm="6" dense>
                       <v-text-field
+                        v-model="SignalBias"
                         label="信号偏置（Bias）"
                         type="number"
-                        v-model="SignalBias"
                         :hint="signalHint"
-                      ></v-text-field>
+                      />
                     </v-col>
                   </v-row>
                   <v-text-field
+                    v-model="Inputcolor"
                     label="变量颜色"
                     type="text"
                     disabled
                     required
-                    v-model="Inputcolor"
-                  ></v-text-field>
+                  />
                 </v-col>
               </v-row>
             </v-form>
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="error" @click="reset()">清空</v-btn>
-          <v-btn color="primary" :disabled="!valid" @click="addVariable()">添加</v-btn>
+          <v-spacer />
+          <v-btn color="error" @click="reset()">
+            清空
+          </v-btn>
+          <v-btn color="primary" :disabled="!valid" @click="addVariable()">
+            添加
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -101,7 +105,12 @@ import { postVariable } from "@/api/variable.js";
 
 export default {
   mixins: [errorMixin],
-  props: ["opt"],
+  props: {
+    opt: {
+      type: String,
+      default: "",
+    },
+  },
   data: () => ({
     dialog: false,
     disable: false,

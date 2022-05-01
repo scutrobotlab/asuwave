@@ -6,15 +6,15 @@
     <ErrorAlert v-model="error" />
     <v-list-item>
       <v-list-item-action>
-        <v-switch v-model="status" v-on:change="optSerial()" inset></v-switch>
+        <v-switch v-model="status" inset @change="optSerial()" />
       </v-list-item-action>
       <v-select
-        :items="serialList"
         v-model="serial"
-        v-on:click="getSerialList()"
-        v-bind:disabled="status"
+        :items="serialList"
+        :disabled="status"
         label="选择串口"
-      ></v-select>
+        @click="getSerialList()"
+      />
     </v-list-item>
   </v-list>
 </template>
@@ -28,9 +28,6 @@ export default {
     serial: null,
     serialList: [],
   }),
-  mounted() {
-    Promise.all([this.getSerialList(), this.getSerial()]);
-  },
   computed: {
     status: {
       get() {
@@ -40,6 +37,9 @@ export default {
         this.$store.commit("serialPort/setStatus", val);
       },
     },
+  },
+  mounted() {
+    Promise.all([this.getSerialList(), this.getSerial()]);
   },
   methods: {
     async getSerialList() {

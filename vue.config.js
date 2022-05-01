@@ -7,5 +7,5 @@ module.exports = {
     proxy: 'http://localhost:8000'
   },
 
-  productionSourceMap: false,
+  productionSourceMap: false
 }

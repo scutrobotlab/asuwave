@@ -1,15 +1,15 @@
 export default {
-    namespaced: true,
-    state: {
-        status: false,
-    },
-    getters: {},
+  namespaced: true,
+  state: {
+    status: false,
+  },
+  getters: {},
 
-    mutations: {
-        setStatus(state, i) {
-            state.status = i;
-        },
+  mutations: {
+    setStatus(state, i) {
+      state.status = i;
     },
-    actions: {},
-    modules: {},
+  },
+  actions: {},
+  modules: {},
 };

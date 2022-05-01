@@ -1,40 +1,46 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-dialog
+      v-model="dialog" fullscreen hide-overlay
+      transition="dialog-bottom-transition"
+    >
       <v-card>
         <v-toolbar dark color="primary">
           <v-toolbar-items>
-            <v-btn icon dark v-on:click="closeDialog">
+            <v-btn icon dark @click="closeDialog">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-toolbar-items>
           <v-toolbar-title>变量列表</v-toolbar-title>
         </v-toolbar>
-        <v-alert type="success" :value="alert">添加成功！ </v-alert>
+        <v-alert type="success" :value="alert">
+          添加成功！
+        </v-alert>
         <v-row>
           <v-col cols="4">
-            <v-file-input label="上传elf或者axf文件" v-model="file"></v-file-input>
+            <v-file-input v-model="file" label="上传elf或者axf文件" />
           </v-col>
           <v-col cols="7">
             <v-text-field
+              v-model="keyword"
               clearable
               placeholder="搜索变量"
               prepend-icon="mdi-magnify"
-              v-model="keyword"
-            ></v-text-field>
+            />
           </v-col>
           <v-col cols="1">
-            <v-btn class="ma-2" outlined color="primary" @click="deleteVariable()">
+            <v-btn
+              class="ma-2" outlined color="primary"
+              @click="deleteVariable()"
+            >
               一键删除
             </v-btn>
           </v-col>
         </v-row>
 
         <ErrorAlert v-model="error" />
-        <v-data-table :items="lists" :headers="headers">
-         
-        </v-data-table>
-        <VariableNewDialog ref="VariableNewDialog" v-bind:opt="opt" />
+        <v-data-table :items="searchData" :headers="headers" />
+        <VariableNewDialog ref="VariableNewDialog" :opt="opt" />
       </v-card>
     </v-dialog>
   </v-row>
@@ -46,6 +52,9 @@ import { postVariableToProj, deleteVariableAll } from "@/api/variable.js"; //pos
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 
 export default {
+  components: {
+    VariableNewDialog,
+  },
   mixins: [errorMixin],
   data: () => ({
     dialog: false,
@@ -69,15 +78,12 @@ export default {
       },
     ]
   }),
-  components: {
-    VariableNewDialog,
-  },
   computed: {
     lists() {
       return this.$store.state.variables.variables.proj;
     },
     searchData() {
-       return this.$store.getters['variables/searchVToProj'](this.keyword)
+      return this.$store.getters['variables/searchVToProj'](this.keyword)
     },
   },
   watch: {

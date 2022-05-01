@@ -1,14 +1,17 @@
 <template>
   <v-card style="overflow-y: hidden">
     <div
-      :class="themeClasses"
       ref="chart"
       style="width: 100%; height: calc(100vh - 56px - 36px - 52px)"
-    ></div>
+    />
     <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn text @click="exportData">导出</v-btn>
-      <v-btn text color="primaryText" @click="follow">{{ showFollow }}</v-btn>
+      <v-spacer />
+      <v-btn text @click="exportData">
+        导出
+      </v-btn>
+      <v-btn text color="primaryText" @click="follow">
+        {{ showFollow }}
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -29,16 +32,21 @@ export default {
     showFollow: "跟随",
     putColors: [],
   }),
+  computed: {
+    variables() {
+      return this.$store.state.variables.variables.read;
+    },
+  },
+  watch: {
+    isDark: function () {
+      this.chart.update();
+    },
+  },
   created() {
     this.initWS();
   },
   destroyed() {
     this.ws.close();
-  },
-  computed: {
-    variables() {
-      return this.$store.state.variables.variables.read;
-    },
   },
   async mounted() {
     this.chart = new timechart(this.$refs.chart, {
@@ -68,11 +76,6 @@ export default {
       this.chart.onResize();
     });
     this.$store.dispatch("variables/getV", "read");
-  },
-  watch: {
-    isDark: function () {
-      this.chart.update();
-    },
   },
   methods: {
     initWS() {
@@ -140,14 +143,14 @@ export default {
     },
     follow() {
       switch (this.showFollow) {
-        case "跟随":
-          this.chart.options.realTime = true;
-          this.showFollow = "取消跟随";
-          break;
-        case "取消跟随":
-          this.chart.options.realTime = false;
-          this.showFollow = "跟随";
-          break;
+      case "跟随":
+        this.chart.options.realTime = true;
+        this.showFollow = "取消跟随";
+        break;
+      case "取消跟随":
+        this.chart.options.realTime = false;
+        this.showFollow = "跟随";
+        break;
       }
     },
     exportData() {
