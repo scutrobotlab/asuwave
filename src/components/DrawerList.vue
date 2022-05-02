@@ -7,7 +7,7 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title>读取变量列表</v-list-item-title>
-          <v-list-item-subtitle>TODO文件路径</v-list-item-subtitle>
+          <!-- <v-list-item-subtitle>TODO文件路径</v-list-item-subtitle> -->
         </v-list-item-content>
         <v-spacer />
         <v-list-item-icon>

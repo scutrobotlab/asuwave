@@ -4,7 +4,7 @@ export default {
   namespaced: true,
   state: {
     variables: {
-      proj: {},
+      proj: [],
       read: {},
       modi: {},
     },
@@ -14,7 +14,7 @@ export default {
     searchVToProj: (state) => (keyword) => {
       if (keyword) {
         let kw = keyword.toLowerCase()
-        return state.variables["proj"].filter(function (product) {
+        return state.variables.proj.filter(function (product) {
           return Object.keys(product).some(function (key) {
             return (
               String(product[key])
@@ -24,7 +24,7 @@ export default {
           });
         });
       } else {
-        return state.variables["proj"];
+        return state.variables.proj;
       }
     },
   },

@@ -16,11 +16,28 @@
         <v-alert type="success" :value="alert">
           添加成功！
         </v-alert>
-        <v-row>
-          <v-col cols="4">
+        <!-- <v-tabs vertical>
+          <v-tab>
+            <v-icon left>
+              mdi-file-upload-outline
+            </v-icon>
+            上传文件
+          </v-tab>
+          <v-tab>
+            <v-icon left>
+              mdi-book-sync-outline 
+            </v-icon>
+            监控文件
+          </v-tab>
+          <v-tab-item> -->
+        <v-file-input v-model="file" label="上传elf或者axf文件" />
+        <!-- </v-tab-item>
+          <v-tab-item>
             <v-file-input v-model="file" label="上传elf或者axf文件" />
-          </v-col>
-          <v-col cols="7">
+          </v-tab-item>
+        </v-tabs> -->
+        <v-row class="mx-1">
+          <v-col cols="8" lg="10">
             <v-text-field
               v-model="keyword"
               clearable
@@ -28,18 +45,35 @@
               prepend-icon="mdi-magnify"
             />
           </v-col>
-          <v-col cols="1">
+          <v-col cols="4" lg="2">
             <v-btn
-              class="ma-2" outlined color="primary"
+              class="my-3" block outlined
               @click="deleteVariable()"
             >
-              一键删除
+              清空
             </v-btn>
           </v-col>
         </v-row>
 
         <ErrorAlert v-model="error" />
-        <v-data-table :items="searchData" :headers="headers" />
+        <v-data-table :headers="headers" :items="searchData">
+          <template #item.isRead="{ item }">
+            <v-btn
+              icon color="green"
+              @click="openVariableDialog(item.Name, item.Type, null, item.Addr, 'read')"
+            >
+              <v-icon>mdi-eye</v-icon>
+            </v-btn>
+          </template>
+          <template #item.isModi="{ item }">
+            <v-btn
+              icon color="green"
+              @click="openVariableDialog(item.Name, item.Type, null, item.Addr, 'modi')"
+            >
+              <v-icon>mdi-pen</v-icon>
+            </v-btn>
+          </template>
+        </v-data-table>
         <VariableNewDialog ref="VariableNewDialog" :opt="opt" />
       </v-card>
     </v-dialog>
@@ -75,6 +109,14 @@ export default {
       {
         text:"变量类型",
         value: "Type"
+      },
+      {
+        text:"只读变量",
+        value: "isRead"
+      },
+      {
+        text:"可写变量",
+        value: "isModi"
       },
     ]
   }),
