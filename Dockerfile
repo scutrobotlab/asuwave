@@ -4,7 +4,7 @@ COPY ./package.json ./package-lock.json /app/
 RUN npm ci
 
 FROM build-env AS build
-COPY ./babel.config.js ./vue.config.js /app/
+COPY ./babel.config.js ./vue.config.js ./.eslintrc.js /app/
 COPY ./public /app/public/
 COPY ./src /app/src/
 RUN npm run build
