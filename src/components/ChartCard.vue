@@ -34,7 +34,7 @@ export default {
   }),
   computed: {
     variables() {
-      return this.$store.state.variables.variables.read;
+      return this.$store.state.variables.read;
     },
   },
   watch: {

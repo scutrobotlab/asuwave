@@ -139,7 +139,7 @@
     请求示例：  
     `GET /variable_type`  
     响应示例：  
-    ```
+    ```json
     {
         "Types":[
             "double","float","int","int16_t","int32_t","int64_t","int8_t","uint16_t","uint32_t","uint64_t","uint8_t"
@@ -171,7 +171,7 @@
     请求示例：  
     `GET /variable_read`  
     响应示例：  
-    ```
+    ```json
     {
         "Variables":[
             {
@@ -213,7 +213,7 @@
 
     请求示例：  
     `POST /variable_read`  
-    ```
+    ```json
     {
         "Board":1,
         "Name":"traceme",
@@ -245,7 +245,7 @@
 
     请求示例：  
     `DELETE /variable_read`  
-    ```
+    ```json
     {
         "Board":1,
         "Name":"traceme",
@@ -280,7 +280,7 @@
     请求示例：  
     `GET /variable_modi`  
     响应示例：  
-    ```
+    ```json
     {
         "Variables":[
             {
@@ -322,7 +322,7 @@
 
     请求示例：  
     `POST /variable_modi`  
-    ```
+    ```json
     {
         "Board":1,
         "Name":"traceme",
@@ -355,7 +355,7 @@
 
     请求示例：  
     `PUT /variable_modi`  
-    ```
+    ```json
     {
         "Board":1,
         "Name":"traceme",
@@ -388,7 +388,7 @@
 
     请求示例：  
     `DELETE /variable_modi`  
-    ```
+    ```json
     {
         "Board":1,
         "Name":"traceme",
@@ -421,7 +421,7 @@
     请求示例：  
     `GET /variable_proj`  
     响应示例：  
-    ```
+    ```json
     {
         "Variables":[
             {
@@ -438,12 +438,15 @@
     }
     ```
 
-### 2.10 上传工程变量
+## 3. 工程文件相关
+
+### 3.1 上传工程文件
+> 注意：上传工程文件会导致文件监控被清除
 * 请求地址  
 
     |  方法   |       URL        |
     |--------|------------------|
-    | `POST` | `/variable_proj` |
+    | `PUT` | `/file/upload`   |
 * 请求参数  
 
     |  参数 | 类型 |     说明      |
@@ -455,16 +458,87 @@
 * 调用示例  
 
     请求示例：  
-    `POST /variable_proj`  
+    `PUT /file/upload`  
     ```
     file=@asuwave.elf
     ```
     响应示例：  
     无  
 
-## 3. 设置
+### 3.2 获取监听的工程文件路径
+* 请求地址  
 
-### 3.1 查看设置
+    |  方法  |       URL        |
+    |--------|------------------|
+    | `GET`  |  `/file/path`   |
+* 请求参数  
+
+    无
+* 响应结果  
+
+    | 参数 |  类型  |       说明        |
+    |------|--------|-------------------|
+    | Path | string | axf或者elf文件路径 |
+* 调用示例  
+
+    请求示例：  
+    `GET /file/path`  
+    ```json
+    {
+        "Path": "C:/user/scutrobotlab/robot.axf"
+    }
+    ```
+    响应示例：  
+    无  
+
+### 3.3 设置监听的工程文件路径
+* 请求地址  
+
+    |  方法   |       URL        |
+    |---------|------------------|
+    |  `PUT`  | `/file/path`    |
+* 请求参数  
+
+    | 参数  |  类型  |       说明        |
+    |------|--------|-------------------|
+    | Path | string | axf或者elf文件路径 |
+* 响应结果  
+
+    无  
+* 调用示例  
+
+    请求示例：  
+    `PUT /file/path`  
+    ```json
+    {
+        "Path": "C:/user/scutrobotlab/robot.axf"
+    }
+    ```
+    响应示例：  
+    无  
+
+### 3.4 清除监听的工程文件路径
+* 请求地址  
+
+    |  方法   |       URL        |
+    |--------|------------------|
+    | `DELETE` | `/file/path`   |
+* 请求参数  
+
+    无
+* 响应结果  
+
+    无  
+* 调用示例  
+
+    请求示例：  
+    无
+    响应示例：  
+    无  
+
+## 4. 设置
+
+### 4.1 查看设置
 * 请求地址  
 
     |  方法  |    URL     |
@@ -483,13 +557,13 @@
     请求示例：  
     `GET /option`  
     响应示例：  
-    ```
+    ```json
     {
         "Save": 7
     }
     ```
 
-### 3.2 修改设置
+### 4.2 修改设置
 * 请求地址  
 
     |  方法  |    URL     |
@@ -509,13 +583,13 @@
 
     请求示例：  
     `PUT /option`  
-    ```
+    ```json
     {
         "Save": 6
     }
     ```
     响应示例：  
-    ```
+    ```json
     {
         "Save": 6
     }

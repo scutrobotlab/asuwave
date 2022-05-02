@@ -50,7 +50,7 @@ export default {
   mixins: [errorMixin],
   computed: {
     variables() {
-      return this.$store.state.variables.variables.read;
+      return this.$store.state.variables.read;
     },
     serial_status() {
       return this.$store.state.serialPort.status;

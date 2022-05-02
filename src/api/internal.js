@@ -30,7 +30,7 @@ export async function fetchApi(url, method = "GET", body = null) {
   throw { status: response.status, data: json.Error };
 }
 
-export async function uploadFile(url, method, file) {
+export async function uploadApi(url, method, file) {
   const body = new FormData();
   body.append("file", file);
   let init = {

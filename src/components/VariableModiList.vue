@@ -45,7 +45,7 @@ export default {
   mixins: [errorMixin],
   computed: {
     variables() {
-      return this.$store.state.variables.variables.modi;
+      return this.$store.state.variables.modi;
     },
     serial_status() {
       return this.$store.state.serialPort.status;

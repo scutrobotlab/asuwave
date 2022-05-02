@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 	"sort"
 
 	"github.com/scutrobotlab/asuwave/datautil"
-	"github.com/scutrobotlab/asuwave/fromelf"
 	"github.com/scutrobotlab/asuwave/serial"
 	"github.com/scutrobotlab/asuwave/variable"
 )
@@ -116,44 +114,6 @@ func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		b, _ := json.Marshal(variable.ToProj)
 		io.WriteString(w, string(b))
-
-	case http.MethodPost:
-		r.ParseMultipartForm(32 << 20)
-		file, _, err := r.FormFile("file")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			io.WriteString(w, errorJson(err.Error()))
-			return
-		}
-		defer file.Close()
-
-		tempFile, err := os.CreateTemp("", "elf")
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			io.WriteString(w, errorJson(err.Error()))
-			return
-		}
-		defer os.Remove(tempFile.Name())
-
-		io.Copy(tempFile, file)
-
-		f, err := fromelf.Check(tempFile)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			io.WriteString(w, errorJson(err.Error()))
-			return
-		}
-		defer f.Close()
-
-		err = fromelf.ReadVariable(&variable.ToProj, f)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			io.WriteString(w, errorJson(err.Error()))
-			return
-		}
-
-		w.WriteHeader(http.StatusNoContent)
-		io.WriteString(w, "")
 	case http.MethodDelete:
 		variable.ToProj = variable.ListProjectT{}
 

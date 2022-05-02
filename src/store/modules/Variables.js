@@ -3,18 +3,16 @@ import { getVariable, getVariableType } from "@/api/variable.js";
 export default {
   namespaced: true,
   state: {
-    variables: {
-      proj: [],
-      read: {},
-      modi: {},
-    },
+    proj: [],
+    read: {},
+    modi: {},
     vTypes: [],
   },
   getters: {
     searchVToProj: (state) => (keyword) => {
       if (keyword) {
         let kw = keyword.toLowerCase()
-        return state.variables.proj.filter(function (product) {
+        return state.proj.filter(function (product) {
           return Object.keys(product).some(function (key) {
             return (
               String(product[key])
@@ -24,13 +22,13 @@ export default {
           });
         });
       } else {
-        return state.variables.proj;
+        return state.proj;
       }
     },
   },
   mutations: {
     setV(state, i) {
-      state.variables[i.t] = i.v;
+      state[i.t] = i.v;
     },
     setVType(state, i) {
       state.vTypes = i;

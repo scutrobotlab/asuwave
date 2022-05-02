@@ -38,6 +38,8 @@ func Start(c chan string, fsys *fs.FS) {
 	http.HandleFunc("/variable_modi", variableToModiCtrl)
 	http.HandleFunc("/variable_proj", variableToProjCtrl)
 	http.HandleFunc("/variable_type", variableTypeCtrl)
+	http.HandleFunc("/file/upload", fileUploadCtrl)
+	http.HandleFunc("/file/path", filePathCtrl)
 	http.HandleFunc("/option", optionCtrl)
 	http.HandleFunc("/ws", websocketCtrl)
 	logger.Log.Fatal(http.ListenAndServe(port, nil))

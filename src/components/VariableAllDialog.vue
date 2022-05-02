@@ -16,7 +16,7 @@
         <v-alert type="success" :value="alert">
           添加成功！
         </v-alert>
-        <!-- <v-tabs vertical>
+        <v-tabs vertical background-color="primary">
           <v-tab>
             <v-icon left>
               mdi-file-upload-outline
@@ -29,13 +29,32 @@
             </v-icon>
             监控文件
           </v-tab>
-          <v-tab-item> -->
-        <v-file-input v-model="file" label="上传elf或者axf文件" />
-        <!-- </v-tab-item>
           <v-tab-item>
-            <v-file-input v-model="file" label="上传elf或者axf文件" />
+            <v-card flat style="background:#88F2" class="px-3">
+              <v-card-text class="pb-0">
+                通过文件资源管理器查找并上传elf或者axf文件，解析返回工程变量。上传文件会导致监控的文件路径被清除。
+              </v-card-text>
+              <v-file-input
+                v-model="file" label="上传elf或者axf文件"
+                append-outer-icon="mdi-send" @click:append-outer="uploadFile"
+              />
+            </v-card>
           </v-tab-item>
-        </v-tabs> -->
+          <v-tab-item>
+            <v-card flat style="background:#88F2" class="px-3">
+              <v-card-text class="pb-0">
+                指定后端设备上的文件路径，监控文件变化，并在每次文件变化时更新工程变量。
+              </v-card-text>
+              <v-text-field 
+                v-model="filepath" 
+                prepend-icon="mdi-file-link-outline" 
+                label="输入elf或者axf文件路径"
+                append-outer-icon="mdi-send"
+                @click:append-outer="watchFile"
+              />
+            </v-card>
+          </v-tab-item>
+        </v-tabs>
         <v-row class="mx-1">
           <v-col cols="8" lg="10">
             <v-text-field
@@ -82,7 +101,8 @@
 
 <script>
 import errorMixin from "@/mixins/errorMixin.js";
-import { postVariableToProj, deleteVariableAll } from "@/api/variable.js"; //postVariable,
+import { deleteVariableAll } from "@/api/variable.js"; //postVariable,
+import { uploadFile, setFilePath } from "@/api/file.js"; //postVariable,
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 
 export default {
@@ -93,6 +113,7 @@ export default {
   data: () => ({
     dialog: false,
     file: null,
+    filepath: null,
     keyword: "",
     reaction: "",
     alert: false,
@@ -122,16 +143,10 @@ export default {
   }),
   computed: {
     lists() {
-      return this.$store.state.variables.variables.proj;
+      return this.$store.state.variables.proj;
     },
     searchData() {
       return this.$store.getters['variables/searchVToProj'](this.keyword)
-    },
-  },
-  watch: {
-    file: async function () {
-      await this.errorHandler(postVariableToProj(this.file));
-      await this.getVariableList();
     },
   },
   async mounted() {
@@ -142,6 +157,14 @@ export default {
     });
   },
   methods: {
+    async uploadFile() { 
+      await this.errorHandler(uploadFile(this.file));
+      await this.getVariableList();
+    },
+    async watchFile() { 
+      await this.errorHandler(setFilePath(this.filepath));
+      await this.getVariableList();
+    },
     openDialog() {
       this.dialog = true;
     },
