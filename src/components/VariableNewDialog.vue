@@ -170,9 +170,13 @@ export default {
     openDialogFromList(name, type, board, addr) {
       this.dialog = true;
       this.disable = true;
+      this.Board = board;
       this.Name = name;
       this.Type = type;
       this.Addr = addr;
+      this.SignalGain = 1;
+      this.SignalBias = 0;
+      this.Inputcolor = this.randomColor();
     },
     addVariable() {
       if (this.$refs.form.validate()) {
