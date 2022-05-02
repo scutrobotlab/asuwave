@@ -3,7 +3,11 @@
     <v-list-item>
       <v-list-item-title>串口</v-list-item-title>
       <v-spacer />
-      <v-switch v-model="status" inset @change="optSerial()" />
+      <v-switch 
+        v-model="status" inset 
+        :disabled="!valid"
+        @change="optSerial()"
+      />
     </v-list-item>
     <ErrorAlert v-model="error" />
     <v-list-item>
@@ -33,9 +37,9 @@ import baudRate from "@/const/BaudRate.json";
 export default {
   mixins: [errorMixin],
   data: () => ({
-    serial: null,
+    serial: "",
     serialList: [],
-    baud: null,
+    baud: "",
     baudList: baudRate
   }),
   computed: {
@@ -47,6 +51,10 @@ export default {
         this.$store.commit("serialPort/setStatus", val);
       },
     },
+    valid() {
+      return this.serial!="" && this.serial!=null &&
+            this.baud!="" && this.baud!=null 
+    }
   },
   mounted() {
     Promise.all([this.getSerialList(), this.getSerial()]);
@@ -56,21 +64,21 @@ export default {
       this.serialList = await this.errorHandler(getSerial());
     },
     async getSerial() {
-      this.serial = await this.errorHandler(getSerialCur());
-      if (this.serial) {
+      let serialCur = await this.errorHandler(getSerialCur());
+      this.serial = serialCur.Serial;
+      this.baud = serialCur.Baud;
+      if (serialCur.Serial) {
         this.$store.commit("serialPort/setStatus", true);
       }
     },
     optSerial() {
-      if (this.status) {
-        this.errorHandler(postSerialCur(this.serial)).catch(() => {
-          this.$store.commit("serialPort/setStatus", false);
-        });
-      } else {
-        this.errorHandler(deleteSerialCur()).catch(() => {
-          this.$store.commit("serialPort/setStatus", true);
-        });
-      }
+      this.errorHandler(
+        this.status?
+          postSerialCur(this.serial, this.baud):
+          deleteSerialCur()
+      ).catch(() => {
+        this.$store.commit("serialPort/setStatus", false);
+      })
     },
   },
 };

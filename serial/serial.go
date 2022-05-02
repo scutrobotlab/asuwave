@@ -58,8 +58,9 @@ func Find() []string {
 }
 
 // Open serial port
-func Open(name string) error {
+func Open(name string, baud int) error {
 	SerialCur.Name = name
+	SerialCur.Mode.BaudRate = baud
 
 	if name == testPortName {
 		SerialCur.Port = newTestPort()
@@ -68,7 +69,7 @@ func Open(name string) error {
 	}
 
 	var err error
-	SerialCur.Port, err = serial.Open(name, &SerialCur.Mode)
+	SerialCur.Port, err = serial.Open(SerialCur.Name, &SerialCur.Mode)
 	if err != nil {
 		SerialCur.Name = ""
 		return err

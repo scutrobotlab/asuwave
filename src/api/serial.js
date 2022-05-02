@@ -7,12 +7,12 @@ export async function getSerial() {
 
 export async function getSerialCur() {
   const res = await fetchApi("/serial_cur");
-  return res.Serial;
+  return res;
 }
 
-export async function postSerialCur(Serial) {
-  const res = await fetchApi("/serial_cur", "POST", { Serial });
-  return res.Serial;
+export async function postSerialCur(Serial, Baud) {
+  const res = await fetchApi("/serial_cur", "POST", { Serial, Baud });
+  return res;
 }
 
 export async function deleteSerialCur() {

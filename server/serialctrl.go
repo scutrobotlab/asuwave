@@ -8,6 +8,11 @@ import (
 	"github.com/scutrobotlab/asuwave/serial"
 )
 
+type SerialSetting struct {
+	Serial string
+	Baud   int
+}
+
 func serialCtrl(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
@@ -31,14 +36,15 @@ func serialCurCtrl(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		j := struct{ Serial string }{Serial: serial.SerialCur.Name}
+		j := SerialSetting{
+			Serial: serial.SerialCur.Name,
+			Baud:   serial.SerialCur.Mode.BaudRate,
+		}
 		b, _ := json.Marshal(j)
 		io.WriteString(w, string(b))
 
 	case http.MethodPost:
-		j := struct {
-			Serial string
-		}{}
+		j := SerialSetting{}
 		postData, _ := io.ReadAll(r.Body)
 		err = json.Unmarshal(postData, &j)
 		if err != nil {
@@ -47,7 +53,7 @@ func serialCurCtrl(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = serial.Open(j.Serial)
+		err = serial.Open(j.Serial, j.Baud)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
