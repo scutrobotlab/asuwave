@@ -117,6 +117,7 @@ export default {
     reaction: "",
     alert: false,
     opt: "",
+    ws: null,
     headers:[
       {
         text:"变量名称",
@@ -155,6 +156,12 @@ export default {
       setTimeout(this.realert, 1000);
     });
   },
+  created() {
+    this.initWS();
+  },
+  destroyed() {
+    this.ws.close();
+  },
   methods: {
     async uploadFile() { 
       await this.$store.dispatch('file/setUpload', this.file)
@@ -187,6 +194,30 @@ export default {
     async deleteVariable() {
       await this.errorHandler(deleteVariableAll());
       this.getVariableList();
+    },
+    initWS() {
+      let url = "";
+      let path = "/filews"
+      if (process.env.NODE_ENV === "production") {
+        url =
+        (document.location.protocol == "https:" ? "wss" : "ws") +
+        "://" +
+        window.location.host + path;
+      } else {
+        url = "ws://localhost:8000" + path;
+      }
+      this.ws = new WebSocket(url);
+      this.ws.onopen = (() => {window.console.log("file: 连接成功")});
+      this.ws.onclose = (() => {window.console.log("file: 连接断开")});
+      this.ws.onmessage = ((e) => {
+        window.console.log(e.data)
+        this.$store.dispatch("variables/getV", "read");
+        this.$store.dispatch("variables/getV", "modi");
+        this.$store.dispatch("variables/getV", "proj");
+      });
+      this.ws.onerror = ((e) => { 
+        this.$store.commit("file/setError", e.data);
+      });
     },
     realert() {
       this.alert = false;

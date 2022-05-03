@@ -42,6 +42,7 @@ func Start(c chan string, fsys *fs.FS) {
 	http.HandleFunc("/file/path", filePathCtrl)
 	http.HandleFunc("/option", optionCtrl)
 	http.HandleFunc("/ws", websocketCtrl)
+	http.HandleFunc("/filews", fileWebsocketCtrl)
 	logger.Log.Fatal(http.ListenAndServe(port, nil))
 }
 

@@ -4,7 +4,8 @@ export default {
   namespaced: true,
   state: {
     path: "",
-    upload: ""
+    upload: "",
+    error: null
   },
   getters: {
     fileStatus (state) {
@@ -18,7 +19,11 @@ export default {
     }
   },
   
-  mutations: {},
+  mutations: {
+    setError (state, err) {
+      state.error = err
+    }
+  },
   actions: {
     async setUpload ({ state }, f) {
       await uploadFile(f).then(()=>{
