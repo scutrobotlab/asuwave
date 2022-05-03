@@ -10,7 +10,7 @@
       />
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-item>
+    <v-list-item dense>
       <v-list-item-content>
         <v-select
           v-model="serial"

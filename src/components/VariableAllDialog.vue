@@ -79,7 +79,7 @@
           <template #item.isRead="{ item }">
             <v-btn
               icon color="green"
-              @click="openVariableDialog(item.Name, item.Type, null, item.Addr, 'read')"
+              @click="openVariableDialog(item.Name, item.Type, 1, item.Addr, 'read')"
             >
               <v-icon>mdi-eye</v-icon>
             </v-btn>
@@ -87,7 +87,7 @@
           <template #item.isModi="{ item }">
             <v-btn
               icon color="green"
-              @click="openVariableDialog(item.Name, item.Type, null, item.Addr, 'modi')"
+              @click="openVariableDialog(item.Name, item.Type, 1, item.Addr, 'modi')"
             >
               <v-icon>mdi-pen</v-icon>
             </v-btn>
@@ -102,7 +102,6 @@
 <script>
 import errorMixin from "@/mixins/errorMixin.js";
 import { deleteVariableAll } from "@/api/variable.js"; //postVariable,
-import { uploadFile, setFilePath } from "@/api/file.js"; //postVariable,
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 
 export default {
@@ -158,11 +157,11 @@ export default {
   },
   methods: {
     async uploadFile() { 
-      await this.errorHandler(uploadFile(this.file));
+      await this.$store.dispatch('file/setUpload', this.file)
       await this.getVariableList();
     },
     async watchFile() { 
-      await this.errorHandler(setFilePath(this.filepath));
+      await this.$store.dispatch('file/setPath', this.filepath)
       await this.getVariableList();
     },
     openDialog() {

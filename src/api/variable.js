@@ -1,4 +1,4 @@
-import { fetchApi, uploadFile } from "./internal";
+import { fetchApi, uploadApi } from "./internal";
 
 export async function getVariable(mode) {
   const res = await fetchApi("/variable_" + mode);
@@ -15,7 +15,7 @@ export async function postVariable(mode, Board, Name, Type, Addr, Inputcolor, Si
 }
 
 export async function postVariableToProj(file) {
-  return await uploadFile("/variable_proj", "POST", file);
+  return await uploadApi("/variable_proj", "POST", file);
 }
 
 export async function putVariable(mode, Board, Name, Type, Addr, Data, Inputcolor) {

@@ -5,7 +5,7 @@
     <v-app-bar app dark color="primary">
       <v-app-bar-nav-icon @click.stop="switchDrawer()" />
       <v-toolbar-title>坠好用的上位机</v-toolbar-title>
-      <v-btn icon @click="openDialog()">
+      <v-btn icon @click="openAboutDialog()">
         <v-icon>mdi-information-outline</v-icon>
       </v-btn>
       <v-spacer />
@@ -22,24 +22,41 @@
       <ChartCard />
     </v-main>
 
-    <v-footer app color="primary">
-      <span class="white--text">华工机器人实验室</span>
+    <v-footer app color="primary" class="pa-0">
+      <v-btn
+        tile class="ma-0"
+        dark color="green darken-3"
+        @click="openAllDialog"
+      >
+        <v-icon>
+          mdi-file-outline
+        </v-icon>
+      </v-btn>
+      <span class="white--text mx-3">{{ fileStatus }}</span>
     </v-footer>
 
+    <VariableAllDialog ref="VariableAllDialog" />
     <AboutDialog ref="AboutDialog" />
   </v-app>
 </template>
 
 <script>
-import DrawerList from "@/components/DrawerList.vue";
+import VariableAllDialog from "@/components/VariableAllDialog.vue";
 import AboutDialog from "@/components/AboutDialog.vue";
+import DrawerList from "@/components/DrawerList.vue";
 import ChartCard from "@/components/ChartCard.vue";
 
 export default {
   components: {
-    DrawerList,
+    VariableAllDialog,
     AboutDialog,
+    DrawerList,
     ChartCard,
+  },
+  computed: {
+    fileStatus () {
+      return this.$store.getters["file/fileStatus"]
+    }
   },
   async mounted() {
     this.$vuetify.theme.dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -49,8 +66,11 @@ export default {
     switchDrawer() {
       this.$refs.DrawerList.switchDrawer();
     },
-    openDialog() {
+    openAboutDialog() {
       this.$refs.AboutDialog.openDialog();
+    },
+    openAllDialog() {
+      this.$refs.VariableAllDialog.openDialog();
     },
   },
 };

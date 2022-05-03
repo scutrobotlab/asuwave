@@ -108,11 +108,6 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = fromelf.Watcher.Add(j.Path)
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		file, err := os.Open(j.Path)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -133,6 +128,11 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
 			return
+		}
+
+		err = fromelf.Watcher.Add(j.Path)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 		w.WriteHeader(http.StatusNoContent)
