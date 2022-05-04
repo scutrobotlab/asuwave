@@ -31,10 +31,15 @@ jobs:
         with:
           fetch-depth: 0
 
+
+      - name: Get git tag
+        uses: olegtarasov/get-tag@v2.1
+        id: tagName
+
       - name: Build project
         run: |
           chmod +x build.sh
-          ./build.sh
+          ./build.sh ${{ steps.tagName.outputs.tag }}
 
       - name: Upload
         uses: actions/upload-artifact@v2
