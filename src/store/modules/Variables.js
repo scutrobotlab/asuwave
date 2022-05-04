@@ -12,7 +12,7 @@ export default {
     searchVToProj: (state) => (keyword) => {
       if (keyword) {
         let kw = keyword.toLowerCase()
-        state.proj.filter(
+        return state.proj.filter(
           (obj) => obj.Name.toLowerCase().includes(kw)
         )
       } else {

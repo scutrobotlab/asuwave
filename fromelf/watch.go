@@ -3,6 +3,7 @@ package fromelf
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/scutrobotlab/asuwave/variable"
@@ -21,17 +22,34 @@ func FileWatch() {
 	}
 	defer Watcher.Close()
 	watchdog := 0
+	lastEventName := ""
 	for {
 		select {
 		case event, ok := <-Watcher.Events:
 			if !ok {
+				log.Println("Event not ok")
 				return
 			}
-			log.Println("event:", event)
+			log.Println("file event:", event)
 			if event.Op&fsnotify.Write == fsnotify.Write {
-				log.Println("modified file:", event.Name)
+				lastEventName = event.Name
+				watchdog = 0
+			}
+		case err, ok := <-Watcher.Errors:
+			if !ok {
+				log.Println("Error not ok")
+				return
+			}
+			lastEventName = ""
+			ChFileError <- err.Error()
+			log.Println("error:", err)
+		default:
+			if lastEventName != "" && watchdog < 10 {
+				watchdog++
+			} else if lastEventName != "" && watchdog == 10 {
+				log.Println("file write done:", lastEventName)
 
-				file, err := os.Open(event.Name)
+				file, err := os.Open(lastEventName)
 				if err != nil {
 					log.Println("file open:", err)
 					return
@@ -50,16 +68,10 @@ func FileWatch() {
 					return
 				}
 				variable.UpdateVariables()
-				ChFileModi <- event.Name
+				ChFileModi <- lastEventName
+				watchdog++
 			}
-		case err, ok := <-Watcher.Errors:
-			if !ok {
-				return
-			}
-			ChFileError <- err.Error()
-			log.Println("error:", err)
-		default:
-			watchdog++
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
