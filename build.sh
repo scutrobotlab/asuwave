@@ -5,7 +5,8 @@ build_prefix="asuwave_"
 os_list=("linux" "darwin" "windows")
 arch_list=("amd64" "arm64")
 gittag=`git describe --tags --abbrev=0`
-cat ${gittag}
+echo ${gittag}
+echo ${GITHUB_REF##*/}
 
 sed -i "s/^VUE_APP_GITTAG=.*/VUE_APP_GITTAG=${gittag}/g" .env
 cat .env
