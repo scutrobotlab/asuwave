@@ -8,18 +8,7 @@ export default {
     modi: {},
     vTypes: [],
   },
-  getters: {
-    searchVToProj: (state) => (keyword) => {
-      if (keyword) {
-        let kw = keyword.toLowerCase()
-        return state.proj.filter(
-          (obj) => obj.Name.toLowerCase().includes(kw)
-        )
-      } else {
-        return state.proj;
-      }
-    },
-  },
+  getters: {},
   mutations: {
     setV(state, i) {
       if (i.t == "proj") {

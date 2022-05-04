@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"mime"
 	"net"
 	"net/http"
 	"strconv"
@@ -30,6 +31,7 @@ func Start(c chan string, fsys *fs.FS) {
 	variableToModiCtrl := makeVariableCtrl(&variable.ToModi, false)
 	websocketCtrl := makeWebsocketCtrl(c)
 
+	mime.AddExtensionType(".js", "application/javascript")
 	http.Handle("/", http.FileServer(http.FS(*fsys)))
 
 	http.HandleFunc("/serial", serialCtrl)

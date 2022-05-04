@@ -13,8 +13,8 @@
           </v-toolbar-items>
           <v-toolbar-title>变量列表</v-toolbar-title>
         </v-toolbar>
-        <v-alert type="success" :value="alert">
-          添加成功！
+        <v-alert type="success" :value="alert!=null">
+          {{ alert }}
         </v-alert>
         <v-tabs vertical background-color="primary">
           <v-tab>
@@ -75,21 +75,21 @@
         </v-row>
 
         <ErrorAlert v-model="error" />
-        <v-data-table :headers="headers" :items="searchData">
+        <v-data-table :headers="headers" :items="proj_vars" :search="keyword">
           <template #item.isRead="{ item }">
             <v-btn
-              icon color="green"
-              @click="openVariableDialog(item.Name, item.Type, 1, item.Addr, 'read')"
+              icon :color="item.isRead?'green':'grey'"
+              @click="toggleVar(item.isRead, item, 'read')"
             >
-              <v-icon>mdi-eye</v-icon>
+              <v-icon>mdi-eye{{ item.isRead?"":"-plus-outline" }}</v-icon>
             </v-btn>
           </template>
           <template #item.isModi="{ item }">
             <v-btn
-              icon color="green"
-              @click="openVariableDialog(item.Name, item.Type, 1, item.Addr, 'modi')"
+              icon :color="item.isModi?'green':'grey'"
+              @click="toggleVar(item.isModi, item, 'modi')"
             >
-              <v-icon>mdi-pen</v-icon>
+              <v-icon>mdi-pencil{{ item.isModi?"":"-plus-outline" }}</v-icon>
             </v-btn>
           </template>
         </v-data-table>
@@ -101,7 +101,7 @@
 
 <script>
 import errorMixin from "@/mixins/errorMixin.js";
-import { deleteVariableAll } from "@/api/variable.js"; //postVariable,
+import { getVariable, deleteVariable, deleteVariableAll } from "@/api/variable.js"; //postVariable,
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 
 export default {
@@ -115,7 +115,7 @@ export default {
     filepath: null,
     keyword: "",
     reaction: "",
-    alert: false,
+    alert: null,
     opt: "",
     ws: null,
     headers:[
@@ -142,14 +142,20 @@ export default {
     ]
   }),
   computed: {
-    searchData() {
-      return this.$store.getters['variables/searchVToProj'](this.keyword)
+    proj_vars() {
+      this.alert; //触发更新
+      return this.$store.state.variables.proj.map((p)=>{
+        let addr = parseInt(p.Addr, 16)
+        p.isRead = (this.$store.state.variables.read[addr] != null);
+        p.isModi = (this.$store.state.variables.modi[addr] != null);
+        return p;
+      })
     },
   },
   async mounted() {
     await this.getVariableList();
     this.$bus.$on("sendalert", (data) => {
-      this.alert = data;
+      this.alert = "添加成功";
       setTimeout(this.realert, 1000);
     });
   },
@@ -160,6 +166,16 @@ export default {
     this.ws.close();
   },
   methods: {
+    async toggleVar(state, item, opt) {
+      if (state) {
+        await deleteVariable(opt, 1, item.Name, item.Type, parseInt(item.Addr, 16));
+        await this.$store.dispatch("variables/getV", opt);
+        this.alert = "删除成功";
+        setTimeout(this.realert, 1000);
+      }else {
+        this.openVariableDialog(item.Name, item.Type, 1, item.Addr, opt);
+      }
+    },
     async uploadFile() { 
       await this.$store.dispatch('file/setUpload', this.file)
       await this.getVariableList();
@@ -217,7 +233,7 @@ export default {
       });
     },
     realert() {
-      this.alert = false;
+      this.alert = null;
     },
   },
 };
