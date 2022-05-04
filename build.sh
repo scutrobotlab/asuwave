@@ -7,6 +7,7 @@ arch_list=("amd64" "arm64")
 gittag=`git describe --tags --abbrev=0`
 
 sed -i "s/^VUE_APP_GITTAG=.*/VUE_APP_GITTAG=${gittag}/g" .env
+cat .env
 
 npm ci
 npm run build
