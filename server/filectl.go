@@ -7,28 +7,18 @@ import (
 	"os"
 
 	"github.com/scutrobotlab/asuwave/fromelf"
+	"github.com/scutrobotlab/asuwave/option"
 	"github.com/scutrobotlab/asuwave/variable"
 )
 
-func removeWathcer() error {
-	l := fromelf.Watcher.WatchList()
-	for _, p := range l {
-		err := fromelf.Watcher.Remove(p)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // 上传elf或axf文件
 func fileUploadCtrl(w http.ResponseWriter, r *http.Request) {
-	defer variable.Refresh()
+	defer option.Refresh()
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case http.MethodPut:
-		err := removeWathcer()
+		err := fromelf.RemoveWathcer()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -79,12 +69,12 @@ func fileUploadCtrl(w http.ResponseWriter, r *http.Request) {
 
 // 监控elf或axf文件
 func filePathCtrl(w http.ResponseWriter, r *http.Request) {
-	defer variable.Refresh()
+	defer option.Refresh()
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case http.MethodGet:
-		j := fromelf.Watcher.WatchList()
+		j := fromelf.GetWatchList()
 		b, _ := json.Marshal(j)
 		io.WriteString(w, string(b))
 
@@ -100,7 +90,7 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = removeWathcer()
+		err = fromelf.RemoveWathcer()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -129,7 +119,7 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = fromelf.Watcher.Add(j.Path)
+		fromelf.ChFileWatch <- j.Path
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -140,7 +130,7 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "")
 
 	case http.MethodDelete:
-		err := removeWathcer()
+		err := fromelf.RemoveWathcer()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))

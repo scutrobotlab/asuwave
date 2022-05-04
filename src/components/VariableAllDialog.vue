@@ -153,14 +153,13 @@ export default {
     },
   },
   async mounted() {
+    this.$store.dispatch("file/refreshPath");
+    this.initWS();
     await this.getVariableList();
     this.$bus.$on("sendalert", (data) => {
       this.alert = "添加成功";
       setTimeout(this.realert, 1000);
     });
-  },
-  created() {
-    this.initWS();
   },
   destroyed() {
     this.ws.close();

@@ -1,4 +1,4 @@
-import { uploadFile, setFilePath } from "@/api/file.js"; //postVariable,
+import { uploadFile, setFilePath, getFilePath} from "@/api/file.js"; //postVariable,
 
 export default {
   namespaced: true,
@@ -25,6 +25,16 @@ export default {
     }
   },
   actions: {
+    async refreshPath ({ state }) {
+      window.console.log("!!!")
+      await getFilePath().then((r)=>{
+        window.console.log(r);
+        if (r.length != 0) {
+          state.upload = "";
+          state.path = r;
+        }
+      });
+    },
     async setUpload ({ state }, f) {
       await uploadFile(f).then(()=>{
         state.upload = f.name;

@@ -11,7 +11,6 @@ import (
 	"github.com/scutrobotlab/asuwave/option"
 	"github.com/scutrobotlab/asuwave/serial"
 	"github.com/scutrobotlab/asuwave/server"
-	"github.com/scutrobotlab/asuwave/variable"
 )
 
 func main() {
@@ -36,7 +35,6 @@ func main() {
 	}
 
 	option.Load()
-	variable.Load()
 
 	if val, ok := os.LookupEnv("PORT"); ok {
 		option.Config.Port, _ = strconv.Atoi(val)

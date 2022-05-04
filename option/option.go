@@ -4,7 +4,9 @@ import (
 	"os"
 	"path"
 
+	"github.com/scutrobotlab/asuwave/fromelf"
 	"github.com/scutrobotlab/asuwave/helper"
+	"github.com/scutrobotlab/asuwave/variable"
 )
 
 const (
@@ -17,6 +19,12 @@ type ConfigT struct {
 	Save int
 	Port int
 }
+
+var (
+	vToReadFileName = path.Join(helper.AppConfigDir(), "vToRead.json")
+	vToModiFileName = path.Join(helper.AppConfigDir(), "vToModi.json")
+	vToProjFileName = path.Join(helper.AppConfigDir(), "vToProj.json")
+)
 
 var Config ConfigT
 
@@ -32,6 +40,32 @@ func Load() {
 		Config.Port = 8000
 	} else {
 		JsonLoad(configFileName, &Config)
+	}
+
+	JsonLoad(vToReadFileName, &variable.ToRead)
+	JsonLoad(vToModiFileName, &variable.ToModi)
+	var watchList []string
+	JsonLoad(vToProjFileName, &watchList)
+	for _, w := range watchList {
+		fromelf.ChFileWatch <- w
+	}
+}
+
+func Refresh() {
+	if CheckCanSave(SaveVariableRead) {
+		JsonSave(vToReadFileName, &variable.ToRead)
+	} else {
+		os.Remove(vToReadFileName)
+	}
+	if CheckCanSave(SaveVariableModi) {
+		JsonSave(vToModiFileName, &variable.ToModi)
+	} else {
+		os.Remove(vToModiFileName)
+	}
+	if CheckCanSave(SaveVariableProj) {
+		JsonSave(vToProjFileName, fromelf.GetWatchList())
+	} else {
+		os.Remove(vToProjFileName)
 	}
 }
 

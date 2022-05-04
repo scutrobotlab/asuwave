@@ -9,23 +9,44 @@ import (
 	"github.com/scutrobotlab/asuwave/variable"
 )
 
-var Watcher *fsnotify.Watcher
+var watcher *fsnotify.Watcher
 
 var ChFileModi chan string = make(chan string, 10)
 var ChFileError chan string = make(chan string, 10)
+var ChFileWatch chan string = make(chan string, 10)
+
+func GetWatchList() []string {
+	return watcher.WatchList()
+}
+
+func RemoveWathcer() error {
+	l := watcher.WatchList()
+	for _, p := range l {
+		err := watcher.Remove(p)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func FileWatch() {
 	var err error
-	Watcher, err = fsnotify.NewWatcher()
+	watcher, err = fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer Watcher.Close()
+	defer watcher.Close()
 	watchdog := 0
 	lastEventName := ""
 	for {
 		select {
-		case event, ok := <-Watcher.Events:
+		case file := <-ChFileWatch:
+			for _, f := range watcher.WatchList() {
+				watcher.Remove(f)
+			}
+			watcher.Add(file)
+		case event, ok := <-watcher.Events:
 			if !ok {
 				log.Println("Event not ok")
 				return
@@ -35,7 +56,7 @@ func FileWatch() {
 				lastEventName = event.Name
 				watchdog = 0
 			}
-		case err, ok := <-Watcher.Errors:
+		case err, ok := <-watcher.Errors:
 			if !ok {
 				log.Println("Error not ok")
 				return
@@ -67,7 +88,7 @@ func FileWatch() {
 					log.Println("file read:", err)
 					return
 				}
-				variable.UpdateVariables()
+				variable.Update()
 				ChFileModi <- lastEventName
 				watchdog++
 			}

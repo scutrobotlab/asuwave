@@ -2,12 +2,10 @@ package variable
 
 import (
 	"log"
-	"os"
 	"path"
 	"strconv"
 
 	"github.com/scutrobotlab/asuwave/helper"
-	"github.com/scutrobotlab/asuwave/option"
 )
 
 var LenType = map[int]string{
@@ -72,31 +70,7 @@ var (
 	vToProjFileName = path.Join(helper.AppConfigDir(), "vToProj.json")
 )
 
-func Load() {
-	option.JsonLoad(vToReadFileName, &ToRead)
-	option.JsonLoad(vToModiFileName, &ToModi)
-	option.JsonLoad(vToProjFileName, &ToProj)
-}
-
-func Refresh() {
-	if option.CheckCanSave(option.SaveVariableRead) {
-		option.JsonSave(vToReadFileName, &ToRead)
-	} else {
-		os.Remove(vToReadFileName)
-	}
-	if option.CheckCanSave(option.SaveVariableModi) {
-		option.JsonSave(vToModiFileName, &ToModi)
-	} else {
-		os.Remove(vToModiFileName)
-	}
-	if option.CheckCanSave(option.SaveVariableProj) {
-		option.JsonSave(vToProjFileName, &ToProj)
-	} else {
-		os.Remove(vToProjFileName)
-	}
-}
-
-func UpdateVariables() {
+func Update() {
 	{
 		NewToRead := ToRead
 		for k, v := range ToRead {

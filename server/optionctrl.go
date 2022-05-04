@@ -6,11 +6,10 @@ import (
 	"net/http"
 
 	"github.com/scutrobotlab/asuwave/option"
-	"github.com/scutrobotlab/asuwave/variable"
 )
 
 func optionCtrl(w http.ResponseWriter, r *http.Request) {
-	defer variable.Refresh()
+	defer option.Refresh()
 	defer option.Save()
 	defer r.Body.Close()
 	var err error
