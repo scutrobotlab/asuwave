@@ -12,15 +12,9 @@ export default {
     searchVToProj: (state) => (keyword) => {
       if (keyword) {
         let kw = keyword.toLowerCase()
-        return state.proj.filter(function (product) {
-          return Object.keys(product).some(function (key) {
-            return (
-              String(product[key])
-                .toLowerCase()
-                .indexOf(kw) > -1
-            );
-          });
-        });
+        state.proj.filter(
+          (obj) => obj.Name.toLowerCase().includes(kw)
+        )
       } else {
         return state.proj;
       }
@@ -28,6 +22,10 @@ export default {
   },
   mutations: {
     setV(state, i) {
+      if (i.t == "proj") {
+        state[i.t] = Object.values(i.v);
+        return;
+      }
       state[i.t] = i.v;
     },
     setVType(state, i) {

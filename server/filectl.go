@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -132,7 +131,9 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 
 		err = fromelf.Watcher.Add(j.Path)
 		if err != nil {
-			log.Fatal(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			io.WriteString(w, errorJson(err.Error()))
+			return
 		}
 
 		w.WriteHeader(http.StatusNoContent)

@@ -1,8 +1,10 @@
 package variable
 
 import (
+	"log"
 	"os"
 	"path"
+	"strconv"
 
 	"github.com/scutrobotlab/asuwave/helper"
 	"github.com/scutrobotlab/asuwave/option"
@@ -51,7 +53,7 @@ type ToProjectT struct {
 	Name string
 	Type string
 }
-type ListProjectT []ToProjectT
+type ListProjectT map[string]ToProjectT
 
 var ToProj ListProjectT = ListProjectT{}
 
@@ -91,5 +93,42 @@ func Refresh() {
 		option.JsonSave(vToProjFileName, &ToProj)
 	} else {
 		os.Remove(vToProjFileName)
+	}
+}
+
+func UpdateVariables() {
+	{
+		NewToRead := ToRead
+		for k, v := range ToRead {
+			if p, ok := ToProj[v.Name]; ok {
+				addr, err := strconv.ParseUint(p.Addr, 16, 32)
+				if err != nil {
+					log.Println(err.Error())
+					continue
+				}
+				v.Addr = uint32(addr)
+				v.Type = p.Type
+				delete(NewToRead, k)
+				NewToRead[v.Addr] = v
+			}
+		}
+		ToRead = NewToRead
+	}
+	{
+		NewToModi := ToModi
+		for k, v := range ToModi {
+			if p, ok := ToProj[v.Name]; ok {
+				addr, err := strconv.ParseUint(p.Addr, 16, 32)
+				if err != nil {
+					log.Println(err.Error())
+					continue
+				}
+				v.Addr = uint32(addr)
+				v.Type = p.Type
+				delete(NewToModi, k)
+				NewToModi[v.Addr] = v
+			}
+		}
+		ToModi = NewToModi
 	}
 }

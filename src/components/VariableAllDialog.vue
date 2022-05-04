@@ -142,9 +142,6 @@ export default {
     ]
   }),
   computed: {
-    lists() {
-      return this.$store.state.variables.proj;
-    },
     searchData() {
       return this.$store.getters['variables/searchVToProj'](this.keyword)
     },

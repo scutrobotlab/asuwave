@@ -127,7 +127,7 @@ func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
 			}
 
 			// 却总有些事，难以忘记
-			*x = append(*x, y)
+			(*x)[y.Name] = y
 		}
 	}
 }
@@ -171,11 +171,12 @@ func dfsStruct(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT,
 			}
 
 			// 道出心底的秘密
-			*x = append(*x, variable.ToProjectT{
-				Name: strings.Join(namePrefix, ".") + "." + v.Name,
+			name := strings.Join(namePrefix, ".") + "." + v.Name
+			(*x)[name] = variable.ToProjectT{
+				Name: name,
 				Addr: fmt.Sprintf("0x%08x", a),
 				Type: v.Type.String(),
-			})
+			}
 		}
 	}
 }
@@ -220,11 +221,12 @@ func dfsArray(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, 
 				continue
 			}
 
-			*x = append(*x, variable.ToProjectT{
-				Name: strings.Join(namePrefix, ".") + ".[" + strconv.FormatInt(i, 10) + "]",
+			name := strings.Join(namePrefix, ".") + ".[" + strconv.FormatInt(i, 10) + "]"
+			(*x)[name] = variable.ToProjectT{
+				Name: name,
 				Addr: fmt.Sprintf("0x%08x", a),
 				Type: t,
-			})
+			}
 		}
 		addrPrefix = addrPrefix + uint32(t.Size())
 	}
