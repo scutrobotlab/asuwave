@@ -33,7 +33,6 @@ jobs:
 
       - name: Build project
         run: |
-          echo ${GITHUB_REF##*/}
           chmod +x build.sh
           ./build.sh
 
