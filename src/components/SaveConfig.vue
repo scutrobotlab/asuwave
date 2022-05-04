@@ -22,7 +22,7 @@ export default {
     save: 7,
     config: [
       {
-        t: "变量列表",
+        t: "监控文件",
         i: 1,
         v: true,
       },

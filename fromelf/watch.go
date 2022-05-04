@@ -10,13 +10,15 @@ import (
 )
 
 var watcher *fsnotify.Watcher
+var watchList []string
 
 var ChFileModi chan string = make(chan string, 10)
 var ChFileError chan string = make(chan string, 10)
 var ChFileWatch chan string = make(chan string, 10)
 
 func GetWatchList() []string {
-	return watcher.WatchList()
+	log.Println("Get: ", watchList)
+	return watchList
 }
 
 func RemoveWathcer() error {
@@ -27,6 +29,7 @@ func RemoveWathcer() error {
 			return err
 		}
 	}
+	log.Println("clear watcher")
 	return nil
 }
 
@@ -45,6 +48,8 @@ func FileWatch() {
 			for _, f := range watcher.WatchList() {
 				watcher.Remove(f)
 			}
+			log.Println("watch: ", file)
+			watchList = []string{file}
 			watcher.Add(file)
 		case event, ok := <-watcher.Events:
 			if !ok {

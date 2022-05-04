@@ -90,13 +90,6 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		err = fromelf.RemoveWathcer()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			io.WriteString(w, errorJson(err.Error()))
-			return
-		}
-
 		file, err := os.Open(j.Path)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
