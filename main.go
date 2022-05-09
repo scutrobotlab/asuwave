@@ -6,11 +6,11 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/scutrobotlab/asuwave/fromelf"
-	"github.com/scutrobotlab/asuwave/helper"
-	"github.com/scutrobotlab/asuwave/option"
-	"github.com/scutrobotlab/asuwave/serial"
-	"github.com/scutrobotlab/asuwave/server"
+	"github.com/scutrobotlab/asuwave/internal/helper"
+	"github.com/scutrobotlab/asuwave/internal/option"
+	"github.com/scutrobotlab/asuwave/internal/serial"
+	"github.com/scutrobotlab/asuwave/internal/server"
+	"github.com/scutrobotlab/asuwave/pkg/file"
 )
 
 func main() {
@@ -54,6 +54,6 @@ func main() {
 	go serial.GrReceive()
 	go serial.GrTransmit()
 	go serial.GrRxPrase(c)
-	go fromelf.FileWatch()
+	go file.FileWatch()
 	server.Start(c, &fsys)
 }

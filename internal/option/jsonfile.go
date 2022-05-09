@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/scutrobotlab/asuwave/logger"
+	"github.com/scutrobotlab/asuwave/internal/logger"
 )
 
 func JsonLoad(filename string, v interface{}) {

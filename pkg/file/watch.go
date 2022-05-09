@@ -1,4 +1,4 @@
-package fromelf
+package file
 
 import (
 	"log"
@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 var watcher *fsnotify.Watcher

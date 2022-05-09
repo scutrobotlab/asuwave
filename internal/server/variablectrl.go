@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/scutrobotlab/asuwave/datautil"
-	"github.com/scutrobotlab/asuwave/option"
-	"github.com/scutrobotlab/asuwave/serial"
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/datautil"
+	"github.com/scutrobotlab/asuwave/internal/option"
+	"github.com/scutrobotlab/asuwave/internal/serial"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 // vList 要控制的参数列表；
@@ -68,7 +68,7 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, "Not allow when serial port closed.")
 				return
 			}
-			err = serial.SendCmd(datautil.ActModeWrite, modVariable)
+			err = serial.SendCmd(datautil.ModeWrite, modVariable)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				io.WriteString(w, errorJson(err.Error()))

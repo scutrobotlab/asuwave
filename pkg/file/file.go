@@ -1,7 +1,7 @@
 /*
 我的秘密，只对你一人说
 */
-package fromelf
+package file
 
 import (
 	"debug/dwarf"
@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 // 你，真的是我一直在等的人吗

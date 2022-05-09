@@ -5,7 +5,7 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/scutrobotlab/asuwave/helper"
+	"github.com/scutrobotlab/asuwave/internal/helper"
 )
 
 var LenType = map[int]string{
@@ -29,41 +29,6 @@ var TypeLen = map[string]int{
 	"double":   8,
 }
 
-type T struct {
-	Board      uint8
-	Name       string
-	Type       string
-	Addr       uint32
-	Data       float64
-	Tick       uint32
-	Inputcolor string
-	SignalGain float64
-	SignalBias float64
-}
-
-type ListT map[uint32]T
-
-var ToRead ListT = ListT{}
-var ToModi ListT = ListT{}
-
-type ToProjectT struct {
-	Addr string
-	Name string
-	Type string
-}
-type ListProjectT map[string]ToProjectT
-
-var ToProj ListProjectT = ListProjectT{}
-
-type ToChartT struct {
-	Board uint8
-	Name  string
-	Data  float64
-	Tick  uint32
-}
-
-type ListChartT []ToChartT
-
 var (
 	vToReadFileName = path.Join(helper.AppConfigDir(), "vToRead.json")
 	vToModiFileName = path.Join(helper.AppConfigDir(), "vToModi.json")
@@ -71,10 +36,14 @@ var (
 )
 
 func Update() {
+	toProj.RLock()
+	defer toProj.RUnlock()
 	{
-		NewToRead := ToRead
-		for k, v := range ToRead {
-			if p, ok := ToProj[v.Name]; ok {
+		to[Read].Lock()
+		defer to[Read].Lock()
+		NewToRead := to[Read].m
+		for k, v := range to[Read].m {
+			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
 				if err != nil {
 					log.Println(err.Error())
@@ -86,12 +55,14 @@ func Update() {
 				NewToRead[v.Addr] = v
 			}
 		}
-		ToRead = NewToRead
+		to[Read].m = NewToRead
 	}
 	{
-		NewToModi := ToModi
-		for k, v := range ToModi {
-			if p, ok := ToProj[v.Name]; ok {
+		to[Modi].Lock()
+		defer to[Modi].Lock()
+		NewToModi := to[Modi].m
+		for k, v := range to[Modi].m {
+			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
 				if err != nil {
 					log.Println(err.Error())
@@ -103,6 +74,6 @@ func Update() {
 				NewToModi[v.Addr] = v
 			}
 		}
-		ToModi = NewToModi
+		to[Modi].m = NewToModi
 	}
 }

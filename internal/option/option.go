@@ -4,9 +4,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/scutrobotlab/asuwave/fromelf"
-	"github.com/scutrobotlab/asuwave/helper"
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/helper"
+	"github.com/scutrobotlab/asuwave/internal/variable"
+	"github.com/scutrobotlab/asuwave/pkg/file"
 )
 
 const (
@@ -47,7 +47,7 @@ func Load() {
 	var watchList []string
 	JsonLoad(vToProjFileName, &watchList)
 	for _, w := range watchList {
-		fromelf.ChFileWatch <- w
+		file.ChFileWatch <- w
 	}
 }
 
@@ -63,7 +63,7 @@ func Refresh() {
 		os.Remove(vToModiFileName)
 	}
 	if CheckCanSave(SaveVariableProj) {
-		JsonSave(vToProjFileName, fromelf.GetWatchList())
+		JsonSave(vToProjFileName, file.GetWatchList())
 	} else {
 		os.Remove(vToProjFileName)
 	}

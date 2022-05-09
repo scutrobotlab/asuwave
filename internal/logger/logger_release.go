@@ -1,3 +1,5 @@
+//go:build release
+
 package logger
 
 import (
@@ -7,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/scutrobotlab/asuwave/helper"
+	"github.com/scutrobotlab/asuwave/internal/helper"
 )
 
 var Log *log.Logger

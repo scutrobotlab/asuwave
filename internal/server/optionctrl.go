@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/scutrobotlab/asuwave/option"
+	"github.com/scutrobotlab/asuwave/internal/option"
 )
 
 func optionCtrl(w http.ResponseWriter, r *http.Request) {

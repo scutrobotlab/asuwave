@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/scutrobotlab/asuwave/fromelf"
-	"github.com/scutrobotlab/asuwave/option"
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/option"
+	"github.com/scutrobotlab/asuwave/internal/variable"
+	"github.com/scutrobotlab/asuwave/pkg/file"
 )
 
 // 上传elf或axf文件
@@ -18,7 +18,7 @@ func fileUploadCtrl(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case http.MethodPut:
-		err := fromelf.RemoveWathcer()
+		err := file.RemoveWathcer()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -44,7 +44,7 @@ func fileUploadCtrl(w http.ResponseWriter, r *http.Request) {
 
 		io.Copy(tempFile, file)
 
-		f, err := fromelf.Check(tempFile)
+		f, err := file.Check(tempFile)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -52,7 +52,7 @@ func fileUploadCtrl(w http.ResponseWriter, r *http.Request) {
 		}
 		defer f.Close()
 
-		err = fromelf.ReadVariable(&variable.ToProj, f)
+		err = file.ReadVariable(&variable.ToProj, f)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -74,7 +74,7 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case http.MethodGet:
-		j := fromelf.GetWatchList()
+		j := file.GetWatchList()
 		b, _ := json.Marshal(j)
 		io.WriteString(w, string(b))
 
@@ -97,7 +97,7 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		f, err := fromelf.Check(file)
+		f, err := file.Check(file)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -105,14 +105,14 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 		}
 		defer f.Close()
 
-		err = fromelf.ReadVariable(&variable.ToProj, f)
+		err = file.ReadVariable(&variable.ToProj, f)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
 			return
 		}
 
-		fromelf.ChFileWatch <- j.Path
+		file.ChFileWatch <- j.Path
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))
@@ -123,7 +123,7 @@ func filePathCtrl(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "")
 
 	case http.MethodDelete:
-		err := fromelf.RemoveWathcer()
+		err := file.RemoveWathcer()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			io.WriteString(w, errorJson(err.Error()))

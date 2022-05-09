@@ -8,9 +8,9 @@ import (
 
 	"go.bug.st/serial"
 
-	"github.com/scutrobotlab/asuwave/datautil"
-	"github.com/scutrobotlab/asuwave/logger"
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/datautil"
+	"github.com/scutrobotlab/asuwave/internal/logger"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 type T struct {
@@ -114,7 +114,7 @@ func Receive(buff []byte) ([]byte, error) {
 	return buff[:n], nil
 }
 
-func SendCmd(act uint8, v variable.T) error {
+func SendCmd(act datautil.ActMode, v variable.T) error {
 	if SerialCur.Port == nil || SerialCur.Name == "" {
 		return errors.New("no serial port")
 	}
@@ -129,10 +129,6 @@ func GrReceive() {
 	buff := make([]byte, 200)
 	for {
 		<-chOp
-		for _, v := range variable.ToRead {
-			SendCmd(datautil.ActModeSubscribe, v)
-			time.Sleep(10 * time.Millisecond)
-		}
 	Loop:
 		for {
 			select {
@@ -185,7 +181,7 @@ func GrRxPrase(c chan string) {
 
 		// 挂念的变量，还望顺问近祺
 		for _, v := range add {
-			err := SendCmd(datautil.ActModeSubscribe, v)
+			err := SendCmd(datautil.Subscribe, v)
 			if err != nil {
 				logger.Log.Println("SendCmd error:", err)
 				return
@@ -194,7 +190,7 @@ func GrRxPrase(c chan string) {
 
 		// 无缘的变量，就请随风逝去
 		for _, v := range del {
-			err := SendCmd(datautil.ActModeUnSubscribe, v)
+			err := SendCmd(datautil.Unsubscribe, v)
 			if err != nil {
 				logger.Log.Println("SendCmd error:", err)
 				return

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 func TestVariableToReadCtrl(t *testing.T) {

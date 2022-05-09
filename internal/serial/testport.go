@@ -8,8 +8,8 @@ import (
 
 	"go.bug.st/serial"
 
-	"github.com/scutrobotlab/asuwave/datautil"
-	"github.com/scutrobotlab/asuwave/variable"
+	"github.com/scutrobotlab/asuwave/internal/datautil"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 type testPort struct {

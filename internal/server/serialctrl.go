@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/scutrobotlab/asuwave/serial"
+	"github.com/scutrobotlab/asuwave/internal/serial"
 )
 
 type SerialSetting struct {

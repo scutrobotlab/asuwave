@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/scutrobotlab/asuwave/serial"
+	"github.com/scutrobotlab/asuwave/internal/serial"
 )
 
 func TestSerialCtrl(t *testing.T) {
