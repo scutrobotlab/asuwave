@@ -1,19 +1,12 @@
 package variable
 
 import (
-	"log"
 	"path"
 	"strconv"
 
+	"github.com/golang/glog"
 	"github.com/scutrobotlab/asuwave/internal/helper"
 )
-
-var LenType = map[int]string{
-	1: "uint8_t",
-	2: "uint16_t",
-	4: "uint32_t",
-	8: "uint64_t",
-}
 
 var TypeLen = map[string]int{
 	"uint8_t":  1,
@@ -35,7 +28,8 @@ var (
 	vToProjFileName = path.Join(helper.AppConfigDir(), "vToProj.json")
 )
 
-func Update() {
+// 通过Proj的变量名更新Read和Modi的地址和类型
+func UpdateByProj() {
 	toProj.RLock()
 	defer toProj.RUnlock()
 	{
@@ -46,7 +40,7 @@ func Update() {
 			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
 				if err != nil {
-					log.Println(err.Error())
+					glog.Errorln(err.Error())
 					continue
 				}
 				v.Addr = uint32(addr)
@@ -65,7 +59,7 @@ func Update() {
 			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
 				if err != nil {
-					log.Println(err.Error())
+					glog.Errorln(err.Error())
 					continue
 				}
 				v.Addr = uint32(addr)

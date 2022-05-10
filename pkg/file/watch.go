@@ -1,11 +1,11 @@
 package file
 
 import (
-	"log"
 	"os"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/golang/glog"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
@@ -17,7 +17,7 @@ var ChFileError chan string = make(chan string, 10)
 var ChFileWatch chan string = make(chan string, 10)
 
 func GetWatchList() []string {
-	log.Println("Get: ", watchList)
+	glog.V(2).Infoln("Get: ", watchList)
 	return watchList
 }
 
@@ -29,7 +29,7 @@ func RemoveWathcer() error {
 			return err
 		}
 	}
-	log.Println("clear watcher")
+	glog.V(2).Infoln("clear watcher")
 	return nil
 }
 
@@ -37,7 +37,8 @@ func FileWatch() {
 	var err error
 	watcher, err = fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		glog.Errorln(err.Error())
+		return
 	}
 	defer watcher.Close()
 	watchdog := 0
@@ -48,52 +49,52 @@ func FileWatch() {
 			for _, f := range watcher.WatchList() {
 				watcher.Remove(f)
 			}
-			log.Println("watch: ", file)
+			glog.Infoln("watch: ", file)
 			watchList = []string{file}
 			watcher.Add(file)
 		case event, ok := <-watcher.Events:
 			if !ok {
-				log.Println("Event not ok")
+				glog.Warningln("Event not ok")
 				return
 			}
-			log.Println("file event:", event)
+			glog.V(2).Infoln("file event:", event)
 			if event.Op&fsnotify.Write == fsnotify.Write {
 				lastEventName = event.Name
 				watchdog = 0
 			}
 		case err, ok := <-watcher.Errors:
 			if !ok {
-				log.Println("Error not ok")
+				glog.Warningln("Error not ok")
 				return
 			}
 			lastEventName = ""
 			ChFileError <- err.Error()
-			log.Println("error:", err)
+			glog.Errorln("error:", err)
 		default:
 			if lastEventName != "" && watchdog < 10 {
 				watchdog++
 			} else if lastEventName != "" && watchdog == 10 {
-				log.Println("file write done:", lastEventName)
+				glog.Infoln("file write done:", lastEventName)
 
 				file, err := os.Open(lastEventName)
 				if err != nil {
-					log.Println("file open:", err)
+					glog.Errorln("file open:", err)
 					return
 				}
 
 				f, err := Check(file)
 				if err != nil {
-					log.Println("file check:", err)
+					glog.Errorln("file check:", err)
 					return
 				}
 				defer f.Close()
 
 				err = ReadVariable(&variable.ToProj, f)
 				if err != nil {
-					log.Println("file read:", err)
+					glog.Errorln("file read:", err)
 					return
 				}
-				variable.Update()
+				variable.UpdateByProj()
 				ChFileModi <- lastEventName
 				watchdog++
 			}

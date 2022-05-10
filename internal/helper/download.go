@@ -3,11 +3,12 @@ package helper
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/golang/glog"
 )
 
 func PrintDownloadPercent(done chan int64, path string, total int64) {
@@ -19,11 +20,11 @@ func PrintDownloadPercent(done chan int64, path string, total int64) {
 		default:
 			file, err := os.Open(path)
 			if err != nil {
-				log.Fatal(err)
+				glog.Fatalln(err.Error())
 			}
 			fi, err := file.Stat()
 			if err != nil {
-				log.Fatal(err)
+				glog.Fatalln(err.Error())
 			}
 			size := fi.Size()
 			if size == 0 {

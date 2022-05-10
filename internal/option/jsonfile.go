@@ -4,31 +4,44 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/scutrobotlab/asuwave/internal/logger"
+	"github.com/golang/glog"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 func JsonLoad(filename string, v interface{}) {
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		return
 	}
-	logger.Log.Println(filename, "Found")
+	glog.Infoln(filename, "Found")
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		logger.Log.Println(err)
+		glog.Errorln(err.Error())
 	}
 	err = json.Unmarshal(data, v)
 	if err != nil {
-		logger.Log.Println(err)
+		glog.Errorln(err.Error())
+	}
+}
+
+func jsonSaveVar(o variable.Opt, filename string) {
+	data, err := variable.GetAll(o)
+	if err != nil {
+		glog.Errorln(err.Error())
+		return
+	}
+	err = os.WriteFile(filename, data, 0644)
+	if err != nil {
+		glog.Errorln(err.Error())
 	}
 }
 
 func JsonSave(filename string, v interface{}) {
 	jsonTxt, err := json.Marshal(v)
 	if err != nil {
-		logger.Log.Println(err)
+		glog.Errorln(err.Error())
 	}
 	err = os.WriteFile(filename, jsonTxt, 0644)
 	if err != nil {
-		logger.Log.Println(err)
+		glog.Errorln(err.Error())
 	}
 }

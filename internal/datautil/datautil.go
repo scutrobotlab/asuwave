@@ -6,7 +6,27 @@ import (
 )
 
 // 把我的思念，化作一串珍珠送给你
-func MakeCmd(act ActMode, v *variable.T) []byte {
+func MakeWriteCmd(v variable.T) []byte {
+	// 拾起一颗颗珍珠
+	data := make([]byte, 16)
+
+	// 刻上你所在的城市和我的思念
+	data[0] = byte(v.Board)
+	data[1] = byte(Write)
+	data[2] = byte(variable.TypeLen[v.Type])
+	copy(data[3:7], variable.AnyToBytes(v.Addr))
+
+	copy(data[7:15], variable.SpecToBytes(v.Type, v.Data))
+
+	// 终于完成了
+	data[15] = '\n'
+
+	// 传达给你吧
+	return data
+}
+
+// 把我的思念，化作一串珍珠送给你
+func MakeCmd(act ActMode, v variable.CmdT) []byte {
 
 	// 拾起一颗颗珍珠
 	data := make([]byte, 16)
@@ -14,14 +34,8 @@ func MakeCmd(act ActMode, v *variable.T) []byte {
 	// 刻上你所在的城市和我的思念
 	data[0] = byte(v.Board)
 	data[1] = byte(act)
-	data[2] = byte(variable.TypeLen[v.Type])
+	data[2] = byte(v.TypeLen)
 	copy(data[3:7], variable.AnyToBytes(v.Addr))
-
-	// 若是心意能够改变
-	if act == Write {
-		// 便也一并传递给你
-		copy(data[7:15], variable.SpecToBytes(v.Type, v.Data))
-	}
 
 	// 终于完成了
 	data[15] = '\n'
@@ -44,7 +58,7 @@ func FindValidPart(data []byte) (int, int) {
 	r := 19
 
 	// 苦苦寻找你的痕迹
-	for r < n && (data[l] != Board1 || data[l+1] != ActModeSubscribeReturn || data[r] != '\n') {
+	for r < n && (data[l] != Board1 || ActMode(data[l+1]) != SubscribeReturn || data[r] != '\n') {
 		l++
 		r++
 	}

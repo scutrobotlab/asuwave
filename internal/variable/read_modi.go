@@ -29,13 +29,11 @@ type RWMap struct { // 一个读写锁保护的线程安全的map
 	m            map[uint32]T
 }
 
-var to []RWMap = []RWMap{
-	RWMap{
-		m: make(map[uint32]T, 0),
-	},
-	RWMap{
-		m: make(map[uint32]T, 0),
-	}}
+var to []RWMap = []RWMap{{
+	m: make(map[uint32]T, 0),
+}, {
+	m: make(map[uint32]T, 0),
+}}
 
 func SetAll(o Opt, m map[uint32]T) {
 	to[o].Lock() // 锁保护

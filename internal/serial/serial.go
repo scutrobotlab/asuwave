@@ -8,8 +8,8 @@ import (
 
 	"go.bug.st/serial"
 
+	"github.com/golang/glog"
 	"github.com/scutrobotlab/asuwave/internal/datautil"
-	"github.com/scutrobotlab/asuwave/internal/logger"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
@@ -44,10 +44,10 @@ func Find() []string {
 
 	tmp, err := serial.GetPortsList()
 	if err != nil {
-		logger.Log.Println("Serial ports errors!")
+		glog.Errorln("Serial ports errors: ", err.Error)
 	}
 	if len(tmp) == 0 {
-		logger.Log.Println("No serial ports found!")
+		glog.Warningln("No serial ports found!")
 	}
 	for _, port := range tmp {
 		if strings.Contains(port, "USB") || strings.Contains(port, "ACM") || strings.Contains(port, "COM") || strings.Contains(port, "tty.usb") {
@@ -114,13 +114,41 @@ func Receive(buff []byte) ([]byte, error) {
 	return buff[:n], nil
 }
 
-func SendCmd(act datautil.ActMode, v variable.T) error {
+var adding = map[variable.CmdT]time.Time{}
+var deling = map[variable.CmdT]time.Time{}
+
+func SendWriteCmd(v variable.T) error {
 	if SerialCur.Port == nil || SerialCur.Name == "" {
 		return errors.New("no serial port")
 	}
 
-	data := datautil.MakeCmd(act, &v)
+	data := datautil.MakeWriteCmd(v)
+	chTx <- data
+	return nil
+}
 
+func SendCmd(act datautil.ActMode, v variable.CmdT) error {
+	if SerialCur.Port == nil || SerialCur.Name == "" {
+		return errors.New("no serial port")
+	}
+
+	if act == datautil.Subscribe {
+		if t, ok := adding[v]; ok {
+			if time.Since(t) < time.Second {
+				glog.V(2).Infoln("Has sent subscribe cmd recently", v)
+				return nil
+			}
+		}
+	} else if act == datautil.Unsubscribe {
+		if t, ok := deling[v]; ok {
+			if time.Since(t) < time.Second {
+				glog.V(2).Infoln("Has sent unsubscribe cmd recently", v)
+				return nil
+			}
+		}
+	}
+
+	data := datautil.MakeCmd(act, v)
 	chTx <- data
 	return nil
 }
@@ -137,7 +165,7 @@ func GrReceive() {
 			default:
 				b, err := Receive(buff)
 				if err != nil {
-					logger.Log.Println("GrReceive error:", err)
+					glog.Errorln("GrReceive error:", err)
 				}
 				chRx <- b
 				time.Sleep(5 * time.Millisecond)
@@ -152,7 +180,7 @@ func GrTransmit() {
 		b := <-chTx
 		err := Transmit(b)
 		if err != nil {
-			logger.Log.Println("GrTransmit error: ", err)
+			glog.Errorln("GrTransmit error: ", err)
 		}
 		time.Sleep(3 * time.Millisecond)
 	}
@@ -165,25 +193,26 @@ func GrRxPrase(c chan string) {
 		rxBuff = append(rxBuff, rx...) // 深藏我的心底
 
 		startIdx, endIdx := datautil.FindValidPart(rxBuff) // 找寻甜蜜的话语
-
-		// 所有的酸甜苦辣都值得铭记
-		logger.Log.Printf("rxBuff: %#v\n", rxBuff)
-		logger.Log.Printf("startIdx: %d, endIdx: %d\n", startIdx, endIdx)
-
-		buff := rxBuff[startIdx:endIdx] // 撷取甜蜜的片段
+		buff := rxBuff[startIdx:endIdx]                    // 撷取甜蜜的片段
 
 		// 拼凑出完整的清单
-		x, add, del := datautil.MakeChartPack(&variable.ToRead, buff)
-		if len(x) != 0 {
-			b, _ := json.Marshal(x)
+		chart, add, del := variable.Filt(buff)
+		if len(chart) != 0 {
+			b, _ := json.Marshal(chart)
 			c <- string(b)
+		}
+
+		// 所有的酸甜苦辣都值得铭记
+		glog.V(3).Infoln("len(chart): ", len(chart))
+		if len(add) > 0 || len(del) > 0 {
+			glog.Infoln("len(add), len(del): ", len(add), len(del))
 		}
 
 		// 挂念的变量，还望顺问近祺
 		for _, v := range add {
 			err := SendCmd(datautil.Subscribe, v)
 			if err != nil {
-				logger.Log.Println("SendCmd error:", err)
+				glog.Errorln("SendCmd error:", err)
 				return
 			}
 		}
@@ -192,7 +221,7 @@ func GrRxPrase(c chan string) {
 		for _, v := range del {
 			err := SendCmd(datautil.Unsubscribe, v)
 			if err != nil {
-				logger.Log.Println("SendCmd error:", err)
+				glog.Errorln("SendCmd error:", err)
 				return
 			}
 		}

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/scutrobotlab/asuwave/internal/datautil"
 	"github.com/scutrobotlab/asuwave/internal/option"
 	"github.com/scutrobotlab/asuwave/internal/serial"
 	"github.com/scutrobotlab/asuwave/internal/variable"
@@ -14,7 +13,7 @@ import (
 
 // vList 要控制的参数列表；
 // isVToRead 为true代表只读变量，为false代表可写变量
-func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
+func makeVariableCtrl(o variable.Opt, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer option.Refresh()
 		defer r.Body.Close()
@@ -23,7 +22,7 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 		switch r.Method {
 		// 获取变量列表
 		case http.MethodGet:
-			b, _ := json.Marshal(vList)
+			b, _ := variable.GetAll(o)
 			io.WriteString(w, string(b))
 		// 新增变量
 		case http.MethodPost:
@@ -40,12 +39,12 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, errorJson("Address out of range"))
 				return
 			}
-			if _, ok := (*vList)[newVariable.Addr]; ok {
+			if _, ok := variable.Get(o, newVariable.Addr); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				io.WriteString(w, errorJson("Address already used"))
 				return
 			}
-			(*vList)[newVariable.Addr] = newVariable
+			variable.Set(o, newVariable.Addr, newVariable)
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, "")
 		// 为变量赋值
@@ -68,7 +67,7 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 				io.WriteString(w, "Not allow when serial port closed.")
 				return
 			}
-			err = serial.SendCmd(datautil.ModeWrite, modVariable)
+			err = serial.SendWriteCmd(modVariable)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				io.WriteString(w, errorJson(err.Error()))
@@ -94,7 +93,7 @@ func makeVariableCtrl(vList *variable.ListT, isVToRead bool) func(w http.Respons
 			// }
 
 			// 从 vList.Variables 中删除地址为 oldVariable.Addr 的变量
-			delete(*vList, oldVariable.Addr)
+			variable.Delete(o, oldVariable.Addr)
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, "")
 			return

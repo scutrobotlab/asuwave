@@ -1,4 +1,4 @@
-// package datautil
+package datautil
 
 // import (
 // 	"encoding/json"

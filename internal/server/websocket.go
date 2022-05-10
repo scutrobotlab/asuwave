@@ -1,12 +1,11 @@
 package server
 
 import (
-	"log"
 	"net/http"
 
+	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
 
-	"github.com/scutrobotlab/asuwave/internal/logger"
 	"github.com/scutrobotlab/asuwave/pkg/file"
 )
 
@@ -21,7 +20,7 @@ func makeWebsocketCtrl(ch chan string) func(w http.ResponseWriter, r *http.Reque
 		}
 		c, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			logger.Log.Print("upgrade:", err)
+			glog.Errorln("upgrade:", err)
 			return
 		}
 		defer c.Close()
@@ -29,7 +28,7 @@ func makeWebsocketCtrl(ch chan string) func(w http.ResponseWriter, r *http.Reque
 			b := <-ch
 			err = c.WriteMessage(websocket.TextMessage, []byte(b))
 			if err != nil {
-				logger.Log.Println("write:", err)
+				glog.Errorln("write:", err)
 				break
 			}
 		}
@@ -46,24 +45,24 @@ func fileWebsocketCtrl(w http.ResponseWriter, r *http.Request) {
 	}
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		logger.Log.Print("upgrade:", err)
+		glog.Errorln("upgrade:", err)
 		return
 	}
 	defer c.Close()
 	for {
 		select {
 		case file := <-file.ChFileModi:
-			log.Println("ws got modified file:", file)
+			glog.Infoln("ws got modified file:", file)
 			err = c.WriteMessage(websocket.TextMessage, []byte(file))
 			if err != nil {
-				logger.Log.Println("write:", err)
+				glog.Errorln("write:", err)
 				break
 			}
 		case err, ok := <-file.ChFileError:
 			if !ok {
 				return
 			}
-			logger.Log.Println("error:", err)
+			glog.Errorln("error:", err)
 		}
 	}
 }

@@ -2,12 +2,12 @@ package serial
 
 import (
 	"errors"
-	"log"
 	"math"
 	"time"
 
 	"go.bug.st/serial"
 
+	"github.com/golang/glog"
 	"github.com/scutrobotlab/asuwave/internal/datautil"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
@@ -20,7 +20,7 @@ type testPort struct {
 var BoardSysTime time.Time = time.Now() // 虚拟电路板的系统时间
 
 func newTestPort() serial.Port {
-	log.Println(BoardSysTime)
+	glog.Infoln("TestPort open at: ", BoardSysTime)
 	return &testPort{
 		readingAddresses: []uint32{},
 		createdTime:      BoardSysTime,
@@ -59,7 +59,7 @@ func testValue(x float64, addr uint32) float64 {
 		scale = math.Sin(currentPhase * 2 * math.Pi)
 	}
 	y := scale * amplitude
-	//log.Printf("Test port: Address: 0x%08X %.5f => %.5f\n", addr, x, y)
+	glog.V(3).Infoln("Test port: Address: 0x%08X %.5f => %.5f\n", addr, x, y)
 	return y
 }
 
@@ -99,7 +99,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 	if board != 1 {
 		return 0, errors.New("invalid board")
 	}
-	act := p[1]
+	act := datautil.ActMode(p[1])
 	typeLen := p[2]
 	if typeLen != 8 {
 		return 0, errors.New("unsupported typeLen")
@@ -107,11 +107,11 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 	address := variable.BytesToUint32(p[3:7])
 
 	switch act {
-	case datautil.ActModeSubscribe:
+	case datautil.Subscribe:
 		tp.readingAddresses = append(tp.readingAddresses, address)
-		log.Printf("Adding address: %08X\n", address)
+		glog.Infoln("Adding address: %08X\n", address)
 
-	case datautil.ActModeUnSubscribe:
+	case datautil.Unsubscribe:
 		var newAddresses []uint32
 		for _, addr := range tp.readingAddresses {
 			if addr != address {
@@ -119,7 +119,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 			}
 		}
 		tp.readingAddresses = newAddresses
-		log.Printf("Deleting address: %08X\n", address)
+		glog.Infoln("Deleting address: %08X\n", address)
 
 	default:
 		return 0, errors.New("invalid act")

@@ -9,15 +9,14 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/scutrobotlab/asuwave/internal/logger"
+	"github.com/golang/glog"
 	"github.com/scutrobotlab/asuwave/internal/option"
-	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 // Start server
 func Start(c chan string, fsys *fs.FS) {
 	port := ":" + strconv.Itoa(option.Config.Port)
-	logger.Log.Println("Listen on " + port)
+	glog.Infoln("Listen on " + port)
 
 	fmt.Println("asuwave running at:")
 	fmt.Println("- Local:   http://localhost" + port + "/")
@@ -27,25 +26,32 @@ func Start(c chan string, fsys *fs.FS) {
 	}
 	fmt.Println("Don't close this before you have done")
 
-	variableToReadCtrl := makeVariableCtrl(&variable.ToRead, true)
-	variableToModiCtrl := makeVariableCtrl(&variable.ToModi, false)
+	variableToReadCtrl := makeVariableCtrl(Read, true)
+	variableToModiCtrl := makeVariableCtrl(Modi, false)
 	websocketCtrl := makeWebsocketCtrl(c)
 
 	mime.AddExtensionType(".js", "application/javascript")
 	http.Handle("/", http.FileServer(http.FS(*fsys)))
 
-	http.HandleFunc("/serial", serialCtrl)
-	http.HandleFunc("/serial_cur", serialCurCtrl)
-	http.HandleFunc("/variable_read", variableToReadCtrl)
-	http.HandleFunc("/variable_modi", variableToModiCtrl)
-	http.HandleFunc("/variable_proj", variableToProjCtrl)
-	http.HandleFunc("/variable_type", variableTypeCtrl)
-	http.HandleFunc("/file/upload", fileUploadCtrl)
-	http.HandleFunc("/file/path", filePathCtrl)
-	http.HandleFunc("/option", optionCtrl)
-	http.HandleFunc("/ws", websocketCtrl)
-	http.HandleFunc("/filews", fileWebsocketCtrl)
-	logger.Log.Fatal(http.ListenAndServe(port, nil))
+	http.Handle("/serial", logs(serialCtrl))
+	http.Handle("/serial_cur", logs(serialCurCtrl))
+	http.Handle("/variable_read", logs(variableToReadCtrl))
+	http.Handle("/variable_modi", logs(variableToModiCtrl))
+	http.Handle("/variable_proj", logs(variableToProjCtrl))
+	http.Handle("/variable_type", logs(variableTypeCtrl))
+	http.Handle("/file/upload", logs(fileUploadCtrl))
+	http.Handle("/file/path", logs(filePathCtrl))
+	http.Handle("/option", logs(optionCtrl))
+	http.Handle("/ws", logs(websocketCtrl))
+	http.Handle("/filews", logs(fileWebsocketCtrl))
+	glog.Fatalln(http.ListenAndServe(port, nil))
+}
+
+func logs(f func(http.ResponseWriter, *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		glog.Infoln("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+		http.HandlerFunc(f).ServeHTTP(w, r)
+	})
 }
 
 func errorJson(s string) string {

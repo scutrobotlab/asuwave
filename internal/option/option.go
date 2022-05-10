@@ -42,8 +42,13 @@ func Load() {
 		JsonLoad(configFileName, &Config)
 	}
 
-	JsonLoad(vToReadFileName, &variable.ToRead)
-	JsonLoad(vToModiFileName, &variable.ToModi)
+	var toRead = map[uint32]variable.T{}
+	var toModi = map[uint32]variable.T{}
+	JsonLoad(vToReadFileName, toRead)
+	JsonLoad(vToModiFileName, toModi)
+	variable.SetAll(variable.Read, toRead)
+	variable.SetAll(variable.Modi, toModi)
+
 	var watchList []string
 	JsonLoad(vToProjFileName, &watchList)
 	for _, w := range watchList {
@@ -53,12 +58,12 @@ func Load() {
 
 func Refresh() {
 	if CheckCanSave(SaveVariableRead) {
-		JsonSave(vToReadFileName, &variable.ToRead)
+		jsonSaveVar(variable.Read, vToReadFileName)
 	} else {
 		os.Remove(vToReadFileName)
 	}
 	if CheckCanSave(SaveVariableModi) {
-		JsonSave(vToModiFileName, &variable.ToModi)
+		jsonSaveVar(variable.Modi, vToModiFileName)
 	} else {
 		os.Remove(vToModiFileName)
 	}
