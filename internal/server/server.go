@@ -10,13 +10,13 @@ import (
 	"strconv"
 
 	"github.com/golang/glog"
-	"github.com/scutrobotlab/asuwave/internal/option"
+	"github.com/scutrobotlab/asuwave/internal/helper"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 // Start server
 func Start(c chan string, fsys *fs.FS) {
-	port := ":" + strconv.Itoa(option.Config.Port)
+	port := ":" + strconv.Itoa(helper.Port)
 	glog.Infoln("Listen on " + port)
 
 	fmt.Println("asuwave running at:")

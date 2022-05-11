@@ -42,6 +42,11 @@ func Load() {
 	for _, w := range watchList {
 		elffile.ChFileWatch <- w
 	}
+
+	jsonSaveVar(variable.Read, vToReadJson)
+	jsonSaveVar(variable.Write, vToWriteJson)
+	JsonSave(fileWatchJson, elffile.GetWatchList())
+	JsonSave(configJson, options)
 }
 
 func GetAll() OptType {

@@ -17,11 +17,10 @@ func main() {
 	vFlag := false
 	uFlag := false
 	bFlag := false
-	pFlag := -1
 	flag.BoolVar(&vFlag, "v", false, "show version")
 	flag.BoolVar(&uFlag, "u", false, "check update")
 	flag.BoolVar(&bFlag, "b", true, "start browser")
-	flag.IntVar(&pFlag, "p", 8000, "port to bind")
+	flag.IntVar(&helper.Port, "p", 8000, "port to bind")
 	flag.Parse()
 
 	if vFlag {
@@ -39,7 +38,7 @@ func main() {
 	fsys := getFS()
 
 	if bFlag {
-		helper.StartBrowser("http://localhost:" + strconv.Itoa(option.Config.Port))
+		helper.StartBrowser("http://localhost:" + strconv.Itoa(helper.Port))
 	}
 
 	c := make(chan string, 10)

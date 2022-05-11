@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	Port      int
 	GitTag    string
 	GitHash   string
 	BuildTime string
