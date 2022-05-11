@@ -4,35 +4,70 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/scutrobotlab/asuwave/internal/option"
 )
 
 func optionCtrl(w http.ResponseWriter, r *http.Request) {
-	defer option.Refresh()
-	defer option.Save()
 	defer r.Body.Close()
-	var err error
 
 	switch r.Method {
 	case http.MethodGet:
-		j := struct{ Save int }{Save: option.Config.Save}
-		b, _ := json.Marshal(j)
+		b, _ := json.Marshal(option.GetAll())
 		io.WriteString(w, string(b))
 
 	case http.MethodPut:
 		j := struct {
-			Save int
+			Key   string
+			Value string
 		}{}
 		postData, _ := io.ReadAll(r.Body)
-		err = json.Unmarshal(postData, &j)
-		if err != nil {
+		if err := json.Unmarshal(postData, &j); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			io.WriteString(w, errorJson("Invaild json"))
 			return
 		}
-		option.Config.Save = j.Save
-		io.WriteString(w, string(postData))
+		switch j.Key {
+		case "LogLevel":
+			if v, err := strconv.Atoi(j.Value); err == nil && v >= 1 && v <= 5 {
+				option.SetLogLevel(v)
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+				io.WriteString(w, errorJson("Invaild value"))
+				return
+			}
+		case "SaveVarList":
+			if v, err := strconv.ParseBool(j.Value); err == nil {
+				option.SetSaveVarList(v)
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+				io.WriteString(w, errorJson("Invaild value"))
+				return
+			}
+		case "SaveFilePath":
+			if v, err := strconv.ParseBool(j.Value); err == nil {
+				option.SetSaveFilePath(v)
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+				io.WriteString(w, errorJson("Invaild value"))
+				return
+			}
+		case "UpdateByProj":
+			if v, err := strconv.ParseBool(j.Value); err == nil {
+				option.SetUpdateByProj(v)
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+				io.WriteString(w, errorJson("Invaild value"))
+				return
+			}
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			io.WriteString(w, errorJson("Option Key Unfound."))
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+		io.WriteString(w, "")
 
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)

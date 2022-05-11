@@ -35,34 +35,34 @@ var to []RWMap = []RWMap{{
 	m: make(map[uint32]T, 0),
 }}
 
-func SetAll(m Mod, m map[uint32]T) {
-	to[m].Lock() // 锁保护
-	defer to[m].Unlock()
-	to[m].m = m
+func SetAll(o Mod, v map[uint32]T) {
+	to[o].Lock() // 锁保护
+	defer to[o].Unlock()
+	to[o].m = v
 }
 
-// 以json格式获取所有Opt变量
-func GetAll(m Mod) ([]byte, error) {
-	to[m].RLock() // 锁保护
-	defer to[m].RUnlock()
-	return json.Marshal(to[m].m)
+// 以json格式获取所有Mod变量
+func GetAll(o Mod) ([]byte, error) {
+	to[o].RLock() // 锁保护
+	defer to[o].RUnlock()
+	return json.Marshal(to[o].m)
 }
 
-func Get(m Mod, k uint32) (T, bool) { //从map中读取一个值
-	to[m].RLock()
-	defer to[m].RUnlock()
-	v, existed := to[m].m[k] // 在锁的保护下从map中读取
+func Get(o Mod, k uint32) (T, bool) { //从map中读取一个值
+	to[o].RLock()
+	defer to[o].RUnlock()
+	v, existed := to[o].m[k] // 在锁的保护下从map中读取
 	return v, existed
 }
 
-func Set(m Mod, k uint32, v T) { // 设置一个键值对
-	to[m].Lock() // 锁保护
-	defer to[m].Unlock()
-	to[m].m[k] = v
+func Set(o Mod, k uint32, v T) { // 设置一个键值对
+	to[o].Lock() // 锁保护
+	defer to[o].Unlock()
+	to[o].m[k] = v
 }
 
-func Delete(m Mod, k uint32) { //删除一个键
-	to[m].Lock() // 锁保护
-	defer to[m].Unlock()
-	delete(to[m].m, k)
+func Delete(o Mod, k uint32) { //删除一个键
+	to[o].Lock() // 锁保护
+	defer to[o].Unlock()
+	delete(to[o].m, k)
 }

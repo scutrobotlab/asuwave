@@ -76,7 +76,7 @@
 
         <ErrorAlert v-model="error" />
         <v-data-table :headers="headers" :items="proj_vars" :search="keyword">
-          <template #item.isRead="{ item }">
+          <template #[`item.isRead`]="{ item }">
             <v-btn
               icon :color="item.isRead?'green':'grey'"
               @click="toggleVar(item.isRead, item, 'read')"
@@ -84,7 +84,7 @@
               <v-icon>mdi-eye{{ item.isRead?"":"-plus-outline" }}</v-icon>
             </v-btn>
           </template>
-          <template #item.isWrite="{ item }">
+          <template #[`item.isWrite`]="{ item }">
             <v-btn
               icon :color="item.isWrite?'green':'grey'"
               @click="toggleVar(item.isWrite, item, 'write')"

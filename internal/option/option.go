@@ -9,18 +9,20 @@ import (
 	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
 
-var options struct {
+type OptType struct {
 	LogLevel     int
 	SaveVarList  bool
 	SaveFilePath bool
 	UpdateByProj bool
 }
 
+var options OptType
+
 var (
-	configJson     = path.Join(helper.AppConfigDir(), "config.json")
-	vToReadJson    = path.Join(helper.AppConfigDir(), "vToRead.json")
-	vToWriteJson   = path.Join(helper.AppConfigDir(), "vToWrite.json")
-	vFileWatchJson = path.Join(helper.AppConfigDir(), "vFileWatch.json")
+	configJson    = path.Join(helper.AppConfigDir(), "config.json")
+	vToReadJson   = path.Join(helper.AppConfigDir(), "vToRead.json")
+	vToWriteJson  = path.Join(helper.AppConfigDir(), "vToWrite.json")
+	fileWatchJson = path.Join(helper.AppConfigDir(), "vFileWatch.json")
 )
 
 func Load() {
@@ -36,10 +38,14 @@ func Load() {
 	variable.SetAll(variable.Write, toWrite)
 
 	var watchList []string
-	JsonLoad(vFileWatchJson, watchList)
+	JsonLoad(fileWatchJson, watchList)
 	for _, w := range watchList {
 		elffile.ChFileWatch <- w
 	}
+}
+
+func GetAll() OptType {
+	return options
 }
 
 func SetLogLevel(v int) {
@@ -47,6 +53,7 @@ func SetLogLevel(v int) {
 		return
 	}
 	options.LogLevel = v
+	JsonSave(configJson, options)
 }
 
 func SetSaveVarList(v bool) {
@@ -61,6 +68,7 @@ func SetSaveVarList(v bool) {
 		os.Remove(vToWriteJson)
 	}
 	options.SaveVarList = v
+	JsonSave(configJson, options)
 }
 
 func SetSaveFilePath(v bool) {
@@ -68,11 +76,12 @@ func SetSaveFilePath(v bool) {
 		return
 	}
 	if options.SaveFilePath {
-		JsonSave(vFileWatchJson, elffile.GetWatchList())
+		JsonSave(fileWatchJson, elffile.GetWatchList())
 	} else {
-		os.Remove(vFileWatchJson)
+		os.Remove(fileWatchJson)
 	}
 	options.SaveFilePath = v
+	JsonSave(configJson, options)
 }
 
 func SetUpdateByProj(v bool) {
@@ -80,8 +89,5 @@ func SetUpdateByProj(v bool) {
 		return
 	}
 	options.UpdateByProj = v
-}
-
-func Save() {
 	JsonSave(configJson, options)
 }

@@ -6,14 +6,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/scutrobotlab/asuwave/internal/option"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
 
 // 上传elf或axf文件
 func fileUploadCtrl(w http.ResponseWriter, r *http.Request) {
-	defer option.Refresh()
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
@@ -70,7 +68,6 @@ func fileUploadCtrl(w http.ResponseWriter, r *http.Request) {
 
 // 监控elf或axf文件
 func filePathCtrl(w http.ResponseWriter, r *http.Request) {
-	defer option.Refresh()
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {

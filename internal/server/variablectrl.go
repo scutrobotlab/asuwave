@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/scutrobotlab/asuwave/internal/option"
 	"github.com/scutrobotlab/asuwave/internal/serial"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
@@ -15,7 +14,6 @@ import (
 // isVToRead 为true代表只读变量，为false代表可写变量
 func makeVariableCtrl(m variable.Mod, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer option.Refresh()
 		defer r.Body.Close()
 		w.Header().Set("Content-Type", "application/json")
 		var err error
@@ -107,7 +105,6 @@ func makeVariableCtrl(m variable.Mod, isVToRead bool) func(w http.ResponseWriter
 
 // 工程变量
 func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
-	defer option.Refresh()
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {

@@ -35,7 +35,6 @@ func main() {
 	}
 
 	option.Load()
-	option.Save()
 
 	fsys := getFS()
 

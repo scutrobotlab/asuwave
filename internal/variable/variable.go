@@ -54,7 +54,7 @@ func UpdateByProj() {
 	{
 		to[Write].Lock()
 		defer to[Write].Lock()
-		NewToWrite := to[Write].m
+		NewToModi := to[Write].m
 		for k, v := range to[Write].m {
 			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
@@ -64,8 +64,8 @@ func UpdateByProj() {
 				}
 				v.Addr = uint32(addr)
 				v.Type = p.Type
-				delete(NewToWrite, k)
-				NewToWrite[v.Addr] = v
+				delete(NewToModi, k)
+				NewToModi[v.Addr] = v
 			}
 		}
 		to[Write].m = NewToModi
