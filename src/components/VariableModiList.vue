@@ -20,7 +20,7 @@
         append-icon="mdi-send"
         type="number"
         :disabled="!serial_status"
-        @click:append="modiVariable(i)"
+        @click:append="writeVariable(i)"
       />
       <v-list-item-action>
         <v-btn small icon @click="delVariable(i)">
@@ -30,7 +30,7 @@
         </v-btn>
       </v-list-item-action>
     </v-list-item>
-    <VariableNewDialog ref="VariableNewDialog" opt="modi" />
+    <VariableNewDialog ref="VariableNewDialog" mod="write" />
   </v-list>
 </template>
 
@@ -45,7 +45,7 @@ export default {
   mixins: [errorMixin],
   computed: {
     variables() {
-      return this.$store.state.variables.modi;
+      return this.$store.state.variables.write;
     },
     serial_status() {
       return this.$store.state.serialPort.status;
@@ -65,15 +65,15 @@ export default {
       return "0x" + z + h;
     },
     async getVariables() {
-      await this.$store.dispatch("variables/getV", "modi");
+      await this.$store.dispatch("variables/getV", "write");
     },
     async delVariable(i) {
-      await this.errorHandler(deleteVariable("modi", 1, i.Name, i.Type, i.Addr));
+      await this.errorHandler(deleteVariable("write", 1, i.Name, i.Type, i.Addr));
       await this.getVariables();
     },
 
-    async modiVariable(i) {
-      await this.errorHandler(putVariable("modi", 1, i.Name, i.Type, i.Addr, parseFloat(i.Data)));
+    async writeVariable(i) {
+      await this.errorHandler(putVariable("write", 1, i.Name, i.Type, i.Addr, parseFloat(i.Data)));
     },
   },
 };

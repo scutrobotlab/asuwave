@@ -35,7 +35,7 @@
         </v-btn>
       </v-list-item-action>
     </v-list-item>
-    <VariableNewDialog ref="VariableNewDialog" opt="read" />
+    <VariableNewDialog ref="VariableNewDialog" mod="read" />
   </v-list>
 </template>
 

@@ -6,74 +6,82 @@ import (
 
 	"github.com/scutrobotlab/asuwave/internal/helper"
 	"github.com/scutrobotlab/asuwave/internal/variable"
-	"github.com/scutrobotlab/asuwave/pkg/file"
+	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
 
-const (
-	SaveVariableProj = 1
-	SaveVariableRead = 2
-	SaveVariableModi = 4
-)
-
-type ConfigT struct {
-	Save int
-	Port int
+var options struct {
+	LogLevel     int
+	SaveVarList  bool
+	SaveFilePath bool
+	UpdateByProj bool
 }
 
 var (
-	vToReadFileName = path.Join(helper.AppConfigDir(), "vToRead.json")
-	vToModiFileName = path.Join(helper.AppConfigDir(), "vToModi.json")
-	vToProjFileName = path.Join(helper.AppConfigDir(), "vToProj.json")
+	configJson     = path.Join(helper.AppConfigDir(), "config.json")
+	vToReadJson    = path.Join(helper.AppConfigDir(), "vToRead.json")
+	vToWriteJson   = path.Join(helper.AppConfigDir(), "vToWrite.json")
+	vFileWatchJson = path.Join(helper.AppConfigDir(), "vFileWatch.json")
 )
 
-var Config ConfigT
-
-var configFileName = path.Join(helper.AppConfigDir(), "config.json")
-
-func CheckCanSave(s int) bool {
-	return s&Config.Save == s
-}
-
 func Load() {
-	if _, err := os.Stat(configFileName); os.IsNotExist(err) {
-		Config.Save = 7
-		Config.Port = 8000
-	} else {
-		JsonLoad(configFileName, &Config)
+	if _, err := os.Stat(configJson); !os.IsNotExist(err) {
+		JsonLoad(configJson, options)
 	}
 
 	var toRead = map[uint32]variable.T{}
-	var toModi = map[uint32]variable.T{}
-	JsonLoad(vToReadFileName, toRead)
-	JsonLoad(vToModiFileName, toModi)
+	var toWrite = map[uint32]variable.T{}
+	JsonLoad(vToReadJson, toRead)
+	JsonLoad(vToWriteJson, toWrite)
 	variable.SetAll(variable.Read, toRead)
-	variable.SetAll(variable.Modi, toModi)
+	variable.SetAll(variable.Write, toWrite)
 
 	var watchList []string
-	JsonLoad(vToProjFileName, &watchList)
+	JsonLoad(vFileWatchJson, watchList)
 	for _, w := range watchList {
-		file.ChFileWatch <- w
+		elffile.ChFileWatch <- w
 	}
 }
 
-func Refresh() {
-	if CheckCanSave(SaveVariableRead) {
-		jsonSaveVar(variable.Read, vToReadFileName)
-	} else {
-		os.Remove(vToReadFileName)
+func SetLogLevel(v int) {
+	if options.LogLevel == v {
+		return
 	}
-	if CheckCanSave(SaveVariableModi) {
-		jsonSaveVar(variable.Modi, vToModiFileName)
-	} else {
-		os.Remove(vToModiFileName)
+	options.LogLevel = v
+}
+
+func SetSaveVarList(v bool) {
+	if options.SaveVarList == v {
+		return
 	}
-	if CheckCanSave(SaveVariableProj) {
-		JsonSave(vToProjFileName, file.GetWatchList())
+	if v {
+		jsonSaveVar(variable.Read, vToReadJson)
+		jsonSaveVar(variable.Write, vToWriteJson)
 	} else {
-		os.Remove(vToProjFileName)
+		os.Remove(vToReadJson)
+		os.Remove(vToWriteJson)
 	}
+	options.SaveVarList = v
+}
+
+func SetSaveFilePath(v bool) {
+	if options.SaveFilePath == v {
+		return
+	}
+	if options.SaveFilePath {
+		JsonSave(vFileWatchJson, elffile.GetWatchList())
+	} else {
+		os.Remove(vFileWatchJson)
+	}
+	options.SaveFilePath = v
+}
+
+func SetUpdateByProj(v bool) {
+	if options.UpdateByProj == v {
+		return
+	}
+	options.UpdateByProj = v
 }
 
 func Save() {
-	JsonSave(configFileName, Config)
+	JsonSave(configJson, options)
 }

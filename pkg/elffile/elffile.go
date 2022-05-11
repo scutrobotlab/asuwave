@@ -1,7 +1,7 @@
 /*
 我的秘密，只对你一人说
 */
-package file
+package elffile
 
 import (
 	"debug/dwarf"
@@ -41,15 +41,15 @@ func Check(f *os.File) (*elf.File, error) {
 }
 
 // 将你心中的秘密，分享给我吧
-func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
+func ReadVariable(f *elf.File) (variable.Projs, error) {
 
 	// 排除一切杂念，听你娓娓道来
-	*x = variable.ListProjectT{}
+	x := variable.Projs{}
 
 	// 故事很长，从那一天说起吧
 	dwarfData, err := f.DWARF()
 	if err != nil {
-		return err
+		return x, err
 	}
 	r := dwarfData.Reader()
 
@@ -58,17 +58,17 @@ func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
 		// 不断倾诉你心底的声音
 		entry, err := r.Next()
 		if err != nil {
-			return err
+			return x, err
 		}
 
 		// 直到尽头才满意地离开
 		if entry == nil {
-			return nil
+			return x, nil
 		}
 
 		// 重要的回忆，怎能忘记
 		if entry.Tag == dwarf.TagVariable && !entry.Children {
-			y := variable.ToProjectT{}
+			y := variable.ProjT{}
 			var a uint32
 
 			// 探访你的住址
@@ -104,11 +104,11 @@ func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
 
 					// 尝试着一层一层地拨开
 					namePrefix := []string{y.Name}
-					dfsStruct(namePrefix, a, x, s.Field)
+					dfsStruct(namePrefix, a, &x, s.Field)
 
 				} else if ar, ok := checkArray(t); ok {
 					namePrefix := []string{y.Name}
-					dfsArray(namePrefix, a, x, ar.Type, ar.Count)
+					dfsArray(namePrefix, a, &x, ar.Type, ar.Count)
 				} else {
 
 					// 别用谎言欺骗自己
@@ -127,13 +127,13 @@ func ReadVariable(x *variable.ListProjectT, f *elf.File) error {
 			}
 
 			// 却总有些事，难以忘记
-			(*x)[y.Name] = y
+			x[y.Name] = y
 		}
 	}
 }
 
 // 一层一层地拨开你的心
-func dfsStruct(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, s []*dwarf.StructField) {
+func dfsStruct(namePrefix []string, addrPrefix uint32, x *variable.Projs, s []*dwarf.StructField) {
 
 	// 不愿放过每一个问题
 	for _, v := range s {
@@ -172,7 +172,7 @@ func dfsStruct(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT,
 
 			// 道出心底的秘密
 			name := strings.Join(namePrefix, ".") + "." + v.Name
-			(*x)[name] = variable.ToProjectT{
+			(*x)[name] = variable.ProjT{
 				Name: name,
 				Addr: fmt.Sprintf("0x%08x", a),
 				Type: v.Type.String(),
@@ -200,7 +200,7 @@ func checkStruct(t dwarf.Type) (*dwarf.StructType, bool) {
 	return nil, false
 }
 
-func dfsArray(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, t dwarf.Type, c int64) {
+func dfsArray(namePrefix []string, addrPrefix uint32, x *variable.Projs, t dwarf.Type, c int64) {
 
 	for i := int64(0); i < c; i++ {
 		if st, ok := checkStruct(t); ok {
@@ -222,7 +222,7 @@ func dfsArray(namePrefix []string, addrPrefix uint32, x *variable.ListProjectT, 
 			}
 
 			name := strings.Join(namePrefix, ".") + ".[" + strconv.FormatInt(i, 10) + "]"
-			(*x)[name] = variable.ToProjectT{
+			(*x)[name] = variable.ProjT{
 				Name: name,
 				Addr: fmt.Sprintf("0x%08x", a),
 				Type: t,

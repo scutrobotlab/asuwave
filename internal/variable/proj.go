@@ -11,16 +11,18 @@ type ProjT struct {
 	Type string
 }
 
-type ProjMapType struct { // 一个读写锁保护的线程安全的map
+type Projs map[string]ProjT
+
+type projMapType struct { // 一个读写锁保护的线程安全的map
 	sync.RWMutex // 读写锁保护下面的map字段
-	m            map[string]ProjT
+	m            Projs
 }
 
-var toProj ProjMapType = ProjMapType{
-	m: make(map[string]ProjT, 0),
+var toProj projMapType = projMapType{
+	m: make(Projs, 0),
 }
 
-func SetAllProj(m map[string]ProjT) {
+func SetAllProj(m Projs) {
 	toProj.Lock() // 锁保护
 	defer toProj.Unlock()
 	toProj.m = m

@@ -23,12 +23,12 @@ var TypeLen = map[string]int{
 }
 
 var (
-	vToReadFileName = path.Join(helper.AppConfigDir(), "vToRead.json")
-	vToModiFileName = path.Join(helper.AppConfigDir(), "vToModi.json")
-	vToProjFileName = path.Join(helper.AppConfigDir(), "vToProj.json")
+	vToReadFileName  = path.Join(helper.AppConfigDir(), "vToRead.json")
+	vToWriteFileName = path.Join(helper.AppConfigDir(), "vToWrite.json")
+	vToProjFileName  = path.Join(helper.AppConfigDir(), "vToProj.json")
 )
 
-// 通过Proj的变量名更新Read和Modi的地址和类型
+// 通过Proj的变量名更新Read和Write的地址和类型
 func UpdateByProj() {
 	toProj.RLock()
 	defer toProj.RUnlock()
@@ -52,10 +52,10 @@ func UpdateByProj() {
 		to[Read].m = NewToRead
 	}
 	{
-		to[Modi].Lock()
-		defer to[Modi].Lock()
-		NewToModi := to[Modi].m
-		for k, v := range to[Modi].m {
+		to[Write].Lock()
+		defer to[Write].Lock()
+		NewToWrite := to[Write].m
+		for k, v := range to[Write].m {
 			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
 				if err != nil {
@@ -64,10 +64,10 @@ func UpdateByProj() {
 				}
 				v.Addr = uint32(addr)
 				v.Type = p.Type
-				delete(NewToModi, k)
-				NewToModi[v.Addr] = v
+				delete(NewToWrite, k)
+				NewToWrite[v.Addr] = v
 			}
 		}
-		to[Modi].m = NewToModi
+		to[Write].m = NewToModi
 	}
 }

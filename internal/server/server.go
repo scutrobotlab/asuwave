@@ -11,6 +11,7 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/scutrobotlab/asuwave/internal/option"
+	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 // Start server
@@ -26,8 +27,8 @@ func Start(c chan string, fsys *fs.FS) {
 	}
 	fmt.Println("Don't close this before you have done")
 
-	variableToReadCtrl := makeVariableCtrl(Read, true)
-	variableToModiCtrl := makeVariableCtrl(Modi, false)
+	variableToReadCtrl := makeVariableCtrl(variable.Read, true)
+	variableToWriteCtrl := makeVariableCtrl(variable.Write, false)
 	websocketCtrl := makeWebsocketCtrl(c)
 
 	mime.AddExtensionType(".js", "application/javascript")
@@ -36,7 +37,7 @@ func Start(c chan string, fsys *fs.FS) {
 	http.Handle("/serial", logs(serialCtrl))
 	http.Handle("/serial_cur", logs(serialCurCtrl))
 	http.Handle("/variable_read", logs(variableToReadCtrl))
-	http.Handle("/variable_modi", logs(variableToModiCtrl))
+	http.Handle("/variable_write", logs(variableToWriteCtrl))
 	http.Handle("/variable_proj", logs(variableToProjCtrl))
 	http.Handle("/variable_type", logs(variableTypeCtrl))
 	http.Handle("/file/upload", logs(fileUploadCtrl))

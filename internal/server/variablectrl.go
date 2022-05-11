@@ -13,7 +13,7 @@ import (
 
 // vList 要控制的参数列表；
 // isVToRead 为true代表只读变量，为false代表可写变量
-func makeVariableCtrl(o variable.Opt, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
+func makeVariableCtrl(m variable.Mod, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer option.Refresh()
 		defer r.Body.Close()
@@ -22,7 +22,7 @@ func makeVariableCtrl(o variable.Opt, isVToRead bool) func(w http.ResponseWriter
 		switch r.Method {
 		// 获取变量列表
 		case http.MethodGet:
-			b, _ := variable.GetAll(o)
+			b, _ := variable.GetAll(m)
 			io.WriteString(w, string(b))
 		// 新增变量
 		case http.MethodPost:
@@ -39,12 +39,12 @@ func makeVariableCtrl(o variable.Opt, isVToRead bool) func(w http.ResponseWriter
 				io.WriteString(w, errorJson("Address out of range"))
 				return
 			}
-			if _, ok := variable.Get(o, newVariable.Addr); ok {
+			if _, ok := variable.Get(m, newVariable.Addr); ok {
 				w.WriteHeader(http.StatusBadRequest)
 				io.WriteString(w, errorJson("Address already used"))
 				return
 			}
-			variable.Set(o, newVariable.Addr, newVariable)
+			variable.Set(m, newVariable.Addr, newVariable)
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, "")
 		// 为变量赋值
@@ -93,7 +93,7 @@ func makeVariableCtrl(o variable.Opt, isVToRead bool) func(w http.ResponseWriter
 			// }
 
 			// 从 vList.Variables 中删除地址为 oldVariable.Addr 的变量
-			variable.Delete(o, oldVariable.Addr)
+			variable.Delete(m, oldVariable.Addr)
 			w.WriteHeader(http.StatusNoContent)
 			io.WriteString(w, "")
 			return
@@ -112,10 +112,10 @@ func variableToProjCtrl(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
 	case http.MethodGet:
-		b, _ := json.Marshal(variable.ToProj)
+		b, _ := variable.GetAllProj()
 		io.WriteString(w, string(b))
 	case http.MethodDelete:
-		variable.ToProj = variable.ListProjectT{}
+		variable.SetAllProj(variable.Projs{})
 
 		w.WriteHeader(http.StatusNoContent)
 		io.WriteString(w, "")

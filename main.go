@@ -10,7 +10,7 @@ import (
 	"github.com/scutrobotlab/asuwave/internal/option"
 	"github.com/scutrobotlab/asuwave/internal/serial"
 	"github.com/scutrobotlab/asuwave/internal/server"
-	"github.com/scutrobotlab/asuwave/pkg/file"
+	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
 
 func main() {
@@ -35,13 +35,6 @@ func main() {
 	}
 
 	option.Load()
-
-	if val, ok := os.LookupEnv("PORT"); ok {
-		option.Config.Port, _ = strconv.Atoi(val)
-	} else if pFlag >= 0 && pFlag <= 65535 {
-		option.Config.Port = pFlag
-	}
-
 	option.Save()
 
 	fsys := getFS()
@@ -54,6 +47,6 @@ func main() {
 	go serial.GrReceive()
 	go serial.GrTransmit()
 	go serial.GrRxPrase(c)
-	go file.FileWatch()
+	go elffile.FileWatch()
 	server.Start(c, &fsys)
 }

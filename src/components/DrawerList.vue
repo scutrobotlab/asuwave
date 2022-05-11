@@ -4,7 +4,7 @@
     <v-divider />
     <VariableReadList />
     <v-divider />
-    <VariableModiList />
+    <VariableWriteList />
     <v-divider />
     <SaveConfig />
   </v-navigation-drawer>
@@ -13,13 +13,13 @@
 <script>
 import SerialPort from "@/components/SerialPort.vue";
 import SaveConfig from "@/components/SaveConfig.vue";
-import VariableModiList from "@/components/VariableModiList.vue";
+import VariableWriteList from "@/components/VariableWriteList.vue";
 import VariableReadList from "@/components/VariableReadList.vue";
 export default {
   components: {
     SerialPort,
     SaveConfig,
-    VariableModiList,
+    VariableWriteList,
     VariableReadList,
   },
   data: () => ({

@@ -23,8 +23,8 @@ func JsonLoad(filename string, v interface{}) {
 	}
 }
 
-func jsonSaveVar(o variable.Opt, filename string) {
-	data, err := variable.GetAll(o)
+func jsonSaveVar(m variable.Mod, filename string) {
+	data, err := variable.GetAll(m)
 	if err != nil {
 		glog.Errorln(err.Error())
 		return

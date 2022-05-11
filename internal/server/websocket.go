@@ -6,7 +6,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
 
-	"github.com/scutrobotlab/asuwave/pkg/file"
+	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
 
 func makeWebsocketCtrl(ch chan string) func(w http.ResponseWriter, r *http.Request) {
@@ -51,14 +51,14 @@ func fileWebsocketCtrl(w http.ResponseWriter, r *http.Request) {
 	defer c.Close()
 	for {
 		select {
-		case file := <-file.ChFileModi:
+		case file := <-elffile.ChFileWrite:
 			glog.Infoln("ws got modified file:", file)
 			err = c.WriteMessage(websocket.TextMessage, []byte(file))
 			if err != nil {
 				glog.Errorln("write:", err)
 				break
 			}
-		case err, ok := <-file.ChFileError:
+		case err, ok := <-elffile.ChFileError:
 			if !ok {
 				return
 			}

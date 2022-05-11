@@ -62,22 +62,22 @@ func TestVariableToReadCtrl(t *testing.T) {
 		},
 	}
 
-	variableToReadCtrl := makeVariableCtrl(&variable.ToRead, true)
+	variableToReadCtrl := makeVariableCtrl(variable.Read, true)
 
 	ctrlerTest(variableToReadCtrl, "variableToReadCtrl", cases, t)
 }
 
-func TestVariableToModiCtrl(t *testing.T) {
+func TestVariableToWriteCtrl(t *testing.T) {
 	cases := casesT{
 		{
 			http.MethodGet,
-			"/variable_modi",
+			"/variable_write",
 			nil,
 			http.StatusOK,
 		},
 		{
 			http.MethodPost,
-			"/variable_modi",
+			"/variable_write",
 			struct {
 				Board uint8
 				Name  string
@@ -93,13 +93,13 @@ func TestVariableToModiCtrl(t *testing.T) {
 		},
 		{
 			http.MethodGet,
-			"/variable_modi",
+			"/variable_write",
 			nil,
 			http.StatusOK,
 		},
 		{
 			http.MethodPut,
-			"/variable_modi",
+			"/variable_write",
 			struct {
 				Board uint8
 				Name  string
@@ -117,7 +117,7 @@ func TestVariableToModiCtrl(t *testing.T) {
 		},
 		{
 			http.MethodDelete,
-			"/variable_modi",
+			"/variable_write",
 			struct {
 				Board uint8
 				Name  string
@@ -133,9 +133,9 @@ func TestVariableToModiCtrl(t *testing.T) {
 		},
 	}
 
-	variableToModiCtrl := makeVariableCtrl(&variable.ToModi, false)
+	variableToWriteCtrl := makeVariableCtrl(variable.Write, false)
 
-	ctrlerTest(variableToModiCtrl, "variableToModiCtrl", cases, t)
+	ctrlerTest(variableToWriteCtrl, "variableToWriteCtrl", cases, t)
 }
 
 func TestVariableTypeCtrl(t *testing.T) {

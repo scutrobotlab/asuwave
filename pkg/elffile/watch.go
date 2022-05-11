@@ -1,4 +1,4 @@
-package file
+package elffile
 
 import (
 	"os"
@@ -12,7 +12,7 @@ import (
 var watcher *fsnotify.Watcher
 var watchList []string
 
-var ChFileModi chan string = make(chan string, 10)
+var ChFileWrite chan string = make(chan string, 10)
 var ChFileError chan string = make(chan string, 10)
 var ChFileWatch chan string = make(chan string, 10)
 
@@ -70,10 +70,10 @@ func FileWatch() {
 			lastEventName = ""
 			ChFileError <- err.Error()
 			glog.Errorln("error:", err)
-		default:
-			if lastEventName != "" && watchdog < 10 {
+		case <-time.After(200 * time.Millisecond):
+			if lastEventName != "" && watchdog < 5 {
 				watchdog++
-			} else if lastEventName != "" && watchdog == 10 {
+			} else if lastEventName != "" && watchdog == 5 {
 				glog.Infoln("file write done:", lastEventName)
 
 				file, err := os.Open(lastEventName)
@@ -89,16 +89,16 @@ func FileWatch() {
 				}
 				defer f.Close()
 
-				err = ReadVariable(&variable.ToProj, f)
+				projs, err := ReadVariable(f)
 				if err != nil {
 					glog.Errorln("file read:", err)
 					return
 				}
+				variable.SetAllProj(projs)
 				variable.UpdateByProj()
-				ChFileModi <- lastEventName
+				ChFileWrite <- lastEventName
 				watchdog++
 			}
-			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }

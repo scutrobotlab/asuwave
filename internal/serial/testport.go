@@ -108,18 +108,22 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 
 	switch act {
 	case datautil.Subscribe:
-		tp.readingAddresses = append(tp.readingAddresses, address)
-		glog.Infoln("Adding address: %08X\n", address)
+		go time.AfterFunc(500*time.Millisecond, func() {
+			tp.readingAddresses = append(tp.readingAddresses, address)
+			glog.Infoln("Adding address: %08X\n", address)
+		})
 
 	case datautil.Unsubscribe:
-		var newAddresses []uint32
-		for _, addr := range tp.readingAddresses {
-			if addr != address {
-				newAddresses = append(newAddresses, addr)
+		go time.AfterFunc(500*time.Millisecond, func() {
+			var newAddresses []uint32
+			for _, addr := range tp.readingAddresses {
+				if addr != address {
+					newAddresses = append(newAddresses, addr)
+				}
 			}
-		}
-		tp.readingAddresses = newAddresses
-		glog.Infoln("Deleting address: %08X\n", address)
+			tp.readingAddresses = newAddresses
+			glog.Infoln("Deleting address: %08X\n", address)
+		})
 
 	default:
 		return 0, errors.New("invalid act")
