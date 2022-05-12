@@ -14,7 +14,7 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		b, _ := json.Marshal(option.GetAll())
+		b, _ := json.Marshal(option.Get())
 		io.WriteString(w, string(b))
 
 	case http.MethodPut:
