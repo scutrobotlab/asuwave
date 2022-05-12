@@ -1,10 +1,12 @@
 package option
 
 import (
+	"flag"
 	"os"
-	"path"
+	"strconv"
 
-	"github.com/scutrobotlab/asuwave/internal/helper"
+	"github.com/golang/glog"
+	"github.com/scutrobotlab/asuwave/internal/jsonfile"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
@@ -18,35 +20,27 @@ type OptType struct {
 
 var options OptType
 
-var (
-	configJson    = path.Join(helper.AppConfigDir(), "config.json")
-	vToReadJson   = path.Join(helper.AppConfigDir(), "vToRead.json")
-	vToWriteJson  = path.Join(helper.AppConfigDir(), "vToWrite.json")
-	fileWatchJson = path.Join(helper.AppConfigDir(), "vFileWatch.json")
-)
-
 func Load() {
-	if _, err := os.Stat(configJson); !os.IsNotExist(err) {
-		JsonLoad(configJson, options)
-	}
+	jsonfile.Load(configJson, &options)
 
 	var toRead = map[uint32]variable.T{}
 	var toWrite = map[uint32]variable.T{}
-	JsonLoad(vToReadJson, toRead)
-	JsonLoad(vToWriteJson, toWrite)
+	jsonfile.Load(variableJson[variable.Read], &toRead)
+	jsonfile.Load(variableJson[variable.Write], &toWrite)
 	variable.SetAll(variable.Read, toRead)
 	variable.SetAll(variable.Write, toWrite)
 
 	var watchList []string
-	JsonLoad(fileWatchJson, watchList)
+	jsonfile.Load(fileWatchJson, &watchList)
 	for _, w := range watchList {
 		elffile.ChFileWatch <- w
 	}
 
-	jsonSaveVar(variable.Read, vToReadJson)
-	jsonSaveVar(variable.Write, vToWriteJson)
-	JsonSave(fileWatchJson, elffile.GetWatchList())
-	JsonSave(configJson, options)
+	jsonfile.UpdateVar(variable.Read)
+	jsonfile.UpdateVar(variable.Write)
+
+	jsonfile.Save(fileWatchJson, elffile.GetWatchList())
+	jsonfile.Save(configJson, options)
 }
 
 func GetAll() OptType {
@@ -55,44 +49,50 @@ func GetAll() OptType {
 
 func SetLogLevel(v int) {
 	if options.LogLevel == v {
+		glog.V(1).Infof("LogLevel has set to %d, skip\n", v)
 		return
 	}
+	glog.V(1).Infof("Set LogLevel to %t\n", v)
 	options.LogLevel = v
-	JsonSave(configJson, options)
+	if err := flag.Set("v", strconv.Itoa(v)); err != nil {
+		glog.Errorln(err.Error())
+	}
+	jsonfile.Save(configJson, options)
 }
 
 func SetSaveVarList(v bool) {
 	if options.SaveVarList == v {
+		glog.V(1).Infof("SaveVarList has set to %t, skip\n", v)
 		return
 	}
-	if v {
-		jsonSaveVar(variable.Read, vToReadJson)
-		jsonSaveVar(variable.Write, vToWriteJson)
-	} else {
-		os.Remove(vToReadJson)
-		os.Remove(vToWriteJson)
-	}
+	glog.V(1).Infof("Set SaveVarList to %t\n", v)
+	jsonfile.UpdateVar(variable.Read)
+	jsonfile.UpdateVar(variable.Write)
 	options.SaveVarList = v
-	JsonSave(configJson, options)
+	jsonfile.Save(configJson, options)
 }
 
 func SetSaveFilePath(v bool) {
 	if options.SaveFilePath == v {
+		glog.V(1).Infof("SaveFilePath has set to %t, skip\n", v)
 		return
 	}
+	glog.V(1).Infof("Set SaveFilePath to %t\n", v)
 	if options.SaveFilePath {
-		JsonSave(fileWatchJson, elffile.GetWatchList())
+		jsonfile.Save(fileWatchJson, elffile.GetWatchList())
 	} else {
 		os.Remove(fileWatchJson)
 	}
 	options.SaveFilePath = v
-	JsonSave(configJson, options)
+	jsonfile.Save(configJson, options)
 }
 
 func SetUpdateByProj(v bool) {
 	if options.UpdateByProj == v {
+		glog.V(1).Infof("UpdateByProj has set to %t, skip\n", v)
 		return
 	}
+	glog.V(1).Infof("Set UpdateByProj to %t\n", v)
 	options.UpdateByProj = v
-	JsonSave(configJson, options)
+	jsonfile.Save(configJson, options)
 }

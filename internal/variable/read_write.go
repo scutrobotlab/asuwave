@@ -3,6 +3,8 @@ package variable
 import (
 	"encoding/json"
 	"sync"
+
+	"github.com/scutrobotlab/asuwave/internal/option"
 )
 
 type Mod int
@@ -39,6 +41,7 @@ func SetAll(o Mod, v map[uint32]T) {
 	to[o].Lock() // 锁保护
 	defer to[o].Unlock()
 	to[o].m = v
+	option.JsonUpdateVar(o)
 }
 
 // 以json格式获取所有Mod变量
@@ -59,10 +62,12 @@ func Set(o Mod, k uint32, v T) { // 设置一个键值对
 	to[o].Lock() // 锁保护
 	defer to[o].Unlock()
 	to[o].m[k] = v
+	option.JsonUpdateVar(o)
 }
 
 func Delete(o Mod, k uint32) { //删除一个键
 	to[o].Lock() // 锁保护
 	defer to[o].Unlock()
 	delete(to[o].m, k)
+	option.JsonUpdateVar(o)
 }

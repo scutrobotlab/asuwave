@@ -15,7 +15,7 @@ import (
 )
 
 // Start server
-func Start(c chan string, fsys *fs.FS) {
+func Start(fsys *fs.FS) {
 	port := ":" + strconv.Itoa(helper.Port)
 	glog.Infoln("Listen on " + port)
 
@@ -27,9 +27,8 @@ func Start(c chan string, fsys *fs.FS) {
 	}
 	fmt.Println("Don't close this before you have done")
 
-	variableToReadCtrl := makeVariableCtrl(variable.Read, true)
-	variableToWriteCtrl := makeVariableCtrl(variable.Write, false)
-	websocketCtrl := makeWebsocketCtrl(c)
+	variableToReadCtrl := makeVariableCtrl(variable.Read)
+	variableToWriteCtrl := makeVariableCtrl(variable.Write)
 
 	mime.AddExtensionType(".js", "application/javascript")
 	http.Handle("/", http.FileServer(http.FS(*fsys)))
@@ -43,14 +42,14 @@ func Start(c chan string, fsys *fs.FS) {
 	http.Handle("/file/upload", logs(fileUploadCtrl))
 	http.Handle("/file/path", logs(filePathCtrl))
 	http.Handle("/option", logs(optionCtrl))
-	http.Handle("/ws", logs(websocketCtrl))
+	http.Handle("/dataws", logs(dataWebsocketCtrl))
 	http.Handle("/filews", logs(fileWebsocketCtrl))
 	glog.Fatalln(http.ListenAndServe(port, nil))
 }
 
 func logs(f func(http.ResponseWriter, *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		glog.Infoln("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
+		glog.Infoln(r.RemoteAddr, r.Method, r.URL)
 		http.HandlerFunc(f).ServeHTTP(w, r)
 	})
 }

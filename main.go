@@ -17,7 +17,7 @@ func main() {
 	vFlag := false
 	uFlag := false
 	bFlag := false
-	flag.BoolVar(&vFlag, "v", false, "show version")
+	flag.BoolVar(&vFlag, "i", false, "show version")
 	flag.BoolVar(&uFlag, "u", false, "check update")
 	flag.BoolVar(&bFlag, "b", true, "start browser")
 	flag.IntVar(&helper.Port, "p", 8000, "port to bind")
@@ -41,10 +41,9 @@ func main() {
 		helper.StartBrowser("http://localhost:" + strconv.Itoa(helper.Port))
 	}
 
-	c := make(chan string, 10)
 	go serial.GrReceive()
 	go serial.GrTransmit()
-	go serial.GrRxPrase(c)
+	go serial.GrRxPrase()
 	go elffile.FileWatch()
-	server.Start(c, &fsys)
+	server.Start(&fsys)
 }

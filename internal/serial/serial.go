@@ -30,6 +30,8 @@ var SerialCur = T{
 	Port: nil,
 }
 
+var Chch = make(chan string) // 新图表Json
+
 var chOp = make(chan bool)       // 敞开心扉
 var chEd = make(chan bool)       // 沉默不语
 var chRx = make(chan []byte, 10) // 来信收讫
@@ -74,6 +76,7 @@ func Open(name string, baud int) error {
 		SerialCur.Name = ""
 		return err
 	}
+	glog.Infoln(SerialCur.Name, "Opened.")
 	chOp <- true
 	return nil
 }
@@ -88,6 +91,7 @@ func Close() error {
 	if err != nil {
 		return err
 	}
+	glog.Infoln(SerialCur.Name, "Closed.")
 	SerialCur.Name = ""
 	chEd <- true
 	return nil
@@ -122,6 +126,7 @@ func SendWriteCmd(v variable.T) error {
 		return errors.New("no serial port")
 	}
 
+	glog.Infoln("Send write cmd", v)
 	data := datautil.MakeWriteCmd(v)
 	chTx <- data
 	return nil
@@ -148,6 +153,7 @@ func SendCmd(act datautil.ActMode, v variable.CmdT) error {
 		}
 	}
 
+	glog.Infoln("Send cmd", act, v)
 	data := datautil.MakeCmd(act, v)
 	chTx <- data
 	return nil
@@ -186,7 +192,7 @@ func GrTransmit() {
 	}
 }
 
-func GrRxPrase(c chan string) {
+func GrRxPrase() {
 	var rxBuff []byte
 	for {
 		rx := <-chRx                   // 收到你的来信
@@ -199,13 +205,13 @@ func GrRxPrase(c chan string) {
 		chart, add, del := variable.Filt(buff)
 		if len(chart) != 0 {
 			b, _ := json.Marshal(chart)
-			c <- string(b)
+			Chch <- string(b)
 		}
 
 		// 所有的酸甜苦辣都值得铭记
 		glog.V(3).Infoln("len(chart): ", len(chart))
-		if len(add) > 0 || len(del) > 0 {
-			glog.Infoln("len(add), len(del): ", len(add), len(del))
+		if glog.V(2) && len(add) > 0 || len(del) > 0 {
+			glog.Infof("add: %v, del: %v\n", add, del)
 		}
 
 		// 挂念的变量，还望顺问近祺

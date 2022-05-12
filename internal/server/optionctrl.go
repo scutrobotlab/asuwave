@@ -20,7 +20,7 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		j := struct {
 			Key   string
-			Value string
+			Value *json.RawMessage
 		}{}
 		postData, _ := io.ReadAll(r.Body)
 		if err := json.Unmarshal(postData, &j); err != nil {
@@ -28,9 +28,10 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, errorJson("Invaild json"))
 			return
 		}
+		value := string(*j.Value)
 		switch j.Key {
 		case "LogLevel":
-			if v, err := strconv.Atoi(j.Value); err == nil && v >= 1 && v <= 5 {
+			if v, err := strconv.Atoi(value); err == nil && v >= 1 && v <= 5 {
 				option.SetLogLevel(v)
 			} else {
 				w.WriteHeader(http.StatusBadRequest)
@@ -38,7 +39,7 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		case "SaveVarList":
-			if v, err := strconv.ParseBool(j.Value); err == nil {
+			if v, err := strconv.ParseBool(value); err == nil {
 				option.SetSaveVarList(v)
 			} else {
 				w.WriteHeader(http.StatusBadRequest)
@@ -46,7 +47,7 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		case "SaveFilePath":
-			if v, err := strconv.ParseBool(j.Value); err == nil {
+			if v, err := strconv.ParseBool(value); err == nil {
 				option.SetSaveFilePath(v)
 			} else {
 				w.WriteHeader(http.StatusBadRequest)
@@ -54,7 +55,7 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		case "UpdateByProj":
-			if v, err := strconv.ParseBool(j.Value); err == nil {
+			if v, err := strconv.ParseBool(value); err == nil {
 				option.SetUpdateByProj(v)
 			} else {
 				w.WriteHeader(http.StatusBadRequest)
@@ -63,7 +64,7 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 			}
 		default:
 			w.WriteHeader(http.StatusBadRequest)
-			io.WriteString(w, errorJson("Option Key Unfound."))
+			io.WriteString(w, errorJson("Unfound key: "+j.Key))
 			return
 		}
 		w.WriteHeader(http.StatusNoContent)

@@ -6,31 +6,30 @@ import (
 	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
 
+	"github.com/scutrobotlab/asuwave/internal/serial"
 	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
 
-func makeWebsocketCtrl(ch chan string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var upgrader = websocket.Upgrader{
-			ReadBufferSize:  1024,
-			WriteBufferSize: 1024,
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
-		}
-		c, err := upgrader.Upgrade(w, r, nil)
+func dataWebsocketCtrl(w http.ResponseWriter, r *http.Request) {
+	var upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		glog.Errorln("upgrade:", err)
+		return
+	}
+	defer c.Close()
+	for {
+		b := <-serial.Chch
+		err = c.WriteMessage(websocket.TextMessage, []byte(b))
 		if err != nil {
-			glog.Errorln("upgrade:", err)
-			return
-		}
-		defer c.Close()
-		for {
-			b := <-ch
-			err = c.WriteMessage(websocket.TextMessage, []byte(b))
-			if err != nil {
-				glog.Errorln("write:", err)
-				break
-			}
+			glog.Errorln("write:", err)
+			break
 		}
 	}
 }

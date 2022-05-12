@@ -12,7 +12,7 @@ import (
 
 // vList 要控制的参数列表；
 // isVToRead 为true代表只读变量，为false代表可写变量
-func makeVariableCtrl(m variable.Mod, isVToRead bool) func(w http.ResponseWriter, r *http.Request) {
+func makeVariableCtrl(m variable.Mod) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		w.Header().Set("Content-Type", "application/json")
@@ -47,7 +47,7 @@ func makeVariableCtrl(m variable.Mod, isVToRead bool) func(w http.ResponseWriter
 			io.WriteString(w, "")
 		// 为变量赋值
 		case http.MethodPut:
-			if isVToRead {
+			if m == variable.Read {
 				w.WriteHeader(http.StatusMethodNotAllowed)
 				io.WriteString(w, errorJson(http.StatusText(http.StatusMethodNotAllowed)))
 				return
