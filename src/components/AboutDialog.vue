@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" max-width="400">
+  <v-dialog v-model="dialog" max-width="50%">
     <v-card>
       <v-list-item>
         <v-list-item-avatar tile>
@@ -27,7 +27,7 @@
           <v-icon color="success" left>
             mdi-check-circle
           </v-icon>已是最新版本。
-          <a class="text--secondary " @click="checkUpdate">重新检查</a>
+          <a class="text--secondary" @click="checkUpdate">重新检查</a>
         </v-card-text>
         <div v-else>
           <v-card-title>
@@ -66,6 +66,16 @@
         </div>
       </div>
       <v-divider />
+      <v-card-title>设置</v-card-title>
+      <v-card-text>
+        <v-slider
+          label="日志等级" ticks="always"
+          min="0" max="5" dense
+        />
+        <v-checkbox dense label="保存变量列表" />
+        <v-checkbox dense label="保存监控文件路径" />
+        <v-checkbox dense label="监控文件更新时根据变量名更新列表" />
+      </v-card-text>
       <v-card-actions class="caption text--secondary">
         <span>&copy; {{ new Date().getFullYear() }} 华工机器人实验室</span>
         <v-spacer />
@@ -120,7 +130,7 @@ export default {
   },
   mounted() {
     this.current_tag = process.env.VUE_APP_GITTAG;
-    window.console.log(this.current_tag)
+    window.console.log(this.current_tag);
 
     if (/Win|win/i.test(navigator.userAgent)) this.os = "windows";
     else if (/Mac|mac|darwin/i.test(navigator.userAgent)) this.os = "darwin";

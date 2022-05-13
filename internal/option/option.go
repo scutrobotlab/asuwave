@@ -60,7 +60,7 @@ func SetLogLevel(v int) {
 		glog.V(1).Infof("LogLevel has set to %d, skip\n", v)
 		return
 	}
-	glog.V(1).Infof("Set LogLevel to %t\n", v)
+	glog.V(1).Infof("Set LogLevel to %d\n", v)
 	LogLevel = v
 	if err := flag.Set("v", strconv.Itoa(v)); err != nil {
 		glog.Errorln(err.Error())
