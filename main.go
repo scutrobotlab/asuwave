@@ -6,22 +6,21 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/scutrobotlab/asuwave/fromelf"
-	"github.com/scutrobotlab/asuwave/helper"
-	"github.com/scutrobotlab/asuwave/option"
-	"github.com/scutrobotlab/asuwave/serial"
-	"github.com/scutrobotlab/asuwave/server"
+	"github.com/scutrobotlab/asuwave/internal/helper"
+	"github.com/scutrobotlab/asuwave/internal/option"
+	"github.com/scutrobotlab/asuwave/internal/serial"
+	"github.com/scutrobotlab/asuwave/internal/server"
+	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
 
 func main() {
 	vFlag := false
 	uFlag := false
 	bFlag := false
-	pFlag := -1
-	flag.BoolVar(&vFlag, "v", false, "show version")
+	flag.BoolVar(&vFlag, "i", false, "show version")
 	flag.BoolVar(&uFlag, "u", false, "check update")
 	flag.BoolVar(&bFlag, "b", true, "start browser")
-	flag.IntVar(&pFlag, "p", 8000, "port to bind")
+	flag.IntVar(&helper.Port, "p", 8000, "port to bind")
 	flag.Parse()
 
 	if vFlag {
@@ -36,24 +35,15 @@ func main() {
 
 	option.Load()
 
-	if val, ok := os.LookupEnv("PORT"); ok {
-		option.Config.Port, _ = strconv.Atoi(val)
-	} else if pFlag >= 0 && pFlag <= 65535 {
-		option.Config.Port = pFlag
-	}
-
-	option.Save()
-
 	fsys := getFS()
 
 	if bFlag {
-		helper.StartBrowser("http://localhost:" + strconv.Itoa(option.Config.Port))
+		helper.StartBrowser("http://localhost:" + strconv.Itoa(helper.Port))
 	}
 
-	c := make(chan string, 10)
 	go serial.GrReceive()
 	go serial.GrTransmit()
-	go serial.GrRxPrase(c)
-	go fromelf.FileWatch()
-	server.Start(c, &fsys)
+	go serial.GrRxPrase()
+	go elffile.FileWatch()
+	server.Start(&fsys)
 }

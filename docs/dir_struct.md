@@ -12,8 +12,8 @@
 │   ├── const.go
 │   ├── datautil.go
 │   └── datautil_test.go
-├── fromelf - 后端·elf/axf文件处理
-│   └── fromelf.go
+├── file - 后端·elf/axf文件处理
+│   └── file.go
 ├── helper - 后端·杂七杂八函数
 │   └── helper.go
 ├── logger - 后端·日志

@@ -5,9 +5,6 @@ module.exports = {
     'plugin:vue/recommended', // Use this if you are using Vue.js 2.x.
   ],
   rules: {
-    "vue/valid-v-slot": ["error", {
-      "allowModifiers": true
-    }],
     "vue/max-attributes-per-line": ["error", {
       "singleline": {
         "max": 3

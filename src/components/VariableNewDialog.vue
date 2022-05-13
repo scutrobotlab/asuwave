@@ -106,7 +106,7 @@ import { postVariable } from "@/api/variable.js";
 export default {
   mixins: [errorMixin],
   props: {
-    opt: {
+    mod: {
       type: String,
       default: "",
     },
@@ -182,7 +182,7 @@ export default {
       if (this.$refs.form.validate()) {
         this.errorHandler(
           postVariable(
-            this.opt,
+            this.mod,
             this.Board,
             this.Name,
             this.Type,
@@ -193,9 +193,9 @@ export default {
           )
         ).then(async () => {
           this.dialog = false;
-          await this.$store.dispatch("variables/getV", this.opt);
+          await this.$store.dispatch("variables/getV", this.mod);
           this.$bus.$emit("sendalert", true);
-          console.log(this.opt);
+          console.log(this.mod);
         });
       }
     },

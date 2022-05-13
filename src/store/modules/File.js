@@ -26,10 +26,9 @@ export default {
   },
   actions: {
     async refreshPath ({ state }) {
-      window.console.log("!!!")
       await getFilePath().then((r)=>{
-        window.console.log(r);
-        if (r.length != 0) {
+        window.console.log("Watching file: ", r);
+        if (r != null) {
           state.upload = "";
           state.path = r;
         }

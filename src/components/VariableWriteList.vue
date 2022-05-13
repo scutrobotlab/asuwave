@@ -1,7 +1,7 @@
 <template>
   <v-list class="mb-8">
     <v-list-item>
-      <v-list-item-title>只读变量</v-list-item-title>
+      <v-list-item-title>可写变量</v-list-item-title>
       <v-spacer />
       <v-list-item-icon>
         <v-btn icon @click="openDialog()">
@@ -10,23 +10,18 @@
       </v-list-item-icon>
     </v-list-item>
     <ErrorAlert v-model="error" />
-    <v-list-item
-      v-for="(i, Addr) in variables" :key="Addr" dense
-      style="font-family: monospace"
-    >
-      <v-list-item-avatar size="20" :color="i.Inputcolor" />
-      <v-list-item-content>
-        <v-list-item-title>
-          <span class="green--text">{{ i.Type }}</span> {{ i.Name }}
-          <span class="text--disabled"> -> {{ hexdsp(i.Addr) }}</span>;
-        </v-list-item-title>
-        <v-list-item-subtitle>
-          <span style="color: #1b1a;">return </span>
-          <span v-if="i.SignalGain != 1" class="text--disabled"> {{ i.SignalGain }} * </span>
-          <span>{{ i.Name }}</span>
-          <span v-if="i.SignalBias != 0" class="text--disabled"> + {{ i.SignalBias }} </span>;
-        </v-list-item-subtitle>
-      </v-list-item-content>
+    <v-list-item v-for="(i, Addr) in variables" :key="Addr" class="mb-2">
+      <v-text-field
+        v-model="i.Data"
+        style="font-family: monospace"
+        dense
+        :label="i.Type + ' ' + i.Name + ' ='"
+        :hint="hexdsp(i.Addr)"
+        append-icon="mdi-send"
+        type="number"
+        :disabled="!serial_status"
+        @click:append="writeVariable(i)"
+      />
       <v-list-item-action>
         <v-btn small icon @click="delVariable(i)">
           <v-icon small>
@@ -35,13 +30,13 @@
         </v-btn>
       </v-list-item-action>
     </v-list-item>
-    <VariableNewDialog ref="VariableNewDialog" mod="read" />
+    <VariableNewDialog ref="VariableNewDialog" mod="write" />
   </v-list>
 </template>
 
 <script>
 import errorMixin from "@/mixins/errorMixin.js";
-import { deleteVariable } from "@/api/variable.js";
+import { putVariable, deleteVariable } from "@/api/variable.js";
 import VariableNewDialog from "@/components/VariableNewDialog.vue";
 export default {
   components: {
@@ -50,14 +45,14 @@ export default {
   mixins: [errorMixin],
   computed: {
     variables() {
-      return this.$store.state.variables.read;
+      return this.$store.state.variables.write;
     },
     serial_status() {
       return this.$store.state.serialPort.status;
     },
   },
   async mounted() {
-    this.getVariables();
+    await this.getVariables();
   },
   methods: {
     openDialog() {
@@ -70,11 +65,15 @@ export default {
       return "0x" + z + h;
     },
     async getVariables() {
-      await this.$store.dispatch("variables/getV", "read");
+      await this.$store.dispatch("variables/getV", "write");
     },
     async delVariable(i) {
-      await this.errorHandler(deleteVariable("read", 1, i.Name, i.Type, i.Addr));
+      await this.errorHandler(deleteVariable("write", 1, i.Name, i.Type, i.Addr));
       await this.getVariables();
+    },
+
+    async writeVariable(i) {
+      await this.errorHandler(putVariable("write", 1, i.Name, i.Type, i.Addr, parseFloat(i.Data)));
     },
   },
 };
