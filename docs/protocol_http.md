@@ -261,7 +261,7 @@
 
     |  方法  |       URL        |
     |-------|------------------|
-    | `GET` | `/variable_modi` |
+    | `GET` | `/variable_write` |
 * 请求参数  
 
     无  
@@ -278,7 +278,7 @@
 * 调用示例  
 
     请求示例：  
-    `GET /variable_modi`  
+    `GET /variable_write`  
     响应示例：  
     ```json
     {
@@ -306,7 +306,7 @@
 
     |  方法  |        URL        |
     |--------|------------------|
-    | `POST` | `/variable_modi` |
+    | `POST` | `/variable_write` |
 * 请求参数  
 
     |  参数  | 类型   |   说明   |
@@ -321,7 +321,7 @@
 * 调用示例  
 
     请求示例：  
-    `POST /variable_modi`  
+    `POST /variable_write`  
     ```json
     {
         "Board":1,
@@ -338,7 +338,7 @@
 
     |  方法  |        URL       |
     |-------|------------------|
-    | `PUT` | `/variable_modi` |
+    | `PUT` | `/variable_write` |
 * 请求参数  
 
     |  参数  | 类型   |   说明   |
@@ -354,7 +354,7 @@
 * 调用示例  
 
     请求示例：  
-    `PUT /variable_modi`  
+    `PUT /variable_write`  
     ```json
     {
         "Board":1,
@@ -372,7 +372,7 @@
 
     |   方法    |        URL       |
     |----------|------------------|
-    | `DELETE` | `/variable_modi` |
+    | `DELETE` | `/variable_write` |
 * 请求参数  
 
     |  参数  | 类型   |   说明   |
@@ -387,7 +387,7 @@
 * 调用示例  
 
     请求示例：  
-    `DELETE /variable_modi`  
+    `DELETE /variable_write`  
     ```json
     {
         "Board":1,

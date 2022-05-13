@@ -87,7 +87,7 @@ export default {
           window.location.host +
           "/ws";
       } else {
-        url = "ws://localhost:8000/ws";
+        url = "ws://localhost:8000/dataws";
       }
       this.ws = new WebSocket(url);
       this.ws.onopen = this.WSonopen;

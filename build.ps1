@@ -1,4 +1,4 @@
-$importpath="github.com/scutrobotlab/asuwave/helper"
+$importpath="github.com/scutrobotlab/asuwave/internal/helper"
 $gittag=$(git describe --tags --abbrev=0)
 $build_prefix="asuwave_"
 $os_list="linux", "darwin", "windows"

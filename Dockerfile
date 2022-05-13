@@ -12,14 +12,8 @@ RUN npm run build
 FROM golang:latest AS binary
 WORKDIR /build
 COPY ./main.go ./main_release.go ./go.sum ./go.mod /build/
-COPY ./datautil /build/datautil/
-COPY ./fromelf /build/fromelf/
-COPY ./helper /build/helper/
-COPY ./logger /build/logger/
-COPY ./option /build/option/
-COPY ./serial /build/serial/
-COPY ./server /build/server/
-COPY ./variable /build/variable/
+COPY ./internal /build/internal/
+COPY ./pkg /build/pkg/
 COPY --from=build /app/dist/ /build/dist/
 RUN CGO_ENABLED=0 go build -tags release -ldflags="-w -s" -o asuwave
 

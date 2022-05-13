@@ -76,7 +76,7 @@
 
         <ErrorAlert v-model="error" />
         <v-data-table :headers="headers" :items="proj_vars" :search="keyword">
-          <template #item.isRead="{ item }">
+          <template #[`item.isRead`]="{ item }">
             <v-btn
               icon :color="item.isRead?'green':'grey'"
               @click="toggleVar(item.isRead, item, 'read')"
@@ -84,16 +84,16 @@
               <v-icon>mdi-eye{{ item.isRead?"":"-plus-outline" }}</v-icon>
             </v-btn>
           </template>
-          <template #item.isModi="{ item }">
+          <template #[`item.isWrite`]="{ item }">
             <v-btn
-              icon :color="item.isModi?'green':'grey'"
-              @click="toggleVar(item.isModi, item, 'modi')"
+              icon :color="item.isWrite?'green':'grey'"
+              @click="toggleVar(item.isWrite, item, 'write')"
             >
-              <v-icon>mdi-pencil{{ item.isModi?"":"-plus-outline" }}</v-icon>
+              <v-icon>mdi-pencil{{ item.isWrite?"":"-plus-outline" }}</v-icon>
             </v-btn>
           </template>
         </v-data-table>
-        <VariableNewDialog ref="VariableNewDialog" :opt="opt" />
+        <VariableNewDialog ref="VariableNewDialog" :mod="mod" />
       </v-card>
     </v-dialog>
   </v-row>
@@ -116,7 +116,7 @@ export default {
     keyword: "",
     reaction: "",
     alert: null,
-    opt: "",
+    mod: "",
     ws: null,
     headers:[
       {
@@ -137,7 +137,7 @@ export default {
       },
       {
         text:"可写变量",
-        value: "isModi"
+        value: "isWrite"
       },
     ]
   }),
@@ -147,7 +147,7 @@ export default {
       return this.$store.state.variables.proj.map((p)=>{
         let addr = parseInt(p.Addr, 16)
         p.isRead = (this.$store.state.variables.read[addr] != null);
-        p.isModi = (this.$store.state.variables.modi[addr] != null);
+        p.isWrite = (this.$store.state.variables.write[addr] != null);
         return p;
       })
     },
@@ -165,14 +165,14 @@ export default {
     this.ws.close();
   },
   methods: {
-    async toggleVar(state, item, opt) {
+    async toggleVar(state, item, mod) {
       if (state) {
-        await deleteVariable(opt, 1, item.Name, item.Type, parseInt(item.Addr, 16));
-        await this.$store.dispatch("variables/getV", opt);
+        await deleteVariable(mod, 1, item.Name, item.Type, parseInt(item.Addr, 16));
+        await this.$store.dispatch("variables/getV", mod);
         this.alert = "删除成功";
         setTimeout(this.realert, 1000);
       }else {
-        this.openVariableDialog(item.Name, item.Type, 1, item.Addr, opt);
+        this.openVariableDialog(item.Name, item.Type, 1, item.Addr, mod);
       }
     },
     async uploadFile() { 
@@ -186,13 +186,13 @@ export default {
     openDialog() {
       this.dialog = true;
     },
-    openVariableDialog(name, type, board, addr, opt) {
-      this.opt = opt;
+    openVariableDialog(name, type, board, addr, mod) {
+      this.mod = mod;
       this.$refs.VariableNewDialog.openDialogFromList(name, type, board, addr);
     },
     async closeDialog() {
       await this.$store.dispatch("variables/getV", "read");
-      await this.$store.dispatch("variables/getV", "modi");
+      await this.$store.dispatch("variables/getV", "write");
       this.dialog = false;
     },
     async getVariableList() {
@@ -224,7 +224,7 @@ export default {
       this.ws.onmessage = ((e) => {
         window.console.log(e.data)
         this.$store.dispatch("variables/getV", "read");
-        this.$store.dispatch("variables/getV", "modi");
+        this.$store.dispatch("variables/getV", "write");
         this.$store.dispatch("variables/getV", "proj");
       });
       this.ws.onerror = ((e) => { 

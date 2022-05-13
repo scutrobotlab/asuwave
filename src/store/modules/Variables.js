@@ -5,7 +5,7 @@ export default {
   state: {
     proj: [],
     read: {},
-    modi: {},
+    write: {},
     vTypes: [],
   },
   getters: {},
