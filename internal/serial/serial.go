@@ -49,7 +49,7 @@ func Find() []string {
 		glog.Errorln("Serial ports errors: ", err.Error)
 	}
 	if len(tmp) == 0 {
-		glog.Warningln("No serial ports found!")
+		glog.Infoln("No serial ports found!")
 	}
 	for _, port := range tmp {
 		if strings.Contains(port, "USB") || strings.Contains(port, "ACM") || strings.Contains(port, "COM") || strings.Contains(port, "tty.usb") {
@@ -84,7 +84,7 @@ func Open(name string, baud int) error {
 // Close serial port
 func Close() error {
 	if SerialCur.Name == "" {
-		return errors.New("empty serial port")
+		return errors.New("Serial port had closed.")
 	}
 
 	err := SerialCur.Port.Close()
@@ -144,6 +144,7 @@ func SendCmd(act datautil.ActMode, v variable.CmdT) error {
 				return nil
 			}
 		}
+		adding[v] = time.Now()
 	} else if act == datautil.Unsubscribe {
 		if t, ok := deling[v]; ok {
 			if time.Since(t) < time.Second {
@@ -151,6 +152,7 @@ func SendCmd(act datautil.ActMode, v variable.CmdT) error {
 				return nil
 			}
 		}
+		deling[v] = time.Now()
 	}
 
 	glog.Infoln("Send cmd", act, v)

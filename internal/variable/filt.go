@@ -61,11 +61,11 @@ func Filt(data []byte) (chart []ChartT, add []CmdT, del []CmdT) {
 				Tick:  v.Tick,
 			})
 		} else { // 不是的，请忘了它
-			del[addr] = CmdT{
+			del = append(del, CmdT{
 				Board:   board,
 				TypeLen: typelen,
 				Addr:    addr,
-			}
+			})
 		}
 	}
 
@@ -73,11 +73,11 @@ func Filt(data []byte) (chart []ChartT, add []CmdT, del []CmdT) {
 	for _, v := range to[Read].m {
 		if _, ok := addrs[v.Addr]; !ok {
 			// 我很想它，下次请别忘记
-			add[v.Addr] = CmdT{
+			add = append(add, CmdT{
 				Board:   v.Board,
 				TypeLen: TypeLen[v.Type],
 				Addr:    v.Addr,
-			}
+			})
 		}
 	}
 	return

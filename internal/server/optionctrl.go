@@ -31,7 +31,7 @@ func optionCtrl(w http.ResponseWriter, r *http.Request) {
 		value := string(*j.Value)
 		switch j.Key {
 		case "LogLevel":
-			if v, err := strconv.Atoi(value); err == nil && v >= 1 && v <= 5 {
+			if v, err := strconv.Atoi(value); err == nil && v >= 0 && v <= 5 {
 				option.SetLogLevel(v)
 			} else {
 				w.WriteHeader(http.StatusBadRequest)

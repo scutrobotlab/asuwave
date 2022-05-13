@@ -3,22 +3,33 @@ import { getOption, setOption } from "@/api/option.js"; //postVariable,
 export default {
   namespaced: true,
   state: {
-    LogLevel: 3,
+    LogLevel: 0,
     SaveVarList: false,
-    SaveFilePath: true,
-    UpdateByProj: true
+    SaveFilePath: false,
+    UpdateByProj: false
   },
   getters: {},
-  mutations: {},
+  mutations: {
+    all(state, s) {
+      state.LogLevel = s.LogLevel
+      state.SaveVarList = s.SaveVarList
+      state.SaveFilePath = s.SaveFilePath
+      state.UpdateByProj = s.UpdateByProj
+    },
+    kv(state, {k, v}) {
+      state[k] = v
+    }
+  },
   actions: {
-    async get ({ state }) {
+    async get ({ commit }) {
       await getOption().then((r)=>{
-        state = r
+        commit("all", r)
       });
     },
-    async set ({ state }, k, v) {
+    async set ({ commit }, {k, v}) {
+      window.console.log(k, v);
       await setOption(k, v).then(()=>{
-        state.k = v;
+        commit("kv", {k, v});
       });
     },
   },

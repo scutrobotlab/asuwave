@@ -59,7 +59,7 @@ func testValue(x float64, addr uint32) float64 {
 		scale = math.Sin(currentPhase * 2 * math.Pi)
 	}
 	y := scale * amplitude
-	glog.V(3).Infoln("Test port: Address: 0x%08X %.5f => %.5f\n", addr, x, y)
+	glog.V(4).Infof("Test port: Address: 0x%08X %.5f => %.5f\n", addr, x, y)
 	return y
 }
 
@@ -110,7 +110,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 	case datautil.Subscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
 			tp.readingAddresses = append(tp.readingAddresses, address)
-			glog.Infoln("Adding address: %08X\n", address)
+			glog.Infof("Adding address: %08X\n", address)
 		})
 
 	case datautil.Unsubscribe:
@@ -122,7 +122,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 				}
 			}
 			tp.readingAddresses = newAddresses
-			glog.Infoln("Deleting address: %08X\n", address)
+			glog.Infof("Deleting address: %08X\n", address)
 		})
 
 	default:

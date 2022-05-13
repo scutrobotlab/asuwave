@@ -6,7 +6,12 @@
       <v-app-bar-nav-icon @click.stop="switchDrawer()" />
       <v-toolbar-title>坠好用的上位机</v-toolbar-title>
       <v-btn icon @click="openAboutDialog()">
-        <v-icon>mdi-information-outline</v-icon>
+        <v-icon v-if="NewVersion" color="warning">
+          mdi-alert-decagram
+        </v-icon>
+        <v-icon v-else>
+          mdi-information-outline
+        </v-icon>
       </v-btn>
       <v-spacer />
       <v-switch
@@ -42,7 +47,7 @@
 
 <script>
 import VariableAllDialog from "@/components/VariableAllDialog.vue";
-import AboutDialog from "@/components/AboutDialog.vue";
+import AboutDialog from "@/components/AboutDialog/AboutDialog.vue";
 import DrawerList from "@/components/DrawerList.vue";
 import ChartCard from "@/components/ChartCard.vue";
 
@@ -56,11 +61,16 @@ export default {
   computed: {
     fileStatus () {
       return this.$store.getters["file/fileStatus"]
+    }, 
+    NewVersion() {
+      return this.$store.getters["version/NewVersion"];
     }
   },
-  async mounted() {
+  mounted() {
     this.$vuetify.theme.dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    await this.$store.dispatch("variables/getVType");
+    this.$store.dispatch("variables/getVType");
+    this.$store.dispatch("version/Init");
+    this.$store.dispatch("option/get");
   },
   methods: {
     switchDrawer() {

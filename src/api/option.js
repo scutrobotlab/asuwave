@@ -5,6 +5,6 @@ export async function getOption() {
   return res;
 }
 
-export async function putOption(Key, Value) {
+export async function setOption(Key, Value) {
   return await fetchApi("/option", "PUT", { Key, Value });
 }
