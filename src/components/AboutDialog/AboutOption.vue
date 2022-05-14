@@ -33,7 +33,7 @@ export default {
     },
     SaveVarList: {
       get(){
-        return this.$store.state.option.LogLevel;
+        return this.$store.state.option.SaveVarList;
       },
       set(v){
         this.$store.dispatch("option/set", {k: "SaveVarList", v})
@@ -41,7 +41,7 @@ export default {
     },
     SaveFilePath: {
       get(){
-        return this.$store.state.option.LogLevel;
+        return this.$store.state.option.SaveFilePath;
       },
       set(v){
         this.$store.dispatch("option/set", {k: "SaveFilePath", v})
@@ -49,7 +49,7 @@ export default {
     },
     UpdateByProj: {
       get(){
-        return this.$store.state.option.LogLevel;
+        return this.$store.state.option.UpdateByProj;
       },
       set(v){
         this.$store.dispatch("option/set", {k: "UpdateByProj", v})

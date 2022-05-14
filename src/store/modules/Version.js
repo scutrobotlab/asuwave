@@ -26,7 +26,21 @@ export default {
       });
     },
     NewVersion(state) {
-      return (state.update.response.tag_name != "" && state.current_tag != state.update.response.tag_name);
+      function compare(v1, v2) {
+        v1.slice(1);
+        v2.slice(1);
+        v1 = v1.split('.');
+        v2 = v2.split('.');
+        const k = Math.min(v1.length, v2.length);
+        for (let i = 0; i < k; ++ i) {
+          v1[i] = parseInt(v1[i], 10);
+          v2[i] = parseInt(v2[i], 10);
+          if (v1[i] > v2[i]) return false;
+          if (v1[i] < v2[i]) return true;        
+        }
+        return v1.length == v2.length ? false: (v1.length < v2.length ? true : false);
+      }
+      return (state.update.response.tag_name != "" && compare(state.current_tag, state.update.response.tag_name));
     }
   },
   mutations: {

@@ -85,7 +85,7 @@ export default {
           (document.location.protocol == "https:" ? "wss" : "ws") +
           "://" +
           window.location.host +
-          "/ws";
+          "/dataws";
       } else {
         url = "ws://localhost:8000/dataws";
       }
