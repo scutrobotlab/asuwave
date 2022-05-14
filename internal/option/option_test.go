@@ -1,27 +1,32 @@
-package option
+package option_test
 
-// import "testing"
+import (
+	"testing"
 
-// func TestCheckCanSave(t *testing.T) {
-// 	cases := []struct {
-// 		save int
-// 		in   int
-// 		want bool
-// 	}{
-// 		{1, SaveVariableProj, true},
-// 		{2, SaveVariableRead, true},
-// 		{4, SaveVariableWrite, true},
-// 		{1, SaveVariableWrite, false},
-// 		{5, SaveVariableRead, false},
-// 		{6, SaveVariableProj, false},
-// 		{6, SaveVariableWrite, true},
-// 		{7, SaveVariableRead, true},
-// 	}
-// 	for _, c := range cases {
-// 		Config.Save = c.save
-// 		got := CheckCanSave(c.in)
-// 		if got != c.want {
-// 			t.Errorf("checkCanSave(%#v) == %#v, want %#v", c.in, got, c.want)
-// 		}
-// 	}
-// }
+	"github.com/scutrobotlab/asuwave/internal/option"
+)
+
+func FuzzOption(f *testing.F) {
+	f.Fuzz(func(t *testing.T, logLevel int, saveFilePath bool, saveVarList bool, updateByProj bool) {
+
+		option.SetLogLevel(logLevel)
+		option.SetSaveFilePath(saveFilePath)
+		option.SetSaveVarList(saveVarList)
+		option.SetUpdateByProj(updateByProj)
+
+		got := option.Get()
+
+		assertEQ(t, got.LogLevel, logLevel)
+		assertEQ(t, got.SaveFilePath, saveFilePath)
+		assertEQ(t, got.SaveVarList, saveVarList)
+		assertEQ(t, got.UpdateByProj, updateByProj)
+	})
+}
+
+func assertEQ[V int | bool](t *testing.T, a V, b V) {
+	if a != b {
+		t.Errorf("%v != %v", a, b)
+	} else {
+		t.Logf("%v == %v", a, b)
+	}
+}

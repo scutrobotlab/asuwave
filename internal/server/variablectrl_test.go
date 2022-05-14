@@ -1,158 +1,159 @@
 package server
 
-// import (
-// 	"net/http"
-// 	"testing"
+import (
+	"net/http"
+	"testing"
 
-// 	"github.com/scutrobotlab/asuwave/internal/variable"
-// )
+	"github.com/scutrobotlab/asuwave/internal/serial"
+	"github.com/scutrobotlab/asuwave/internal/variable"
+)
 
-// func TestVariableToReadCtrl(t *testing.T) {
-// 	// serial.Open("Test port")
-// 	cases := casesT{
-// 		{
-// 			http.MethodGet,
-// 			"/variable_read",
-// 			nil,
-// 			http.StatusOK,
-// 		},
-// 		{
-// 			http.MethodPost,
-// 			"/variable_read",
-// 			struct {
-// 				Board uint8
-// 				Name  string
-// 				Type  string
-// 				Addr  uint32
-// 			}{
-// 				Board: 1,
-// 				Name:  "a",
-// 				Type:  "int",
-// 				Addr:  0x20123456,
-// 			},
-// 			http.StatusNoContent,
-// 		},
-// 		{
-// 			http.MethodGet,
-// 			"/variable_read",
-// 			nil,
-// 			http.StatusOK,
-// 		},
-// 		{
-// 			http.MethodPut,
-// 			"/variable_read",
-// 			nil,
-// 			http.StatusMethodNotAllowed,
-// 		},
-// 		{
-// 			http.MethodDelete,
-// 			"/variable_read",
-// 			struct {
-// 				Board uint8
-// 				Name  string
-// 				Type  string
-// 				Addr  uint32
-// 			}{
-// 				Board: 1,
-// 				Name:  "a",
-// 				Type:  "int",
-// 				Addr:  0x20123456,
-// 			},
-// 			http.StatusNoContent,
-// 		},
-// 	}
+func TestVariableToReadCtrl(t *testing.T) {
+	cases := casesT{
+		{
+			http.MethodGet,
+			"/variable_read",
+			nil,
+			http.StatusOK,
+		},
+		{
+			http.MethodPost,
+			"/variable_read",
+			struct {
+				Board uint8
+				Name  string
+				Type  string
+				Addr  uint32
+			}{
+				Board: 1,
+				Name:  "a",
+				Type:  "int",
+				Addr:  0x20123456,
+			},
+			http.StatusNoContent,
+		},
+		{
+			http.MethodGet,
+			"/variable_read",
+			nil,
+			http.StatusOK,
+		},
+		{
+			http.MethodPut,
+			"/variable_read",
+			nil,
+			http.StatusMethodNotAllowed,
+		},
+		{
+			http.MethodDelete,
+			"/variable_read",
+			struct {
+				Board uint8
+				Name  string
+				Type  string
+				Addr  uint32
+			}{
+				Board: 1,
+				Name:  "a",
+				Type:  "int",
+				Addr:  0x20123456,
+			},
+			http.StatusNoContent,
+		},
+	}
 
-// 	variableToReadCtrl := makeVariableCtrl(variable.Read, true)
+	variableToReadCtrl := makeVariableCtrl(variable.Read)
 
-// 	ctrlerTest(variableToReadCtrl, "variableToReadCtrl", cases, t)
-// }
+	ctrlerTest(variableToReadCtrl, cases, t)
+}
 
-// func TestVariableToWriteCtrl(t *testing.T) {
-// 	cases := casesT{
-// 		{
-// 			http.MethodGet,
-// 			"/variable_write",
-// 			nil,
-// 			http.StatusOK,
-// 		},
-// 		{
-// 			http.MethodPost,
-// 			"/variable_write",
-// 			struct {
-// 				Board uint8
-// 				Name  string
-// 				Type  string
-// 				Addr  uint32
-// 			}{
-// 				Board: 1,
-// 				Name:  "a",
-// 				Type:  "int",
-// 				Addr:  0x20123456,
-// 			},
-// 			http.StatusNoContent,
-// 		},
-// 		{
-// 			http.MethodGet,
-// 			"/variable_write",
-// 			nil,
-// 			http.StatusOK,
-// 		},
-// 		{
-// 			http.MethodPut,
-// 			"/variable_write",
-// 			struct {
-// 				Board uint8
-// 				Name  string
-// 				Type  string
-// 				Addr  uint32
-// 				Data  float64
-// 			}{
-// 				Board: 1,
-// 				Name:  "a",
-// 				Type:  "int",
-// 				Addr:  0x20123456,
-// 				Data:  100,
-// 			},
-// 			http.StatusInternalServerError,
-// 		},
-// 		{
-// 			http.MethodDelete,
-// 			"/variable_write",
-// 			struct {
-// 				Board uint8
-// 				Name  string
-// 				Type  string
-// 				Addr  uint32
-// 			}{
-// 				Board: 1,
-// 				Name:  "a",
-// 				Type:  "int",
-// 				Addr:  0x20123456,
-// 			},
-// 			http.StatusNoContent,
-// 		},
-// 	}
+func TestVariableToWriteCtrl(t *testing.T) {
+	serial.Open("Test port", 115200)
+	cases := casesT{
+		{
+			http.MethodGet,
+			"/variable_write",
+			nil,
+			http.StatusOK,
+		},
+		{
+			http.MethodPost,
+			"/variable_write",
+			struct {
+				Board uint8
+				Name  string
+				Type  string
+				Addr  uint32
+			}{
+				Board: 1,
+				Name:  "a",
+				Type:  "double",
+				Addr:  0x20123456,
+			},
+			http.StatusNoContent,
+		},
+		{
+			http.MethodGet,
+			"/variable_write",
+			nil,
+			http.StatusOK,
+		},
+		{
+			http.MethodPut,
+			"/variable_write",
+			struct {
+				Board uint8
+				Name  string
+				Type  string
+				Addr  uint32
+				Data  float64
+			}{
+				Board: 1,
+				Name:  "a",
+				Type:  "double",
+				Addr:  0x20123456,
+				Data:  100,
+			},
+			http.StatusNoContent,
+		},
+		{
+			http.MethodDelete,
+			"/variable_write",
+			struct {
+				Board uint8
+				Name  string
+				Type  string
+				Addr  uint32
+			}{
+				Board: 1,
+				Name:  "a",
+				Type:  "double",
+				Addr:  0x20123456,
+			},
+			http.StatusNoContent,
+		},
+	}
 
-// 	variableToWriteCtrl := makeVariableCtrl(variable.Write, false)
+	variableToWriteCtrl := makeVariableCtrl(variable.Write)
 
-// 	ctrlerTest(variableToWriteCtrl, "variableToWriteCtrl", cases, t)
-// }
+	ctrlerTest(variableToWriteCtrl, cases, t)
+}
 
-// func TestVariableTypeCtrl(t *testing.T) {
-// 	cases := casesT{
-// 		{
-// 			http.MethodGet,
-// 			"/serials",
-// 			nil,
-// 			http.StatusOK,
-// 		},
-// 		{
-// 			http.MethodPost,
-// 			"/serials",
-// 			nil,
-// 			http.StatusMethodNotAllowed,
-// 		},
-// 	}
+func TestVariableTypeCtrl(t *testing.T) {
+	cases := casesT{
+		{
+			http.MethodGet,
+			"/serials",
+			nil,
+			http.StatusOK,
+		},
+		{
+			http.MethodPost,
+			"/serials",
+			nil,
+			http.StatusMethodNotAllowed,
+		},
+	}
 
-// 	ctrlerTest(variableTypeCtrl, "variableTypeCtrl", cases, t)
-// }
+	ctrlerTest(variableTypeCtrl, cases, t)
+}

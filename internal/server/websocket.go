@@ -51,7 +51,7 @@ func fileWebsocketCtrl(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case file := <-elffile.ChFileWrite:
-			glog.Infoln("ws got modified file:", file)
+			glog.Infoln("filews got modified event:", file)
 			err = c.WriteMessage(websocket.TextMessage, []byte(file))
 			if err != nil {
 				glog.Errorln("write:", err)

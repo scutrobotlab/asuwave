@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	LogLevel     int
-	SaveFilePath bool
+	logLevel     int
+	saveFilePath bool
 )
 
 var (
@@ -23,24 +23,24 @@ var (
 	fileWatchPath = path.Join(helper.AppConfigDir(), "FileWatch.json")
 )
 
-type optT struct {
+type OptT struct {
 	LogLevel     int
 	SaveFilePath bool
 	SaveVarList  bool
 	UpdateByProj bool
 }
 
-func Get() optT {
-	return optT{
-		LogLevel:     LogLevel,
-		SaveFilePath: SaveFilePath,
+func Get() OptT {
+	return OptT{
+		LogLevel:     logLevel,
+		SaveFilePath: saveFilePath,
 		SaveVarList:  variable.GetOptSaveVarList(),
 		UpdateByProj: variable.GetOptUpdateByProj(),
 	}
 }
 
 func Load() {
-	var opt optT
+	var opt OptT
 	jsonfile.Load(optionPath, &opt)
 	variable.SetOptSaveVarList(opt.SaveVarList)
 	variable.SetOptUpdateByProj(opt.UpdateByProj)
@@ -56,12 +56,12 @@ func Load() {
 }
 
 func SetLogLevel(v int) {
-	if LogLevel == v {
+	if logLevel == v {
 		glog.V(1).Infof("LogLevel has set to %d, skip\n", v)
 		return
 	}
 	glog.V(1).Infof("Set LogLevel to %d\n", v)
-	LogLevel = v
+	logLevel = v
 	if err := flag.Set("v", strconv.Itoa(v)); err != nil {
 		glog.Errorln(err.Error())
 	}
@@ -69,7 +69,7 @@ func SetLogLevel(v int) {
 }
 
 func SetSaveFilePath(v bool) {
-	if SaveFilePath == v {
+	if saveFilePath == v {
 		glog.V(1).Infof("SaveFilePath has set to %t, skip\n", v)
 		return
 	}
@@ -79,7 +79,7 @@ func SetSaveFilePath(v bool) {
 	} else {
 		os.Remove(fileWatchPath)
 	}
-	SaveFilePath = v
+	saveFilePath = v
 	jsonfile.Save(optionPath, Get())
 }
 

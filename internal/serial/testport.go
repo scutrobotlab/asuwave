@@ -2,6 +2,7 @@ package serial
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"time"
 
@@ -126,7 +127,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 		})
 
 	default:
-		return 0, errors.New("invalid act")
+		return 0, errors.New(fmt.Sprint("invalid act: ", act))
 	}
 
 	return 16, nil
