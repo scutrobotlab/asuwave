@@ -4,7 +4,6 @@
 [![Docker](https://github.com/scutrobotlab/asuwave/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/docker-publish.yml)
 [![Release](https://github.com/scutrobotlab/asuwave/actions/workflows/release.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/release.yml)
 [![Node.js](https://github.com/scutrobotlab/asuwave/actions/workflows/node.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/node.yml)
-[![CodeQL](https://github.com/scutrobotlab/asuwave/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/codeql-analysis.yml)  
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/scutrobotlab/asuwave)](https://github.com/scutrobotlab/asuwave/releases)
 [![GitHub all releases](https://img.shields.io/github/downloads/scutrobotlab/asuwave/total)](https://github.com/scutrobotlab/asuwave/releases)
 [![GitHub release (latest by date)](https://img.shields.io/github/downloads/scutrobotlab/asuwave/latest/total)](https://github.com/scutrobotlab/asuwave/releases)  
@@ -22,7 +21,7 @@
 
 ## 佛系·上位机
 
-其一 · 于辛丑年夏
+其一 · 于辛丑年夏  
 君问何项最佛系，当属网页上位机。  
 先由杨工做设计，后有玮文提建议。  
 退队人员再召集，分工明确尽全力。  
