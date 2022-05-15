@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 	"testing"
+
+	"github.com/scutrobotlab/asuwave/internal/serial"
 )
 
 func TestSerialCtrl(t *testing.T) {
@@ -36,6 +38,9 @@ func TestSerialCtrl(t *testing.T) {
 }
 
 func TestSerialCurCtrl(t *testing.T) {
+	go serial.GrReceive()
+	go serial.GrTransmit()
+	go serial.GrRxPrase()
 	cases := casesT{
 		{
 			http.MethodGet,
