@@ -9,8 +9,8 @@
       <v-btn text @click="exportData">
         导出
       </v-btn>
-      <v-btn text color="primaryText" @click="follow">
-        {{ showFollow }}
+      <v-btn text color="primaryText" @click="toggleFollow">
+        {{ follow?"取消跟随":"跟随" }}
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -29,7 +29,7 @@ export default {
   data: () => ({
     chart: null,
     ws: null,
-    showFollow: "跟随",
+    follow: true,
     putColors: [],
   }),
   computed: {
@@ -90,22 +90,10 @@ export default {
         url = "ws://localhost:8000/dataws";
       }
       this.ws = new WebSocket(url);
-      this.ws.onopen = this.WSonopen;
-      this.ws.onclose = this.WSclose;
-      this.ws.onmessage = this.WSonmessage;
-      this.ws.onerror = this.WSonerror;
-    },
-    WSonopen() {
-      console.log("连接成功");
-    },
-    WSclose() {
-      console.log("连接断开");
-    },
-    WSonmessage(evt) {
-      this.parseWS(evt.data);
-    },
-    WSonerror(evt) {
-      console.log("ERROR: " + evt.data);
+      this.ws.onopen = ()=>{console.log("连接成功")};
+      this.ws.onclose = ()=>{console.log("连接断开")};
+      this.ws.onmessage = (evt) => {this.parseWS(evt.data)};
+      this.ws.onerror = (evt)=>{console.log("ERROR: " + evt.data)}
     },
     parseWS(data) {
       if (!data) {
@@ -141,17 +129,9 @@ export default {
       }
       this.chart.update();
     },
-    follow() {
-      switch (this.showFollow) {
-      case "跟随":
-        this.chart.options.realTime = true;
-        this.showFollow = "取消跟随";
-        break;
-      case "取消跟随":
-        this.chart.options.realTime = false;
-        this.showFollow = "跟随";
-        break;
-      }
+    toggleFollow() {
+      this.follow = !this.follow;
+      this.chart.options.realTime = this.follow;
     },
     exportData() {
       console.log(this.chart.options.series);

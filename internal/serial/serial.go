@@ -84,7 +84,7 @@ func Open(name string, baud int) error {
 // Close serial port
 func Close() error {
 	if SerialCur.Name == "" {
-		return errors.New("Serial port had closed.")
+		return errors.New("serial port had closed")
 	}
 
 	err := SerialCur.Port.Close()
@@ -253,6 +253,9 @@ func GrRxPrase() {
 			}
 		case <-time.After(200 * time.Millisecond):
 			glog.V(4).Infoln("GrRxPrase: time after 200ms...")
+			if SerialCur.Port == nil || SerialCur.Name == "" {
+				break
+			}
 			_, add, _ := variable.Filt([]byte{})
 			glog.V(3).Infoln("add: ", add)
 			for _, v := range add {

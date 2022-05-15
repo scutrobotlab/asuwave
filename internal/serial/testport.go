@@ -13,59 +13,99 @@ import (
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
-type testPort struct {
-	readingAddresses []uint32
-	createdTime      time.Time
+/**
+0x20000000 静止，可写变量
+0x30000000 动态变化，double
+0x40000000 动态变化，float
+0x50000000 动态变化，int8
+0x60000000 动态变化，int16
+0x70000000 动态变化，int32
+0x80000000 动态变化，int64
+**/
+var vartypeMap = map[uint32]string{
+	3: "double",
+	4: "float",
+	5: "int8_t",
+	6: "int16_t",
+	7: "int32_t",
+	8: "int64_t",
 }
 
-var BoardSysTime time.Time = time.Now() // 虚拟电路板的系统时间
+var (
+	addresses    []uint32          = []uint32{}          // 观察的地址
+	writeData    map[uint32][]byte = map[uint32][]byte{} // 直接写入数据
+	BoardSysTime time.Time         = time.Now()          // 虚拟电路板的系统时间
+)
+
+type testPort struct{}
 
 func newTestPort() serial.Port {
 	glog.Infoln("TestPort open at: ", BoardSysTime)
-	return &testPort{
-		readingAddresses: []uint32{},
-		createdTime:      BoardSysTime,
-	}
+	return &testPort{}
 }
 
 func (tp *testPort) SetMode(mode *serial.Mode) error { return nil }
 
-func testValue(x float64, addr uint32) float64 {
-	ratio := float64(addr&0xF) * 16.0
+func testValue(x float64, addr uint32) []byte {
+	if data, ok := writeData[addr]; ok {
+		return data
+	}
+
+	ratio := float64(addr&0xF) * 8.0
 	phase := float64((addr >> 4) & 0xF)
-	freq := (float64((addr>>8)&0xFF) - 0x80) / 16.0
+	freq := (float64((addr>>8)&0xFF) - 0x80) / 64.0
 	freq = math.Exp(freq)
 	amplitude := float64((addr>>16)&0xFF) / 16.0
 	amplitude = math.Exp(amplitude)
 	waveform := (addr >> 24) & 0xF
+	vartype := (addr >> 28) & 0xF
 	currentPhase := x*freq + phase
 	dist := currentPhase - math.Floor(currentPhase)
+
+	glog.V(5).Info("ratio=", ratio)
+	glog.V(5).Info("phase=", phase)
+	glog.V(5).Info("freq=", freq)
+	glog.V(5).Info("amplitude=", amplitude)
+	glog.V(5).Info("currentPhase=", currentPhase)
+	glog.V(5).Info("dist=", dist)
+	glog.V(5).Infof("vartype=%d(%s)", vartype, vartypeMap[vartype])
+
 	var scale float64
 	switch waveform {
 	case 0: // square
+		glog.V(5).Info("waveform=square")
 		if dist < 0.5 {
 			scale = 1.0
 		} else {
 			scale = -1.0
 		}
 	case 1: // triangle
+		glog.V(5).Info("waveform=triangle")
 		scale = 4 * (math.Abs(dist-0.5) - 0.25)
 	case 2: // scan
+		glog.V(5).Info("waveform=scan")
 		scale = 2 * (dist - 0.5)
 	case 3: //exsin
+		glog.V(5).Info("waveform=exsin")
 		scale = math.Exp(x/ratio) * math.Sin(currentPhase*2*math.Pi)
 	case 4: //e-xsin
+		glog.V(5).Info("waveform=e-xsin")
 		scale = math.Exp(-x/ratio) * math.Sin(currentPhase*2*math.Pi)
 	default: // sin
+		glog.V(5).Info("waveform=sin")
 		scale = math.Sin(currentPhase * 2 * math.Pi)
 	}
 	y := scale * amplitude
-	glog.V(4).Infof("Test port: Address: 0x%08X %.5f => %.5f\n", addr, x, y)
-	return y
+
+	if t, ok := vartypeMap[vartype]; ok {
+		data := variable.SpecToBytes(t, y)
+		return data
+	}
+
+	return make([]byte, 8)
 }
 
 func (tp *testPort) Read(p []byte) (n int, err error) {
-	addresses := tp.readingAddresses
 	maxNumPack := len(p) / 20
 	if len(addresses) > maxNumPack {
 		addresses = addresses[:maxNumPack]
@@ -77,11 +117,11 @@ func (tp *testPort) Read(p []byte) (n int, err error) {
 		s[1] = 2                                // 响应或错误代号 act (0x02 = 订阅的正常返回)
 		s[2] = 8                                // 数据长度 typeLen
 		copy(s[3:7], variable.AnyToBytes(addr)) // 单片机地址
-		t := time.Since(tp.createdTime)
+		t := time.Since(BoardSysTime)
 		x := t.Seconds()
 		u := t.Milliseconds()
 		y := testValue(x, addr)
-		copy(s[7:15], variable.AnyToBytes(y))          // 数据
+		copy(s[7:15], y)                               // 数据
 		copy(s[15:19], variable.AnyToBytes(uint32(u))) // 时间戳
 		s[19] = '\n'                                   // 尾部固定为0x0a
 	}
@@ -89,41 +129,42 @@ func (tp *testPort) Read(p []byte) (n int, err error) {
 }
 
 func (tp *testPort) Write(p []byte) (n int, err error) {
-	if len(p) != 16 {
-		return 0, errors.New("invalid len")
-	}
 	if p[len(p)-1] != '\n' {
 		return 0, errors.New("invalid package")
 	}
-
 	board := p[0]
-	if board != 1 {
-		return 0, errors.New("invalid board")
-	}
+	glog.Infoln("Got write: board = ", board)
 	act := datautil.ActMode(p[1])
+	glog.Infoln("Got write: act = ", act)
 	typeLen := p[2]
-	if typeLen != 8 {
-		return 0, errors.New("unsupported typeLen")
-	}
+	glog.Infoln("Got write: typeLen = ", typeLen)
 	address := variable.BytesToUint32(p[3:7])
+	glog.Infoln("Got write: address = ", address)
+	data := p[7:15]
 
 	switch act {
 	case datautil.Subscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
-			tp.readingAddresses = append(tp.readingAddresses, address)
+			addresses = append(addresses, address)
 			glog.Infof("Adding address: %08X\n", address)
 		})
 
 	case datautil.Unsubscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
 			var newAddresses []uint32
-			for _, addr := range tp.readingAddresses {
+			for _, addr := range addresses {
 				if addr != address {
 					newAddresses = append(newAddresses, addr)
 				}
 			}
-			tp.readingAddresses = newAddresses
+			addresses = newAddresses
 			glog.Infof("Deleting address: %08X\n", address)
+		})
+
+	case datautil.Write:
+		go time.AfterFunc(500*time.Millisecond, func() {
+			writeData[address] = data
+			glog.Infof("Writing address: %08X = %v\n", address, data)
 		})
 
 	default:
