@@ -68,9 +68,6 @@ func TestVariableToReadCtrl(t *testing.T) {
 }
 
 func TestVariableToWriteCtrl(t *testing.T) {
-	go serial.GrReceive()
-	go serial.GrTransmit()
-	go serial.GrRxPrase()
 	serial.Open("Test port", 115200)
 	cases := casesT{
 		{
