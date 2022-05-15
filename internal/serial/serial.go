@@ -99,6 +99,7 @@ func Close() error {
 
 //Transmit data
 func Transmit(data []byte) error {
+	glog.V(3).Infoln("serial port write: ", data)
 	_, err := SerialCur.Port.Write(data)
 	if err != nil {
 		return err
@@ -109,6 +110,7 @@ func Transmit(data []byte) error {
 //Receive data
 func Receive(buff []byte) ([]byte, error) {
 	n, err := SerialCur.Port.Read(buff)
+	glog.V(5).Infoln("serial port read: ", n)
 	if err != nil {
 		return nil, err
 	}
@@ -165,17 +167,22 @@ func GrReceive() {
 	buff := make([]byte, 200)
 	for {
 		<-chOp
+		glog.V(4).Infoln("chOp...")
 	Loop:
 		for {
 			select {
 			case <-chEd:
+				glog.V(4).Infoln("GrReceive: got chEd...")
 				break Loop
 			default:
+				glog.V(4).Infoln("GrReceive: default...")
 				b, err := Receive(buff)
 				if err != nil {
 					glog.Errorln("GrReceive error:", err)
 				}
+				glog.V(4).Infoln("GrReceive b: ", b)
 				chRx <- b
+				glog.V(4).Infoln("GrReceive: send chRx...")
 				time.Sleep(5 * time.Millisecond)
 			}
 		}
@@ -185,7 +192,9 @@ func GrReceive() {
 
 func GrTransmit() {
 	for {
+		glog.V(4).Infoln("GrTransmit: ")
 		b := <-chTx
+		glog.V(4).Infoln("GrTransmit: got chTx...")
 		err := Transmit(b)
 		if err != nil {
 			glog.Errorln("GrTransmit error: ", err)
@@ -197,47 +206,61 @@ func GrTransmit() {
 func GrRxPrase() {
 	var rxBuff []byte
 	for {
-		rx := <-chRx                   // 收到你的来信
-		rxBuff = append(rxBuff, rx...) // 深藏我的心底
+		select {
+		case rx := <-chRx: // 收到你的来信
+			glog.V(4).Infoln("GrRxPrase: got chRx...")
+			rxBuff = append(rxBuff, rx...) // 深藏我的心底
 
-		startIdx, endIdx := datautil.FindValidPart(rxBuff) // 找寻甜蜜的话语
-		buff := rxBuff[startIdx:endIdx]                    // 撷取甜蜜的片段
+			startIdx, endIdx := datautil.FindValidPart(rxBuff) // 找寻甜蜜的话语
+			buff := rxBuff[startIdx:endIdx]                    // 撷取甜蜜的片段
 
-		// 拼凑出完整的清单
-		chart, add, del := variable.Filt(buff)
-		if len(chart) != 0 {
-			b, _ := json.Marshal(chart)
-			Chch <- string(b)
-		}
+			// 所有的酸甜苦辣都值得铭记
+			glog.V(3).Infoln("read buff: ", rxBuff)
+			glog.V(3).Infof("valid part: [%d:%d]\n", startIdx, endIdx)
 
-		// 所有的酸甜苦辣都值得铭记
-		glog.V(3).Infoln("len(chart): ", len(chart))
-		if glog.V(2) && len(add) > 0 || len(del) > 0 {
-			glog.Infof("add: %v, del: %v\n", add, del)
-		}
-
-		// 挂念的变量，还望顺问近祺
-		for _, v := range add {
-			err := SendCmd(datautil.Subscribe, v)
-			if err != nil {
-				glog.Errorln("SendCmd error:", err)
-				return
+			// 拼凑出完整的清单
+			chart, add, del := variable.Filt(buff)
+			if len(chart) != 0 {
+				b, _ := json.Marshal(chart)
+				Chch <- string(b)
 			}
-		}
 
-		// 无缘的变量，就请随风逝去
-		for _, v := range del {
-			err := SendCmd(datautil.Unsubscribe, v)
-			if err != nil {
-				glog.Errorln("SendCmd error:", err)
-				return
+			glog.V(3).Infoln("len(chart): ", len(chart))
+			if glog.V(2) && len(add) > 0 || len(del) > 0 {
+				glog.Infof("add: %v, del: %v\n", add, del)
 			}
-		}
 
-		if endIdx >= len(rxBuff) {
-			rxBuff = nil
-		} else {
-			rxBuff = rxBuff[endIdx:]
+			// 挂念的变量，还望顺问近祺
+			for _, v := range add {
+				err := SendCmd(datautil.Subscribe, v)
+				if err != nil {
+					glog.Errorln("SendCmd error:", err)
+				}
+			}
+
+			// 无缘的变量，就请随风逝去
+			for _, v := range del {
+				err := SendCmd(datautil.Unsubscribe, v)
+				if err != nil {
+					glog.Errorln("SendCmd error:", err)
+				}
+			}
+
+			if endIdx >= len(rxBuff) {
+				rxBuff = nil
+			} else {
+				rxBuff = rxBuff[endIdx:]
+			}
+		case <-time.After(200 * time.Millisecond):
+			glog.V(4).Infoln("GrRxPrase: time after 200ms...")
+			_, add, _ := variable.Filt([]byte{})
+			glog.V(3).Infoln("add: ", add)
+			for _, v := range add {
+				err := SendCmd(datautil.Subscribe, v)
+				if err != nil {
+					glog.Errorln("SendCmd error:", err)
+				}
+			}
 		}
 	}
 }

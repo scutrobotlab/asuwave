@@ -8,6 +8,7 @@ import (
 
 	"github.com/scutrobotlab/asuwave/internal/helper"
 	"github.com/scutrobotlab/asuwave/internal/option"
+	"github.com/scutrobotlab/asuwave/internal/serial"
 	"github.com/scutrobotlab/asuwave/internal/server"
 	"github.com/scutrobotlab/asuwave/pkg/elffile"
 )
@@ -40,6 +41,9 @@ func main() {
 		helper.StartBrowser("http://localhost:" + strconv.Itoa(helper.Port))
 	}
 
+	go serial.GrReceive()
+	go serial.GrTransmit()
+	go serial.GrRxPrase()
 	go elffile.FileWatch()
 	server.Start(&fsys)
 }
