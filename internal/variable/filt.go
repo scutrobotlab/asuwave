@@ -16,12 +16,16 @@ type CmdT struct {
 // 在如山的信笺里，找寻变量的回音
 func Unpack(data []byte) ([]CmdT, []byte) {
 
-	// 将信笺分开
+	// 分开信笺
 	ends := []int{}
 	for i, d := range data {
 		if d == slip.END {
 			ends = append(ends, i)
 		}
+	}
+
+	if len(ends) == 0 { // 若是无言
+		return []CmdT{}, []byte{}
 	}
 
 	vars := []CmdT{}
@@ -33,11 +37,13 @@ func Unpack(data []byte) ([]CmdT, []byte) {
 			continue
 		}
 		// 解开此信
-		pack, err := slip.Unpack(data[ends[i]:ends[i-1]])
+		glog.Infoln(data[ends[i-1] : ends[i]+1])
+		pack, err := slip.Unpack(data[ends[i-1] : ends[i]+1])
 		if err != nil {
-			glog.V(1).Infoln(err.Error())
+			glog.Errorln(err.Error())
 			continue
 		}
+		glog.Infoln(pack)
 		// 非变量之回音，或无合法之落款，则弃之
 		for len(pack) != 20 || ActMode(pack[1]) != SubscribeReturn || pack[19] != '\n' {
 			glog.V(1).Infoln("Not Subscribereturn pack", pack)
@@ -54,8 +60,8 @@ func Unpack(data []byte) ([]CmdT, []byte) {
 		// 加入变量列表
 		vars = append(vars, v)
 	}
-	f := ends[len(ends)-1] // 最后的结束，也是新的开始
-	return vars, data[f:]  // 变量的回音，仍有余音
+	f := ends[len(ends)-1]  // 最后的结束，也是新的开始
+	return vars, data[f+1:] // 变量的回音，仍有余音
 }
 
 // 从茫茫 vars 中，寻找我所挂念的 to[RD] ，记录在列表 chart 中。

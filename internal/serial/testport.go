@@ -10,6 +10,7 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/scutrobotlab/asuwave/internal/variable"
+	"github.com/scutrobotlab/asuwave/pkg/slip"
 )
 
 /**
@@ -31,6 +32,7 @@ var vartypeMap = map[uint32]string{
 }
 
 var (
+	chAddr                         = make(chan bool, 10) // 修改通知
 	addresses    []uint32          = []uint32{}          // 观察的地址
 	writeData    map[uint32][]byte = map[uint32][]byte{} // 直接写入数据
 	BoardSysTime time.Time         = time.Now()          // 虚拟电路板的系统时间
@@ -105,13 +107,17 @@ func testValue(x float64, addr uint32) []byte {
 }
 
 func (tp *testPort) Read(p []byte) (n int, err error) {
-	maxNumPack := len(p) / 20
-	if len(addresses) > maxNumPack {
-		addresses = addresses[:maxNumPack]
+	// maxNumPack := len(p) / 20
+	// if len(addresses) > maxNumPack {
+	// 	addresses = addresses[:maxNumPack]
+	// }
+	for len(addresses) == 0 {
+		<-chAddr
 	}
+	pdu := make([]byte, len(addresses)*20)
 
 	for i, addr := range addresses {
-		s := p[20*i : 20*(i+1)]
+		s := pdu[20*i : 20*(i+1)]
 		s[0] = 1                                // 单片机代号 board
 		s[1] = 2                                // 响应或错误代号 act (0x02 = 订阅的正常返回)
 		s[2] = 8                                // 数据长度 length
@@ -124,7 +130,9 @@ func (tp *testPort) Read(p []byte) (n int, err error) {
 		copy(s[15:19], variable.AnyToBytes(uint32(u))) // 时间戳
 		s[19] = '\n'                                   // 尾部固定为0x0a
 	}
-	return len(addresses) * 20, nil
+
+	sdu := slip.Pack(pdu)
+	return copy(p, sdu), nil
 }
 
 func (tp *testPort) Write(p []byte) (n int, err error) {
@@ -145,6 +153,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 	case variable.Subscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
 			addresses = append(addresses, address)
+			chAddr <- true
 			glog.Infof("Adding address: %08X\n", address)
 		})
 
@@ -157,6 +166,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 				}
 			}
 			addresses = newAddresses
+			chAddr <- true
 			glog.Infof("Deleting address: %08X\n", address)
 		})
 

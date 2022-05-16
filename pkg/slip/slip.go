@@ -45,7 +45,7 @@ func Pack(PDU []byte) (SDU []byte) {
 		}
 	}
 	SDU = append(SDU, END)
-	if len(SDU) == SDU_len {
+	if len(SDU) != SDU_len {
 		glog.Errorf("SLIP: length %d != expected length %d", len(SDU), SDU_len)
 	}
 	return SDU
@@ -59,10 +59,13 @@ func Pack(PDU []byte) (SDU []byte) {
 func Unpack(SDU []byte) (PDU []byte, err error) {
 	PDU = make([]byte, 0, len(SDU)-2)
 	i := 0
-	for i = 0; i < len(SDU); i++ {
+	for ; i < len(SDU); i++ {
 		if SDU[i] == END {
 			break
 		}
+	}
+	if SDU[i] != END {
+		return []byte{}, errors.New("END unfound")
 	}
 	for i++; i < len(SDU); i++ {
 		switch SDU[i] {

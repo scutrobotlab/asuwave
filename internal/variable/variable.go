@@ -12,7 +12,7 @@ func UpdateByProj() {
 	defer toProj.RUnlock()
 	{
 		to[RD].Lock()
-		defer to[RD].Lock()
+		defer to[RD].Unlock()
 		NewToRead := to[RD].m
 		for k, v := range to[RD].m {
 			if p, ok := toProj.m[v.Name]; ok {
@@ -31,7 +31,7 @@ func UpdateByProj() {
 	}
 	{
 		to[WR].Lock()
-		defer to[WR].Lock()
+		defer to[WR].Unlock()
 		NewToModi := to[WR].m
 		for k, v := range to[WR].m {
 			if p, ok := toProj.m[v.Name]; ok {

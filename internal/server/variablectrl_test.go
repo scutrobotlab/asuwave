@@ -134,7 +134,7 @@ func TestVariableToWriteCtrl(t *testing.T) {
 		},
 	}
 
-	variableToWriteCtrl := makeVariableCtrl(variable.Write)
+	variableToWriteCtrl := makeVariableCtrl(variable.WR)
 
 	ctrlerTest(variableToWriteCtrl, cases, t)
 }
