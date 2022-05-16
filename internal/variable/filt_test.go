@@ -1,19 +1,17 @@
-package variable_test
+package variable
 
 import (
 	"fmt"
 	"testing"
-
-	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
 func TestFilt(t *testing.T) {
 	cases := []struct {
 		in        []byte
-		listV     map[uint32]variable.T
-		wantChart []variable.ChartT
-		wantAdd   []variable.CmdT
-		wantDel   []variable.CmdT
+		listV     map[uint32]T
+		wantChart []ChartT
+		wantAdd   []CmdT
+		wantDel   []CmdT
 	}{
 		{
 			in: []byte{
@@ -23,7 +21,7 @@ func TestFilt(t *testing.T) {
 				0x01, 0x00, 0x00, 0x00,
 				0x0a,
 			},
-			listV: map[uint32]variable.T{
+			listV: map[uint32]T{
 				0x80123456: {
 					Board:      1,
 					Name:       "a",
@@ -39,7 +37,7 @@ func TestFilt(t *testing.T) {
 					SignalGain: 1,
 				},
 			},
-			wantChart: []variable.ChartT{
+			wantChart: []ChartT{
 				{
 					Board: 1,
 					Name:  "a",
@@ -47,14 +45,14 @@ func TestFilt(t *testing.T) {
 					Tick:  1,
 				},
 			},
-			wantAdd: []variable.CmdT{
+			wantAdd: []CmdT{
 				{
-					Board:   1,
-					TypeLen: 4,
-					Addr:    0x80654321,
+					Board:  1,
+					Length: 4,
+					Addr:   0x80654321,
 				},
 			},
-			wantDel: []variable.CmdT{},
+			wantDel: []CmdT{},
 		},
 
 		{
@@ -70,7 +68,7 @@ func TestFilt(t *testing.T) {
 				0x01, 0x00, 0x00, 0x00,
 				0x0a,
 			},
-			listV: map[uint32]variable.T{
+			listV: map[uint32]T{
 				0x80123456: {
 					Board:      1,
 					Name:       "a",
@@ -79,7 +77,7 @@ func TestFilt(t *testing.T) {
 					SignalGain: 1,
 				},
 			},
-			wantChart: []variable.ChartT{
+			wantChart: []ChartT{
 				{
 					Board: 1,
 					Name:  "a",
@@ -87,19 +85,19 @@ func TestFilt(t *testing.T) {
 					Tick:  1,
 				},
 			},
-			wantAdd: []variable.CmdT{},
-			wantDel: []variable.CmdT{
+			wantAdd: []CmdT{},
+			wantDel: []CmdT{
 				{
-					Board:   1,
-					TypeLen: 4,
-					Addr:    0x80654321,
+					Board:  1,
+					Length: 4,
+					Addr:   0x80654321,
 				},
 			},
 		},
 	}
 	for _, c := range cases {
-		variable.SetAll(variable.Read, c.listV)
-		gotChart, gotAdd, gotDel := variable.Filt(c.in)
+		SetAll(RD, c.listV)
+		gotChart, gotAdd, gotDel := Filt(c.in)
 		if ok, msg := assertEQ(gotChart, c.wantChart); !ok {
 			t.Errorf("Chart list " + msg)
 		}
@@ -112,7 +110,7 @@ func TestFilt(t *testing.T) {
 	}
 }
 
-func assertEQ[T variable.ChartT | variable.CmdT](a []T, b []T) (bool, string) {
+func assertEQ[T ChartT | CmdT](a []T, b []T) (bool, string) {
 	if len(a) != len(b) {
 		return false, fmt.Sprint("Different length", len(a), len(b))
 	}

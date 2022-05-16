@@ -9,7 +9,6 @@ import (
 	"go.bug.st/serial"
 
 	"github.com/golang/glog"
-	"github.com/scutrobotlab/asuwave/internal/datautil"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
@@ -115,7 +114,7 @@ func (tp *testPort) Read(p []byte) (n int, err error) {
 		s := p[20*i : 20*(i+1)]
 		s[0] = 1                                // 单片机代号 board
 		s[1] = 2                                // 响应或错误代号 act (0x02 = 订阅的正常返回)
-		s[2] = 8                                // 数据长度 typeLen
+		s[2] = 8                                // 数据长度 length
 		copy(s[3:7], variable.AnyToBytes(addr)) // 单片机地址
 		t := time.Since(BoardSysTime)
 		x := t.Seconds()
@@ -134,22 +133,22 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 	}
 	board := p[0]
 	glog.Infoln("Got write: board = ", board)
-	act := datautil.ActMode(p[1])
+	act := variable.ActMode(p[1])
 	glog.Infoln("Got write: act = ", act)
-	typeLen := p[2]
-	glog.Infoln("Got write: typeLen = ", typeLen)
+	length := p[2]
+	glog.Infoln("Got write: length = ", length)
 	address := variable.BytesToUint32(p[3:7])
 	glog.Infoln("Got write: address = ", address)
 	data := p[7:15]
 
 	switch act {
-	case datautil.Subscribe:
+	case variable.Subscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
 			addresses = append(addresses, address)
 			glog.Infof("Adding address: %08X\n", address)
 		})
 
-	case datautil.Unsubscribe:
+	case variable.Unsubscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
 			var newAddresses []uint32
 			for _, addr := range addresses {
@@ -161,7 +160,7 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 			glog.Infof("Deleting address: %08X\n", address)
 		})
 
-	case datautil.Write:
+	case variable.Write:
 		go time.AfterFunc(500*time.Millisecond, func() {
 			writeData[address] = data
 			glog.Infof("Writing address: %08X = %v\n", address, data)

@@ -1,12 +1,26 @@
 /*
 想给你写封信，却不知从何说起
 */
-package datautil
+package variable
 
 // 篇幅有限，也挡不住我的思念
 const NumMaxPacket = 5
 
 type ActMode uint8
+
+var TypeLen = map[string]int{
+	"uint8_t":  1,
+	"uint16_t": 2,
+	"uint32_t": 4,
+	"uint64_t": 8,
+	"int8_t":   1,
+	"int16_t":  2,
+	"int32_t":  4,
+	"int64_t":  8,
+	"int":      4,
+	"float":    4,
+	"double":   8,
+}
 
 const (
 	_                 ActMode = iota

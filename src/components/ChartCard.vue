@@ -5,6 +5,10 @@
       style="width: 100%; height: calc(100vh - 56px - 36px - 52px)"
     />
     <v-card-actions>
+      <v-file-input
+        v-model="file" dense 
+        label="导入json文件" accept=".json"
+      />
       <v-spacer />
       <v-btn text @click="exportData">
         导出
@@ -27,6 +31,7 @@ import { nearestPoint } from 'timechart/plugins/nearestPoint';
 export default {
   name: "ChartCard",
   data: () => ({
+    file: null,
     chart: null,
     ws: null,
     follow: true,
@@ -40,6 +45,16 @@ export default {
   watch: {
     isDark: function () {
       this.chart.update();
+    },
+    file: function(v) {
+      window.console.log(v)
+      var reader = new FileReader();
+      reader.onload = (event)=>{
+        console.log(event.target.result);
+        this.chart.options.series = JSON.parse(event.target.result).series;
+        this.chart.update();
+      };
+      reader.readAsText(v);
     },
   },
   created() {

@@ -1,9 +1,57 @@
 package variable
 
+import (
+	"github.com/golang/glog"
+	"github.com/scutrobotlab/asuwave/pkg/slip"
+)
+
 type CmdT struct {
-	Board   uint8
-	TypeLen int
-	Addr    uint32
+	Board  uint8
+	Length int
+	Addr   uint32
+	Tick   uint32
+	Data   [8]byte
+}
+
+// 在如山的信笺里，找寻变量的回音
+func Unpack(data []byte) (vars []CmdT) {
+
+	// 再长情的信，也有结束
+	ends := []int{}
+	for i, d := range data {
+		if d == slip.END {
+			ends = append(ends, i)
+		}
+	}
+
+	// 探寻每一封信
+	for i := 1; i < len(ends); i++ {
+		// 此信浅薄，难载深情
+		if ends[i]-ends[i-1] < 20 {
+			continue
+		}
+		// 解开此信
+		pack, err := slip.Unpack(data[ends[i]:ends[i-1]])
+		if err != nil {
+			glog.V(1).Infoln(err.Error())
+			continue
+		}
+		// 非变量之回音，或无合法之落款，则弃之
+		for len(pack) != 20 || ActMode(pack[1]) != SubscribeReturn || pack[19] != '\n' {
+			glog.V(1).Infoln("Not Subscribereturn pack", pack)
+			continue
+		}
+
+		v := CmdT{
+			Board:  pack[0],
+			Length: int(pack[2]),
+			Addr:   BytesToUint32(pack[3:7]),
+			Data:   *(*[8]byte)(pack[7:15]),
+			Tick:   BytesToUint32(pack[15:19]),
+		}
+		vars = append(vars, v)
+	}
+	return
 }
 
 // 从茫茫 data 中，寻找我所挂念的 to[Read] ，记录在列表 chart 中。
@@ -21,7 +69,7 @@ func Filt(data []byte) (chart []ChartT, add []CmdT, del []CmdT) {
 	for i := 0; i < len(data)/20; i++ {
 		// 解开关于它的一切
 		board := data[i*20]
-		typelen := int(data[i*20+2])
+		length := int(data[i*20+2])
 		addr := BytesToUint32(data[i*20+3 : i*20+7])
 		tick := BytesToUint32(data[i*20+15 : i*20+19])
 
@@ -62,9 +110,9 @@ func Filt(data []byte) (chart []ChartT, add []CmdT, del []CmdT) {
 			})
 		} else { // 不是的，请忘了它
 			del = append(del, CmdT{
-				Board:   board,
-				TypeLen: typelen,
-				Addr:    addr,
+				Board:  board,
+				Length: length,
+				Addr:   addr,
 			})
 		}
 	}
@@ -74,9 +122,9 @@ func Filt(data []byte) (chart []ChartT, add []CmdT, del []CmdT) {
 		if _, ok := addrs[v.Addr]; !ok {
 			// 我很想它，下次请别忘记
 			add = append(add, CmdT{
-				Board:   v.Board,
-				TypeLen: TypeLen[v.Type],
-				Addr:    v.Addr,
+				Board:  v.Board,
+				Length: TypeLen[v.Type],
+				Addr:   v.Addr,
 			})
 		}
 	}

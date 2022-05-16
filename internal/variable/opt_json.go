@@ -10,8 +10,8 @@ import (
 
 var (
 	jsonPath = map[Mod]string{
-		Read:  path.Join(helper.AppConfigDir(), "vToRead.json"),
-		Write: path.Join(helper.AppConfigDir(), "vToWrite.json"),
+		RD: path.Join(helper.AppConfigDir(), "vToRead.json"),
+		WR: path.Join(helper.AppConfigDir(), "vToWrite.json"),
 	}
 	optSaveVarList  bool
 	optUpdateByProj bool
@@ -24,8 +24,8 @@ func SetOptSaveVarList(v bool) {
 		return
 	}
 	glog.V(1).Infof("Set SaveVarList to %t\n", v)
-	jsonfile.Save(jsonPath[Read], to[Read].m)
-	jsonfile.Save(jsonPath[Write], to[Write].m)
+	jsonfile.Save(jsonPath[RD], to[RD].m)
+	jsonfile.Save(jsonPath[WR], to[WR].m)
 	optSaveVarList = v
 }
 
@@ -55,11 +55,11 @@ func JsonLoadAll() {
 	to[Write].Lock()
 	defer to[Write].Unlock()
 
-	jsonfile.Load(jsonPath[Read], &to[Read].m)
-	jsonfile.Load(jsonPath[Write], &to[Write].m)
-	glog.Infoln(jsonPath[Read], "load success.")
-	glog.Infoln(jsonPath[Write], "load success.")
+	jsonfile.Load(jsonPath[RD], &to[RD].m)
+	jsonfile.Load(jsonPath[WR], &to[WR].m)
+	glog.Infoln(jsonPath[RD], "load success.")
+	glog.Infoln(jsonPath[WR], "load success.")
 
-	jsonfile.Save(jsonPath[Read], to[Read].m)
-	jsonfile.Save(jsonPath[Write], to[Write].m)
+	jsonfile.Save(jsonPath[RD], to[RD].m)
+	jsonfile.Save(jsonPath[WR], to[WR].m)
 }

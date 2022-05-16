@@ -26,6 +26,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "asuwave.h"
 #include "string.h"
+#include "SerialLineIP.hpp"
 
 /* Private variables ---------------------------------------------------------*/
 typedef uint32_t (*getTick_f)(void);
@@ -260,8 +261,12 @@ void asuwave_subscribe(void)
       tx_len += 20;
     }
   }
+  
+  /* Pack using SLIP */
+  std::vector<uint8_t> packet = SerialLineIP::Pack(&data_struct, sizeof(data_struct));
+
   /* Send return data */
-  HAL_UART_Transmit_DMA(huart_x, (uint8_t*) tx_buff, tx_len);
+  HAL_UART_Transmit_DMA(huart_x, &packet[0], packet.size());
 }
 
 /**

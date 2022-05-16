@@ -9,7 +9,6 @@ import (
 	"go.bug.st/serial"
 
 	"github.com/golang/glog"
-	"github.com/scutrobotlab/asuwave/internal/datautil"
 	"github.com/scutrobotlab/asuwave/internal/variable"
 )
 
@@ -129,17 +128,17 @@ func SendWriteCmd(v variable.T) error {
 	}
 
 	glog.Infoln("Send write cmd", v)
-	data := datautil.MakeWriteCmd(v)
+	data := variable.MakeWriteCmd(v)
 	chTx <- data
 	return nil
 }
 
-func SendCmd(act datautil.ActMode, v variable.CmdT) error {
+func SendCmd(act variable.ActMode, v variable.CmdT) error {
 	if SerialCur.Port == nil || SerialCur.Name == "" {
 		return errors.New("no serial port")
 	}
 
-	if act == datautil.Subscribe {
+	if act == variable.Subscribe {
 		if t, ok := adding[v]; ok {
 			if time.Since(t) < time.Second {
 				glog.V(2).Infoln("Has sent subscribe cmd recently", v)
@@ -147,7 +146,7 @@ func SendCmd(act datautil.ActMode, v variable.CmdT) error {
 			}
 		}
 		adding[v] = time.Now()
-	} else if act == datautil.Unsubscribe {
+	} else if act == variable.Unsubscribe {
 		if t, ok := deling[v]; ok {
 			if time.Since(t) < time.Second {
 				glog.V(2).Infoln("Has sent unsubscribe cmd recently", v)
@@ -158,7 +157,7 @@ func SendCmd(act datautil.ActMode, v variable.CmdT) error {
 	}
 
 	glog.Infoln("Send cmd", act, v)
-	data := datautil.MakeCmd(act, v)
+	data := variable.MakeCmd(act, v)
 	chTx <- data
 	return nil
 }
@@ -211,7 +210,7 @@ func GrRxPrase() {
 			glog.V(4).Infoln("GrRxPrase: got chRx...")
 			rxBuff = append(rxBuff, rx...) // 深藏我的心底
 
-			startIdx, endIdx := datautil.FindValidPart(rxBuff) // 找寻甜蜜的话语
+			startIdx, endIdx := variable.FindValidPart(rxBuff) // 解开长情的信笺
 			buff := rxBuff[startIdx:endIdx]                    // 撷取甜蜜的片段
 
 			// 所有的酸甜苦辣都值得铭记
@@ -232,7 +231,7 @@ func GrRxPrase() {
 
 			// 挂念的变量，还望顺问近祺
 			for _, v := range add {
-				err := SendCmd(datautil.Subscribe, v)
+				err := SendCmd(variable.Subscribe, v)
 				if err != nil {
 					glog.Errorln("SendCmd error:", err)
 				}
@@ -240,7 +239,7 @@ func GrRxPrase() {
 
 			// 无缘的变量，就请随风逝去
 			for _, v := range del {
-				err := SendCmd(datautil.Unsubscribe, v)
+				err := SendCmd(variable.Unsubscribe, v)
 				if err != nil {
 					glog.Errorln("SendCmd error:", err)
 				}
@@ -259,7 +258,7 @@ func GrRxPrase() {
 			_, add, _ := variable.Filt([]byte{})
 			glog.V(3).Infoln("add: ", add)
 			for _, v := range add {
-				err := SendCmd(datautil.Subscribe, v)
+				err := SendCmd(variable.Subscribe, v)
 				if err != nil {
 					glog.Errorln("SendCmd error:", err)
 				}

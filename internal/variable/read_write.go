@@ -10,8 +10,8 @@ import (
 type Mod int
 
 const (
-	Read Mod = iota
-	Write
+	RD Mod = iota
+	WR
 )
 
 type T struct {
@@ -49,6 +49,15 @@ func GetAll(o Mod) ([]byte, error) {
 	to[o].RLock() // 锁保护
 	defer to[o].RUnlock()
 	return json.Marshal(to[o].m)
+}
+
+func GetKeys(o Mod) (keys []uint32) {
+	to[o].RLock() // 锁保护
+	defer to[o].RUnlock()
+	for k := range to[o].m {
+		keys = append(keys, k)
+	}
+	return
 }
 
 func Get(o Mod, k uint32) (T, bool) { //从map中读取一个值

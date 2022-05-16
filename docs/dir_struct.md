@@ -8,10 +8,10 @@
 │       ├── heroku.yml
 │       ├── node.yml
 │       └── release.yml
-├── datautil - 后端·协议处理
+├── variable - 后端·协议处理
 │   ├── const.go
-│   ├── datautil.go
-│   └── datautil_test.go
+│   ├── variable.go
+│   └── variable_test.go
 ├── file - 后端·elf/axf文件处理
 │   └── file.go
 ├── helper - 后端·杂七杂八函数
