@@ -27,8 +27,8 @@ func Start(fsys *fs.FS) {
 	}
 	fmt.Println("Don't close this before you have done")
 
-	variableToReadCtrl := makeVariableCtrl(variable.Read)
-	variableToWriteCtrl := makeVariableCtrl(variable.Write)
+	variableToReadCtrl := makeVariableCtrl(variable.RD)
+	variableToWriteCtrl := makeVariableCtrl(variable.WR)
 
 	mime.AddExtensionType(".js", "application/javascript")
 	http.Handle("/", http.FileServer(http.FS(*fsys)))

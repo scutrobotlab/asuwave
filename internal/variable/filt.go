@@ -14,15 +14,17 @@ type CmdT struct {
 }
 
 // 在如山的信笺里，找寻变量的回音
-func Unpack(data []byte) (vars []CmdT) {
+func Unpack(data []byte) ([]CmdT, []byte) {
 
-	// 再长情的信，也有结束
+	// 将信笺分开
 	ends := []int{}
 	for i, d := range data {
 		if d == slip.END {
 			ends = append(ends, i)
 		}
 	}
+
+	vars := []CmdT{}
 
 	// 探寻每一封信
 	for i := 1; i < len(ends); i++ {
@@ -41,7 +43,7 @@ func Unpack(data []byte) (vars []CmdT) {
 			glog.V(1).Infoln("Not Subscribereturn pack", pack)
 			continue
 		}
-
+		// 聆听变量的回音
 		v := CmdT{
 			Board:  pack[0],
 			Length: int(pack[2]),
@@ -49,16 +51,18 @@ func Unpack(data []byte) (vars []CmdT) {
 			Data:   *(*[8]byte)(pack[7:15]),
 			Tick:   BytesToUint32(pack[15:19]),
 		}
+		// 加入变量列表
 		vars = append(vars, v)
 	}
-	return
+	f := ends[len(ends)-1] // 最后的结束，也是新的开始
+	return vars, data[f:]  // 变量的回音，仍有余音
 }
 
-// 从茫茫 data 中，寻找我所挂念的 to[Read] ，记录在列表 chart 中。
+// 从茫茫 vars 中，寻找我所挂念的 to[RD] ，记录在列表 chart 中。
 // 所有的 add 我都难以忘记，所有的 del 我都不愿提起
-func Filt(data []byte) (chart []ChartT, add []CmdT, del []CmdT) {
-	to[Read].RLock()
-	defer to[Read].RUnlock()
+func Filt(vars []CmdT) (chart []ChartT, add []CmdT, del []CmdT) {
+	to[RD].RLock()
+	defer to[RD].RUnlock()
 
 	chart = []ChartT{}
 	add = []CmdT{} // 有些变量，我难以忘记
@@ -66,65 +70,30 @@ func Filt(data []byte) (chart []ChartT, add []CmdT, del []CmdT) {
 
 	addrs := map[uint32]bool{}
 
-	for i := 0; i < len(data)/20; i++ {
-		// 解开关于它的一切
-		board := data[i*20]
-		length := int(data[i*20+2])
-		addr := BytesToUint32(data[i*20+3 : i*20+7])
-		tick := BytesToUint32(data[i*20+15 : i*20+19])
-
-		addrs[addr] = true
-
+	for _, v := range vars {
 		// 它是我要找的那个变量吗？
-		if v, ok := to[Read].m[addr]; ok { // 是的，我还挂念着它
-			switch v.Type {
-			case "uint8_t":
-				v.Data = float64(BytesToUint8(data[i*20+7 : i*20+15]))
-			case "uint16_t":
-				v.Data = float64(BytesToUint16(data[i*20+7 : i*20+15]))
-			case "uint32_t":
-				v.Data = float64(BytesToUint32(data[i*20+7 : i*20+15]))
-			case "uint64_t":
-				v.Data = float64(BytesToUint64(data[i*20+7 : i*20+15]))
-			case "int8_t":
-				v.Data = float64(BytesToInt8(data[i*20+7 : i*20+15]))
-			case "int16_t":
-				v.Data = float64(BytesToInt16(data[i*20+7 : i*20+15]))
-			case "int32_t", "int":
-				v.Data = float64(BytesToInt32(data[i*20+7 : i*20+15]))
-			case "int64_t":
-				v.Data = float64(BytesToInt64(data[i*20+7 : i*20+15]))
-			case "float":
-				v.Data = float64(BytesToFloat32(data[i*20+7 : i*20+15]))
-			case "double":
-				v.Data = float64(BytesToFloat64(data[i*20+7 : i*20+15]))
-			default:
-				v.Data = 0
-			}
-			v.Tick = tick // 同步它的心跳
+		if r, ok := to[RD].m[v.Addr]; ok { // 是的，我还挂念着它
+			r.Tick = v.Tick
+			r.Data = SpecFromBytes(r.Type, v.Data[:])
 			chart = append(chart, ChartT{
-				Board: v.Board,
-				Name:  v.Name,
-				Data:  v.SignalGain*v.Data + v.SignalBias,
-				Tick:  v.Tick,
+				Board: r.Board,
+				Name:  r.Name,
+				Data:  r.SignalGain*r.Data + r.SignalBias,
+				Tick:  r.Tick,
 			})
 		} else { // 不是的，请忘了它
-			del = append(del, CmdT{
-				Board:  board,
-				Length: length,
-				Addr:   addr,
-			})
+			del = append(del, v)
 		}
 	}
 
 	// 我所挂念的，它们都还在吗
-	for _, v := range to[Read].m {
-		if _, ok := addrs[v.Addr]; !ok {
+	for _, r := range to[RD].m {
+		if _, ok := addrs[r.Addr]; !ok {
 			// 我很想它，下次请别忘记
 			add = append(add, CmdT{
-				Board:  v.Board,
-				Length: TypeLen[v.Type],
-				Addr:   v.Addr,
+				Board:  r.Board,
+				Length: TypeLen[r.Type],
+				Addr:   r.Addr,
 			})
 		}
 	}

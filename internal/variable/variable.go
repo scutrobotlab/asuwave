@@ -11,10 +11,10 @@ func UpdateByProj() {
 	toProj.RLock()
 	defer toProj.RUnlock()
 	{
-		to[Read].Lock()
-		defer to[Read].Lock()
-		NewToRead := to[Read].m
-		for k, v := range to[Read].m {
+		to[RD].Lock()
+		defer to[RD].Lock()
+		NewToRead := to[RD].m
+		for k, v := range to[RD].m {
 			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
 				if err != nil {
@@ -27,13 +27,13 @@ func UpdateByProj() {
 				NewToRead[v.Addr] = v
 			}
 		}
-		to[Read].m = NewToRead
+		to[RD].m = NewToRead
 	}
 	{
-		to[Write].Lock()
-		defer to[Write].Lock()
-		NewToModi := to[Write].m
-		for k, v := range to[Write].m {
+		to[WR].Lock()
+		defer to[WR].Lock()
+		NewToModi := to[WR].m
+		for k, v := range to[WR].m {
 			if p, ok := toProj.m[v.Name]; ok {
 				addr, err := strconv.ParseUint(p.Addr, 16, 32)
 				if err != nil {
@@ -46,6 +46,6 @@ func UpdateByProj() {
 				NewToModi[v.Addr] = v
 			}
 		}
-		to[Write].m = NewToModi
+		to[WR].m = NewToModi
 	}
 }

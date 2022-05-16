@@ -50,10 +50,10 @@ func GetOptUpdateByProj() bool {
 }
 
 func JsonLoadAll() {
-	to[Read].Lock()
-	defer to[Read].Unlock()
-	to[Write].Lock()
-	defer to[Write].Unlock()
+	to[RD].Lock()
+	defer to[RD].Unlock()
+	to[WR].Lock()
+	defer to[WR].Unlock()
 
 	jsonfile.Load(jsonPath[RD], &to[RD].m)
 	jsonfile.Load(jsonPath[WR], &to[WR].m)

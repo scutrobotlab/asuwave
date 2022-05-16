@@ -205,64 +205,67 @@ func GrTransmit() {
 func GrRxPrase() {
 	var rxBuff []byte
 	for {
-		select {
-		case rx := <-chRx: // 收到你的来信
-			glog.V(4).Infoln("GrRxPrase: got chRx...")
-			rxBuff = append(rxBuff, rx...) // 深藏我的心底
+		<-chOp
+		glog.V(4).Infoln("chOp...")
+	Loop:
+		for {
+			select {
+			case rx := <-chRx: // 收到你的来信
+				glog.V(4).Infoln("GrRxPrase: got chRx...")
+				rxBuff = append(rxBuff, rx...) // 深藏我的心底
 
-			startIdx, endIdx := variable.FindValidPart(rxBuff) // 解开长情的信笺
-			buff := rxBuff[startIdx:endIdx]                    // 撷取甜蜜的片段
+				// 解开长情的信笺
+				// 残余的信亦不能忘却
+				vars, rxBuff := variable.Unpack(rxBuff)
 
-			// 所有的酸甜苦辣都值得铭记
-			glog.V(3).Infoln("read buff: ", rxBuff)
-			glog.V(3).Infof("valid part: [%d:%d]\n", startIdx, endIdx)
+				// 所有的酸甜苦辣都值得铭记
+				glog.V(4).Infoln("read buff: ", rxBuff)
+				glog.V(4).Infof("got vars: %v\n", vars)
 
-			// 拼凑出完整的清单
-			chart, add, del := variable.Filt(buff)
-			if len(chart) != 0 {
-				b, _ := json.Marshal(chart)
-				Chch <- string(b)
-			}
-
-			glog.V(3).Infoln("len(chart): ", len(chart))
-			if glog.V(2) && len(add) > 0 || len(del) > 0 {
-				glog.Infof("add: %v, del: %v\n", add, del)
-			}
-
-			// 挂念的变量，还望顺问近祺
-			for _, v := range add {
-				err := SendCmd(variable.Subscribe, v)
-				if err != nil {
-					glog.Errorln("SendCmd error:", err)
+				// 拼凑出变量的清单
+				chart, add, del := variable.Filt(vars)
+				if len(chart) != 0 {
+					b, _ := json.Marshal(chart)
+					Chch <- string(b)
 				}
-			}
 
-			// 无缘的变量，就请随风逝去
-			for _, v := range del {
-				err := SendCmd(variable.Unsubscribe, v)
-				if err != nil {
-					glog.Errorln("SendCmd error:", err)
+				glog.V(3).Infoln("len(chart): ", len(chart))
+				if glog.V(2) && len(add) > 0 || len(del) > 0 {
+					glog.Infof("add: %v, del: %v\n", add, del)
 				}
-			}
 
-			if endIdx >= len(rxBuff) {
-				rxBuff = nil
-			} else {
-				rxBuff = rxBuff[endIdx:]
-			}
-		case <-time.After(200 * time.Millisecond):
-			glog.V(4).Infoln("GrRxPrase: time after 200ms...")
-			if SerialCur.Port == nil || SerialCur.Name == "" {
-				break
-			}
-			_, add, _ := variable.Filt([]byte{})
-			glog.V(3).Infoln("add: ", add)
-			for _, v := range add {
-				err := SendCmd(variable.Subscribe, v)
-				if err != nil {
-					glog.Errorln("SendCmd error:", err)
+				// 挂念的变量，还望顺问近祺
+				for _, v := range add {
+					err := SendCmd(variable.Subscribe, v)
+					if err != nil {
+						glog.Errorln("SendCmd error:", err)
+					}
 				}
+
+				// 无缘的变量，就请随风逝去
+				for _, v := range del {
+					err := SendCmd(variable.Unsubscribe, v)
+					if err != nil {
+						glog.Errorln("SendCmd error:", err)
+					}
+				}
+
+			case <-time.After(200 * time.Millisecond): // 200ms不见
+				glog.V(4).Infoln("GrRxPrase: time after 200ms...")
+				// 万分想念
+				_, add, _ := variable.Filt([]variable.CmdT{})
+				glog.V(3).Infoln("add: ", add)
+				for _, v := range add {
+					err := SendCmd(variable.Subscribe, v)
+					if err != nil {
+						glog.Errorln("SendCmd error:", err)
+					}
+				}
+			case <-chEd: // 你的灰色头像不会再跳动
+				glog.V(4).Infoln("GrReceive: got chEd...")
+				break Loop // 哪怕是一句简单的问候
 			}
 		}
+		time.Sleep(5 * time.Millisecond)
 	}
 }

@@ -12,6 +12,32 @@ func AnyToBytes(i interface{}) []byte {
 	return buf.Bytes()
 }
 
+func SpecFromBytes(vType string, data []byte) float64 {
+	switch vType {
+	case "uint8_t":
+		return float64(BytesToUint8(data))
+	case "uint16_t":
+		return float64(BytesToUint16(data))
+	case "uint32_t":
+		return float64(BytesToUint32(data))
+	case "uint64_t":
+		return float64(BytesToUint64(data))
+	case "int8_t":
+		return float64(BytesToInt8(data))
+	case "int16_t":
+		return float64(BytesToInt16(data))
+	case "int32_t", "int":
+		return float64(BytesToInt32(data))
+	case "int64_t":
+		return float64(BytesToInt64(data))
+	case "float":
+		return float64(BytesToFloat32(data))
+	case "double":
+		return float64(BytesToFloat64(data))
+	default:
+		return 0
+	}
+}
 func SpecToBytes(vType string, i float64) []byte {
 	switch vType {
 	case "uint8_t":

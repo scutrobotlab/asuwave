@@ -47,7 +47,7 @@ func makeVariableCtrl(m variable.Mod) func(w http.ResponseWriter, r *http.Reques
 			io.WriteString(w, "")
 		// 为变量赋值
 		case http.MethodPut:
-			if m == variable.Read {
+			if m == variable.RD {
 				w.WriteHeader(http.StatusMethodNotAllowed)
 				io.WriteString(w, errorJson(http.StatusText(http.StatusMethodNotAllowed)))
 				return

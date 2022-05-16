@@ -62,7 +62,7 @@ func TestVariableToReadCtrl(t *testing.T) {
 		},
 	}
 
-	variableToReadCtrl := makeVariableCtrl(variable.Read)
+	variableToReadCtrl := makeVariableCtrl(variable.RD)
 
 	ctrlerTest(variableToReadCtrl, cases, t)
 }
