@@ -33,7 +33,7 @@ var vartypeMap = map[uint32]string{
 
 var (
 	chAddr                         = make(chan bool, 10) // 修改通知
-	addresses    []uint32          = []uint32{}          // 观察的地址
+	addresses    map[uint32]bool   = map[uint32]bool{}   // 观察的地址
 	writeData    map[uint32][]byte = map[uint32][]byte{} // 直接写入数据
 	BoardSysTime time.Time         = time.Now()          // 虚拟电路板的系统时间
 )
@@ -107,32 +107,31 @@ func testValue(x float64, addr uint32) []byte {
 }
 
 func (tp *testPort) Read(p []byte) (n int, err error) {
-	// maxNumPack := len(p) / 20
-	// if len(addresses) > maxNumPack {
-	// 	addresses = addresses[:maxNumPack]
-	// }
 	for len(addresses) == 0 {
 		<-chAddr
 	}
-	pdu := make([]byte, len(addresses)*20)
+	data := make([]byte, 0, len(addresses)*40)
 
-	for i, addr := range addresses {
-		s := pdu[20*i : 20*(i+1)]
-		s[0] = 1                                // 单片机代号 board
-		s[1] = 2                                // 响应或错误代号 act (0x02 = 订阅的正常返回)
-		s[2] = 8                                // 数据长度 length
-		copy(s[3:7], variable.AnyToBytes(addr)) // 单片机地址
+	i := 0
+	for addr := range addresses {
+		var pdu [20]byte
+		pdu[0] = 1                                // 单片机代号 board
+		pdu[1] = 2                                // 响应或错误代号 act (0x02 = 订阅的正常返回)
+		pdu[2] = 8                                // 数据长度 length
+		copy(pdu[3:7], variable.AnyToBytes(addr)) // 单片机地址
 		t := time.Since(BoardSysTime)
 		x := t.Seconds()
 		u := t.Milliseconds()
 		y := testValue(x, addr)
-		copy(s[7:15], y)                               // 数据
-		copy(s[15:19], variable.AnyToBytes(uint32(u))) // 时间戳
-		s[19] = '\n'                                   // 尾部固定为0x0a
+		copy(pdu[7:15], y)                               // 数据
+		copy(pdu[15:19], variable.AnyToBytes(uint32(u))) // 时间戳
+		pdu[19] = '\n'                                   // 尾部固定为0x0a
+		i++
+		sdu := slip.Pack(pdu[:])
+		data = append(data, sdu...)
 	}
 
-	sdu := slip.Pack(pdu)
-	return copy(p, sdu), nil
+	return copy(p, data), nil
 }
 
 func (tp *testPort) Write(p []byte) (n int, err error) {
@@ -152,20 +151,14 @@ func (tp *testPort) Write(p []byte) (n int, err error) {
 	switch act {
 	case variable.Subscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
-			addresses = append(addresses, address)
+			addresses[address] = true
 			chAddr <- true
 			glog.Infof("Adding address: %08X\n", address)
 		})
 
 	case variable.Unsubscribe:
 		go time.AfterFunc(500*time.Millisecond, func() {
-			var newAddresses []uint32
-			for _, addr := range addresses {
-				if addr != address {
-					newAddresses = append(newAddresses, addr)
-				}
-			}
-			addresses = newAddresses
+			delete(addresses, address)
 			chAddr <- true
 			glog.Infof("Deleting address: %08X\n", address)
 		})

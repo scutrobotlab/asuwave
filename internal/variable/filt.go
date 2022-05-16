@@ -60,8 +60,13 @@ func Unpack(data []byte) ([]CmdT, []byte) {
 		// 加入变量列表
 		vars = append(vars, v)
 	}
-	f := ends[len(ends)-1]  // 最后的结束，也是新的开始
-	return vars, data[f+1:] // 变量的回音，仍有余音
+	f := ends[len(ends)-1]               // 最后的结束，
+	newbuff := make([]byte, len(data)-f) // 也是新的开始。
+	if len(newbuff) == 0 {
+		return vars, newbuff
+	}
+	copy(newbuff, data[f:]) // 留存残篇。
+	return vars, newbuff    // 变量的回音，仍有余音
 }
 
 // 从茫茫 vars 中，寻找我所挂念的 to[RD] ，记录在列表 chart 中。

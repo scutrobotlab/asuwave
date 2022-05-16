@@ -208,17 +208,25 @@ func GrRxPrase() {
 		select {
 		case rx := <-chRx: // 收到你的来信
 			glog.V(4).Infoln("GrRxPrase: got chRx...")
+
+			glog.V(4).Infoln("had buff: ", rxBuff)
+
 			rxBuff = append(rxBuff, rx...) // 深藏我的心底
 
-			glog.V(4).Infoln("read buff: ", rxBuff)
+			glog.V(4).Infoln("got buff: ", rxBuff)
 
 			// 解开长情的信笺
 			// 残余的信亦不能忘却
-			vars, rxBuff := variable.Unpack(rxBuff)
+			var vars []variable.CmdT
+			vars, rxBuff = variable.Unpack(rxBuff)
 
 			// 所有的酸甜苦辣都值得铭记
 			glog.V(4).Infoln("left buff: ", rxBuff)
 			glog.V(4).Infof("got vars: %v\n", vars)
+
+			if len(vars) > 10 {
+				glog.Fatalln("Too many vars")
+			}
 
 			// 拼凑出变量的清单
 			chart, add, del := variable.Filt(vars)
