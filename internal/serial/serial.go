@@ -241,20 +241,24 @@ func GrRxPrase() {
 			}
 
 			// 挂念的变量，还望顺问近祺
-			for _, v := range add {
-				err := SendCmd(variable.Subscribe, v)
-				if err != nil {
-					glog.Errorln("SendCmd error:", err)
+			go func() {
+				for _, v := range add {
+					err := SendCmd(variable.Subscribe, v)
+					if err != nil {
+						glog.Errorln("SendCmd error:", err)
+					}
 				}
-			}
+			}()
 
 			// 无缘的变量，就请随风逝去
-			for _, v := range del {
-				err := SendCmd(variable.Unsubscribe, v)
-				if err != nil {
-					glog.Errorln("SendCmd error:", err)
+			go func() {
+				for _, v := range del {
+					err := SendCmd(variable.Unsubscribe, v)
+					if err != nil {
+						glog.Errorln("SendCmd error:", err)
+					}
 				}
-			}
+			}()
 
 		case <-time.After(200 * time.Millisecond): // 200ms不见
 			if SerialCur.Port == nil || SerialCur.Name == "" {

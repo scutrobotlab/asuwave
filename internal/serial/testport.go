@@ -108,7 +108,9 @@ func testValue(x float64, addr uint32) []byte {
 
 func (tp *testPort) Read(p []byte) (n int, err error) {
 	for len(addresses) == 0 {
-		<-chAddr
+		if _, ok := <-chAddr; !ok {
+			return 0, nil
+		}
 	}
 	data := make([]byte, 0, len(addresses)*40)
 
@@ -190,4 +192,7 @@ func (tp *testPort) GetModemStatusBits() (*serial.ModemStatusBits, error) {
 	return nil, errors.New("not supported")
 }
 
-func (tp *testPort) Close() error { return nil }
+func (tp *testPort) Close() error {
+	close(chAddr)
+	return nil
+}
