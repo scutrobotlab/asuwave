@@ -1,9 +1,10 @@
 # 上位机 · 网页版 · 重制版
 
 [![Go](https://github.com/scutrobotlab/asuwave/actions/workflows/go.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/go.yml)
+[![Node.js](https://github.com/scutrobotlab/asuwave/actions/workflows/node.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/node.yml)
+[![Heroku](https://github.com/scutrobotlab/asuwave/actions/workflows/heroku.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/heroku.yml)
 [![Docker](https://github.com/scutrobotlab/asuwave/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/docker-publish.yml)
 [![Release](https://github.com/scutrobotlab/asuwave/actions/workflows/release.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/release.yml)
-[![Node.js](https://github.com/scutrobotlab/asuwave/actions/workflows/node.yml/badge.svg)](https://github.com/scutrobotlab/asuwave/actions/workflows/node.yml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/scutrobotlab/asuwave)](https://github.com/scutrobotlab/asuwave/releases)
 [![GitHub all releases](https://img.shields.io/github/downloads/scutrobotlab/asuwave/total)](https://github.com/scutrobotlab/asuwave/releases)
 [![GitHub release (latest by date)](https://img.shields.io/github/downloads/scutrobotlab/asuwave/latest/total)](https://github.com/scutrobotlab/asuwave/releases)  
