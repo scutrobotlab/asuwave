@@ -35,6 +35,10 @@ func main() {
 
 	option.Load()
 
+	if val, ok := os.LookupEnv("PORT"); ok {
+		helper.Port, _ = strconv.Atoi(val)
+	}
+
 	fsys := getFS()
 
 	if bFlag {
