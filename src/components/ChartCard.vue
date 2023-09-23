@@ -147,6 +147,7 @@ export default {
     toggleFollow() {
       this.follow = !this.follow;
       this.chart.options.realTime = this.follow;
+      this.chart.onResize();
     },
     exportData() {
       console.log(this.chart.options.series);
