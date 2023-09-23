@@ -75,7 +75,12 @@
         </v-row>
 
         <ErrorAlert v-model="error" />
-        <v-data-table :headers="headers" :items="proj_vars" :search="keyword">
+        <v-data-table
+          :headers="headers"
+          :items="proj_vars"
+          :search="keyword"
+          group-by="group"
+        >
           <template #[`item.isRead`]="{ item }">
             <v-btn
               icon :color="item.isRead?'green':'grey'"
@@ -148,6 +153,7 @@ export default {
         let addr = parseInt(p.Addr, 16)
         p.isRead = (this.$store.state.variables.read[addr] != null);
         p.isWrite = (this.$store.state.variables.write[addr] != null);
+        p.group = p.Name.split(".")[0];
         return p;
       })
     },

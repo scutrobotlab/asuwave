@@ -6,15 +6,16 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "format": "prettier --write src/**/*.{js,vue}"
+    "format": "prettier --write src/**/*.{js,vue}",
+    "lint:fix": "eslint --fix src/**/*.{js,vue}"
   },
   "dependencies": {
     "@fontsource/roboto": "^4.5.5",
     "@mdi/font": "^6.6.96",
     "core-js": "^3.22.2",
-    "timechart": "^1.0.0-beta.7",
+    "timechart": "^1.0.0-beta.10",
     "vue": "^2.6.11",
-    "vuetify": "^2.6.4",
+    "vuetify": "2.7.1",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
